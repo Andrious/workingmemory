@@ -31,13 +31,13 @@ class Auth {
   static GoogleSignIn _googleSignIn;
 
   static FirebaseUser _user;
-  get user => _user;
+  static get user => _user;
 
 
   static Future<String> signInAnonymously() async {
-
+    assert(_auth != null, "Auth.init() needs to be first called.");
     final currentUser = await _auth.currentUser();
-    if(_user?.uid == currentUser.uid) return _user.uid;
+    if(_user != null && _user?.uid == currentUser.uid) return _user.uid;
 
     var user = await _auth.signInAnonymously();
     assert(user != null);
