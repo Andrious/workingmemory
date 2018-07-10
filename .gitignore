@@ -6,23 +6,25 @@
 .packages
 .pub/
 build/
-ios/.generated/
-packages
+
 .flutter-plugins
 doc/api/
 .dart_tool/
 
+# Android Studio
+*.iml
+
 # Except for application packages
-pubspec.lock
+#pubspec.lock
 
 # Don't need the Android stuff
 android/
 
+# Ignore App signing files
+*.jks
+
 # Don't need the iOS stuff
 ios/
-
-# Avoid any text files
-*.txt
 
 # Avoid committing generated JavaScript files:
 *.dart.js
@@ -33,29 +35,18 @@ ios/
 *.js.deps
 *.js.map
 
-# BlueJ files
-*.ctxt
+### Eclipse ###
+*.pydevproject
+.project
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# Log file
-*.log
-
-# Android Studio captures folder
-captures/
-
-# IntelliJ
-*.iml
-
-# Google Services (e.g. APIs or Firebase)
-google-services.json
+.classpath
+.settings/
+.loadpath
