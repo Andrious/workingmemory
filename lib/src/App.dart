@@ -43,7 +43,7 @@ class App extends StatefulWidget {
   @override
   State createState(){
     /// Pass this 'view' to the State object.
-    return MVCState(view: _vw);
+    return MVCState.set(_vw);
   }
 
   Future<bool> init() async{
