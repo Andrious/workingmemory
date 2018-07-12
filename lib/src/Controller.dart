@@ -6,9 +6,8 @@ import 'package:mvc/MVC.dart';
 import 'package:prefs/prefs.dart';
 
 import 'FireBase.dart';
-import 'package:firebase_database/firebase_database.dart';
 
-import 'auth/auth.dart';
+import 'package:auth/auth.dart';
 
 import 'Model.dart';
 
@@ -22,9 +21,9 @@ class Controller extends MVController {
 
   Future<bool> init() async {
 
-    await Prefs.init();
+    Prefs.init();
 
-    _init = await _model.init();
+    _init = _model.init();
 
     signInAnonymously();
 
@@ -54,13 +53,14 @@ class Controller extends MVController {
     super.dispose();
   }
 
-  static signInAnonymously() async {
-    Auth.init();
-    return Auth.signInAnonymously();
+  static Future<String> signInAnonymously() async {
+    await Auth.signInAnonymously();
+    return Auth.displayName;
   }
 
   static signInWithGoogle() async{
-    return Auth.signInWithGoogle();
+    await Auth.logInWithGoogle();
+    return Auth.displayName;
   }
 
   static get user => Auth.user ?? '<unknown>';
