@@ -8,9 +8,9 @@ dependencies:
 
   # Database utilities from my library
   dbutils:
-#    path: ../../libs/dbutils
-    git:
-      url: git://github.com/AndriousSolutions/dbutils.git
+    path: ../../libs/dbutils
+#    git:
+#      url: git://github.com/AndriousSolutions/dbutils.git
 
   mvc:
     path: ../../libs/mvc
@@ -18,9 +18,9 @@ dependencies:
 #      url: git://github.com/AndriousSolutions/mvc.git
 
   prefs:
-#    path: ../../libs/prefs
-    git:
-      url: git://github.com/AndriousSolutions/prefs.git
+    path: ../../libs/prefs
+#    git:
+#      url: git://github.com/AndriousSolutions/prefs.git
 
   auth:
     path: ../../libs/auth
