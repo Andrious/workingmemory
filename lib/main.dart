@@ -26,11 +26,20 @@ import 'package:mvc/App.dart';
 
 import 'package:workingmemory/src/view/View.dart';
 
+/// Highlights UI while debugging.
+import 'package:flutter/rendering.dart';
 
 
 void main() {
 
-  runApp(App('Working Memory', View()));
+  /// Highlights UI while debugging.
+  debugPaintSizeEnabled = false;
+  debugPaintBaselinesEnabled = false;
+  debugPaintPointersEnabled = false;
+  debugPaintLayerBordersEnabled = false;
+  debugRepaintRainbowEnabled = false;
+
+  runApp(App(View()));
 }
 
 
