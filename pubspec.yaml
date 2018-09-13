@@ -1,6 +1,9 @@
 name: workingmemory
 description: A ToDo List for a not so working memory
 
+environment:
+  sdk: '>=2.0.0 <3.0.0'
+
 dependencies:
 
   flutter:
@@ -8,7 +11,7 @@ dependencies:
 
   # Database utilities from my library
   dbutils:
-    path: ../../libs/dbutils
+    path: ../../libs/db/dbutils
 #    git:
 #      url: git://github.com/AndriousSolutions/dbutils.git
 
@@ -29,8 +32,9 @@ dependencies:
 
   # Files utilities from my library
   file_utils:
-    git:
-      url: git://github.com/AndriousSolutions/files.git
+    path: ../../libs/files/file_utils
+#    git:
+#      url: git://github.com/AndriousSolutions/files.git
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -39,14 +43,14 @@ dependencies:
   # https://pub.dartlang.org/packages/shared_preferences#-changelog-tab-
   shared_preferences: "^0.4.1"
 
-  # https://pub.dartlang.org/packages/firebase_database#-changelog-tab-
-  firebase_database: ^0.4.6
-
-  # https://pub.dartlang.org/packages/firebase_core#-changelog-tab-
-#  firebase_core: ^0.2.3
+  # https://pub.dartlang.org/packages/firebase_core
+  firebase_core: "^0.2.5"
 
   # https://pub.dartlang.org/packages/firebase_auth#-changelog-tab-
-  firebase_auth: "^0.5.9"
+  firebase_auth: "^0.5.20"
+
+  # https://pub.dartlang.org/packages/firebase_database
+  firebase_database: "^1.0.4"
 
   # https://pub.dartlang.org/packages/google_sign_in#-changelog-tab-
   google_sign_in: "^3.0.3"
@@ -64,7 +68,15 @@ dependencies:
   connectivity: "^0.3.0"
 
   # https://pub.dartlang.org/packages/sqflite#-changelog-tab-
-  sqflite: "^0.8.9"
+  sqflite: "0.11.2+2" #"^0.8.9"
+
+  # https://pub.dartlang.org/packages/intl
+  intl: 0.15.7
+
+  # https://pub.dartlang.org/packages/url_launcher
+  # AppSettings.dart
+  url_launcher: 3.0.3
+
 
 dev_dependencies:
   flutter_test:
