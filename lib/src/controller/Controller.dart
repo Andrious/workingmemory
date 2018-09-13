@@ -22,8 +22,6 @@
 
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
 import 'package:mvc/App.dart';
 
 import 'package:workingmemory/src/model/Model.dart';
@@ -33,121 +31,114 @@ import 'package:auth/Auth.dart';
 
 class Controller extends AppController{
 
-  var model = Model();
 
 
   @override
-  Future<bool> init() async{
-    var login = await Auth.logInWithGoogle(
-         listen:(account){setState((){});}
-      );
+  Future<bool> init() async {
+    var init = await super.init();
 
-    model.init();
-    return login;
-  }
+    await signIn();
 
-  get user => Auth.uid;
+    await _model.init();
 
-  get email => Auth.email;
+    /// Access Firebase
+    await FireBase.init();
 
-  get name => Auth.displayName;
-
-  get provider => Auth.providerId;
-
-  get isAnonymous => Auth.isAnonymous;
-
-  get photo => Auth.photoUrl;
-
-  get token => Auth.accessToken;
-
-  get tokenId => Auth.idToken;
-
-
-
-  @override
-  void initState() {
-    super.initState();
+    return init;
   }
 
 
-  
+
   @override
   void dispose(){
-    model.dispose();
+
+    FireBase.dispose();
+
+    _model.dispose();
+
+    _model = null;
+
     super.dispose();
   }
 
 
 
-  Future<String> signInAnonymously() async {
+  static var _model = Model();
+
+
+  
+  static Future<List<Map>> list(){
+
+    return _model.list();
+  }
+
+
+
+  static Future<bool> save(Map data){
+
+    return _model.save(data);
+  }
+
+  
+
+  static Future<bool> saveRec(Map diffRec, Map oldRec){
+    Map newRec = Map();
+
+    if(oldRec == null) {
+
+      newRec.addAll(diffRec);
+    }else {
+
+      newRec.addAll(oldRec);
+
+      newRec.addEntries(diffRec.entries);
+    }
+    return save(newRec);
+  }
+
+
+  static Future<bool> delete(Map data){
+
+    return _model.delete(data);
+  }
+
+  static get defaultIcon => _model.tToDo.newrec[ToDo.TABLE_NAME]['Icon'];
+
+
+  static get uid => Auth.uid;
+
+  static get email => Auth.email;
+
+  static get name => Auth.displayName;
+
+  static get provider => Auth.providerId;
+
+  static get isAnonymous => Auth.isAnonymous;
+
+  static get photo => Auth.photoUrl;
+
+  static get token => Auth.accessToken;
+
+  static get tokenId => Auth.idToken;
+
+
+
+  static Future<String> signInAnonymously() async {
     await Auth.signInAnonymously();
-    return Auth.uid;
+    return Auth.displayName;
   }
 
 
 
-  Future<String> signInWithGoogle() async{
-    await Auth.signIn();
-    return Auth.uid;
-  }
-}
-
-
-
-
-
-
-
-class TodoItemWidget extends StatefulWidget {
-  TodoItemWidget({Key key, this.todo}) : super(key: key);
-
-  final ToDo todo;
-
-  @override
-  _TodoItemWidgetState createState() => new _TodoItemWidgetState();
-}
-
-class _TodoItemWidgetState extends State<TodoItemWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Text("-"),
-      title: Text(widget.todo.name),
-      onTap: _onTap,
-    );
+  static Future<String> signInWithGoogle() async{
+    await Auth.logInWithGoogle();
+    return Auth.displayName;
   }
 
-  void _onTap() {
-    Route route = MaterialPageRoute(
-      settings: RouteSettings(name: "/todos/todo"),
-      builder: (BuildContext context) => TodoPage(todo: widget.todo),
-    );
-    Navigator.of(context).push(route);
-  }
-}
 
-/// place: "/todos/todo"
-class TodoPage extends StatefulWidget {
-  TodoPage({Key key, this.todo}) : super(key: key);
 
-  final ToDo todo;
-
-  @override
-  _TodoPageState createState() => _TodoPageState();
-}
-
-class _TodoPageState extends State<TodoPage> {
-  @override
-  Widget build(BuildContext context) {
-    var _children = <Widget>[
-      Text("finished: " + widget.todo.finished.toString()),
-      Text("name: " + widget.todo.name),
-    ];
-    return Scaffold(
-      appBar: AppBar(title: new Text("My Todo")),
-      body: Column(
-        children: _children,
-      ),
-    );
+  static Future<bool> signIn() async{
+    await Auth.signInAnonymously();
+    return Auth.uid.isNotEmpty;
   }
 }
