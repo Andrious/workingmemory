@@ -30,58 +30,32 @@ import 'package:workingmemory/src/controller/Controller.dart';
 
 import 'package:workingmemory/src/view/TodosPage.dart';
 
+import 'package:workingmemory/src/view/LoginInfo.dart';
+
+import 'package:workingmemory/src/view/SettingsDrawer.dart';
+
 
 class View extends AppView{
 
-  View(): super(_con);
+  View(): super(con: _con,
+    title:'Working Memory',
+    routes: <String, WidgetBuilder>{
+      "/todos": (BuildContext context) => TodosPage().widget,
+      // add another page,
+    },
+  );
   static final Controller _con = Controller();
-
-  Future<String> _message = Future<String>.value('');
-
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("My Home Page")),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          RaisedButton(
-            child: Text("My Todos"),
-            onPressed: _onPressed,
-          ),
-          MaterialButton(
-              child: const Text('Test signInAnonymously'),
-              onPressed: () {
-                setState(() {
-                  _message = _con.signInAnonymously();
-                });
-              }),
-          MaterialButton(
-              child: const Text('Test signInWithGoogle'),
-              onPressed: () {
-                setState(() {
-                  _message = _con.signInWithGoogle();
-                });
-              }),
-          Text('User id: ${_con.user}'), //${setState((){_con.user;})}'),
-          Text('User Name: ${_con.name}'),
-          Text('Anonymous: ${_con.isAnonymous}'),
-          Text('Email:     ${_con.email}'),
-          Text('Provider:  ${_con.provider}'),
-          Text('Photo:     ${_con.photo}'),
-//          Text('Token Id:  ${_con.tokenId}'),
-//          Text('AcessToken:${_con.token}'),
-          FutureBuilder<String>(
-              future: _message,
-              builder: (_, AsyncSnapshot<String> snapshot) {
-                return Text(snapshot.data ?? '',
-                    style: const TextStyle(
-                        color: const Color.fromARGB(255, 0, 155, 0)));
-              }),
-        ],
-      ),
-    );
+//    return LoginInfo.scaffold(_con);
+    return TodosPage().widget;
+
+//    return Scaffold(
+//      appBar: AppBar(title: Text("My Home Page")),
+//      endDrawer: AppDrawer(),
+//      body: LoginInfo.body(_con),
+//    );
   }
 
   void _onPressed() {
