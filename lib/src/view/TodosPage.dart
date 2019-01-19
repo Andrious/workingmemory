@@ -20,137 +20,100 @@
 ///          Created  16 Jun 2018
 
 /// place: "/todos"
-import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show
+        AppBar,
+        AsyncSnapshot,
+        BuildContext,
+        Center,
+        CircularProgressIndicator,
+        Colors,
+        ConnectionState,
+        FloatingActionButton,
+        FutureBuilder,
+        Icon,
+        Icons,
+        Key,
+        MaterialPageRoute,
+        Navigator,
+        RaisedButton,
+        Route,
+        RouteSettings,
+        Scaffold,
+        State,
+        StatefulWidget,
+        Text,
+        Widget;
 
-import 'package:intl/intl.dart';
+import 'package:mvc_application/view.dart' show StateMVC;
 
-import 'package:mvc/App.dart';
+import 'package:workingmemory/src/controller/Todos.dart' show Controller;
 
-import 'package:workingmemory/src/controller/Controller.dart';
+import 'package:workingmemory/src/view/TodoPage.dart' show TodoPage;
 
-import 'package:workingmemory/src/view/TodoPage.dart';
+import 'package:workingmemory/src/view/SettingsDrawer.dart' show SettingsDrawer;
 
-import 'package:workingmemory/src/view/SettingsDrawer.dart';
+class TodosPage extends StatefulWidget {
+  TodosPage({Key key}) : super(key: key);
 
-class TodosPage extends StatedWidget {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  Future<List<Map>> _data;
-  List _content;
+  @override
+  State createState() => _TodosState();
+}
 
-  final _dateFormat = new DateFormat('EEEE, MMM dd  h:mm a');
-
-  final ThemeData _theme = App.theme;
-
-  final Set _deletedRecs = Set();
+class _TodosState extends StateMVC<TodosPage> {
+  _TodosState() : super(Controller());
 
   @override
   void initState() {
     super.initState();
+    addListener(Controller.edit);
+    addListener(Controller.list);
+    Controller.list.query();
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _data = Controller.list();
+  void dispose() {
+    removeListener(Controller.edit);
+    removeListener(Controller.list);
+//    Controller.list.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+      key: Controller.list.scaffoldKey,
       endDrawer: SettingsDrawer(),
       appBar: AppBar(
-        title: Text("My ToDos"),
-//          actions: <Widget>[
-//            RaisedButton(
-//              child: Text(
-//                "NEW",
-//                style: TextStyle(color: Colors.white),
-//              ),
-//              onPressed:(){editToDo();},
-//            )
-//          ],
+        title: const Text("My ToDos"),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){editToDo();},
+        onPressed: () => editToDo(),
         backgroundColor: Colors.redAccent,
         child: const Icon(
           Icons.add,
           semanticLabel: 'Add',
         ),
       ),
-      body: FutureBuilder(
-          future: _data,
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+          future: Controller.list.future,
           builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-            if (!snapshot.hasData || snapshot.data.length == 0)
-              return Center(
-                child: RaisedButton(
-                  child: const Text('New Item'),
-                  onPressed: () => editToDo(),
-                ),
-              );
-            _content = snapshot.data;
-            return ListView.builder(
-              scrollDirection: Axis.vertical,
-              padding: EdgeInsets.all(6.0),
-              itemCount: _content.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Dismissible(
-                  key: ObjectKey(_content[index]['rowid']),
-                  direction: DismissDirection.endToStart,
-                  onDismissed: (DismissDirection direction) {
-                    _deletedRecs.add(_content[index]['rowid']);
-                    final String action =
-                        (direction == DismissDirection.endToStart)
-                            ? 'deleted'
-                            : 'archived';
-                    _scaffoldKey.currentState?.showSnackBar(SnackBar(
-                        content: Text('You $action an item.'),
-                        action: SnackBarAction(
-                            label: 'UNDO',
-                            onPressed: () {
-                              if (_deletedRecs
-                                  .remove(_content[index]['rowid'])) {
-                                refresh();
-                              }
-                            })));
-                  },
-                  background: Container(
-                      color: Colors.red,
-                      child: const ListTile(
-                          trailing: const Icon(Icons.delete,
-                              color: Colors.white, size: 36.0))),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: _theme.canvasColor,
-                        border: Border(
-                            bottom: BorderSide(color: _theme.dividerColor))),
-                    child: ListTile(
-//                          leading: Icon(Icons.remove),
-                      leading: Icon(IconData(
-                          int.tryParse(_content[index]['Icon']),
-                          fontFamily: 'MaterialIcons')),
-                      title: Text(_content[index]['Item']),
-                      subtitle: Text(_dateFormat.format(
-                          DateTime.tryParse(_content[index]['DateTime']))),
-                      onTap: () {
-                        editToDo(_content[index]);
-                      },
-                    ),
+            if (!snapshot.hasData || snapshot.data.length == 0) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return Center(child: CircularProgressIndicator());
+              } else {
+                return Center(
+                  child: RaisedButton(
+                    child: const Text('New Item'),
+                    onPressed: () => editToDo(),
                   ),
                 );
-              },
-            );
+              }
+            }
+            return Controller.list.items(snapshot.data, editToDo);
           }),
     );
-  }
-
-  @override
-  void dispose() {
-    /// List items widget
-    _deleteToDo();
   }
 
   void editToDo([Map todo]) async {
@@ -160,31 +123,7 @@ class TodosPage extends StatedWidget {
       fullscreenDialog: true,
     );
 
-    await Navigator.of(this.state.context).push(route);
-
-    refresh();
-  }
-
-  void _deleteToDo() {
-    if (!mounted) return;
-
-    for (int id in _deletedRecs) {
-      _deletedRecs.remove(id);
-      for (var item in _content) {
-        if (item['rowid'] == id) {
-          _content.remove(item);
-          Controller.delete(item);
-          break;
-        }
-      }
-    }
+    await Navigator.of(context).push(route);
+//    Controller.list.refresh();
   }
 }
-
-//Container(
-//alignment: FractionalOffset.center,
-//margin: EdgeInsets.only(bottom: 6.0),
-//padding: EdgeInsets.all(6.0),
-//color: Colors.blueGrey,
-//child: Text('${content[index]['Item']}'),
-//);

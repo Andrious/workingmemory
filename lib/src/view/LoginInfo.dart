@@ -22,55 +22,67 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:mvc/App.dart';
+import 'package:mvc_application/app.dart';
 
-import 'package:workingmemory/src/controller/Controller.dart';
-
+import 'package:workingmemory/src/controller/WorkingMemoryApp.dart';
 
 class LoginInfo {
-
-  static Widget scaffold(Controller _con){
+  static Widget scaffold(AppView _vw) {
     return Scaffold(
-    appBar: AppBar(title: Text("My Home Page")),
-    endDrawer: AppDrawer(),
-    body: LoginInfo.body(_con));
+        appBar: AppBar(title: Text("My Home Page")),
+        endDrawer: AppDrawer(),
+        body: LoginInfo.body(_vw));
   }
 
-  static Widget body(Controller _con) {
-
-    Future<String> _message = Future<String>.value('');
+  static Widget body(AppView _vw) {
+    Future<String> _uid = Future.value(WorkingMemoryApp.uid);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         RaisedButton(
           child: Text("My Todos"),
-          onPressed:(){Navigator.of(_con.context).pushNamed("/todos");},
+          onPressed: () {
+            Navigator.of(_vw.context).pushNamed("/todos");
+          },
         ),
-        MaterialButton(
+        RaisedButton(
+            child: const Text('Test signIn'),
+            onPressed: () {
+              _vw.setState(() {
+                _uid = WorkingMemoryApp.signIn().then((log){
+                  return WorkingMemoryApp.uid;
+                });
+              });
+            }),
+        RaisedButton(
             child: const Text('Test signInAnonymously'),
             onPressed: () {
-              _con.setState(() {
-                _message = Controller.signInAnonymously();
+              _vw.setState(() {
+                _uid = WorkingMemoryApp.signInAnonymously().then((log){
+                  return WorkingMemoryApp.uid;
+                });
               });
             }),
-        MaterialButton(
+        RaisedButton(
             child: const Text('Test signInWithGoogle'),
             onPressed: () {
-              _con.setState(() {
-                _message = Controller.signInWithGoogle();
+              _vw.setState(() {
+                _uid = WorkingMemoryApp.signInWithGoogle().then((log){
+                  return WorkingMemoryApp.uid;
+                });
               });
             }),
-        Text('User id: ${Controller.uid}'),
-        Text('User Name: ${Controller.name}'),
-        Text('Anonymous: ${Controller.isAnonymous}'),
-        Text('Email:     ${Controller.email}'),
-        Text('Provider:  ${Controller.provider}'),
-        Text('Photo:     ${Controller.photo}'),
+    Text('User id: ${WorkingMemoryApp.uid}'),
+    Text('User Name: ${WorkingMemoryApp.name}'),
+    Text('Anonymous: ${WorkingMemoryApp.isAnonymous}'),
+    Text('Email:     ${WorkingMemoryApp.email}'),
+    Text('Provider:  ${WorkingMemoryApp.provider}'),
+    Text('Photo:     ${WorkingMemoryApp.photo}'),
 //          Text('Token Id:  ${Controller.tokenId}'),
 //          Text('AcessToken:${Controller.token}'),
         FutureBuilder<String>(
-            future: _message,
+            future: _uid,
             builder: (_, AsyncSnapshot<String> snapshot) {
               return Text(snapshot.data ?? '',
                   style: const TextStyle(

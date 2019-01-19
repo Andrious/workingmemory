@@ -21,17 +21,29 @@
 /// place: "/todos/todo"
 ///
 
-import 'dart:async';
+import 'dart:async' show Future;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show
+        AlertDialog,
+        AppBar,
+        BuildContext,
+        Colors,
+        FlatButton,
+        Form,
+        Key,
+        Navigator,
+        Scaffold,
+        State,
+        StatefulWidget,
+        Text,
+        TextStyle,
+        Widget,
+        showDialog;
 
-import 'package:mvc/App.dart';
+import 'package:mvc_application/view.dart' show StateMVC;
 
-import 'package:workingmemory/src/view/DateTimeItem.dart';
-
-import 'package:workingmemory/src/controller/Controller.dart';
-
-import 'package:workingmemory/src/view/IconItems.dart';
+import 'package:workingmemory/src/controller/Todos.dart' show Controller, theme;
 
 class TodoPage extends StatefulWidget {
   TodoPage({Key key, this.todo}) : super(key: key);
@@ -39,205 +51,78 @@ class TodoPage extends StatefulWidget {
   final Map todo;
 
   @override
-  _TodoPageState createState() => _TodoPageState();
+  State createState() => _TodoState();
 }
 
-class _TodoPageState extends State<TodoPage> {
-  Map todo;
-  DateTime fromDateTime;
-  bool saveNeeded;
-  bool hasName;
-  String eventName;
-  String icon;
-  bool hasChanged;
-  TextEditingController changer;
-
-  final scaffoldKey = new GlobalKey<ScaffoldState>();
-
-  final formKey = new GlobalKey<FormState>();
-
-  final ThemeData theme = App.theme;
-
-
-
+class _TodoState extends StateMVC<TodoPage> {
   @override
   void initState() {
     super.initState();
-
-    todo = widget?.todo;
-
-    hasName = todo?.isNotEmpty ?? false;
-
-    if(hasName) {
-
-      eventName = todo['Item'];
-
-      fromDateTime = DateTime.tryParse(todo['DateTime']);
-
-      icon = todo['Icon'];
-    }else{
-
-      icon = Controller.defaultIcon;
-    }
-
-    changer = TextEditingController(text: eventName);
-
-    fromDateTime = fromDateTime ?? DateTime.now();
+    addListener(Controller.edit);
+    Controller.edit.init(widget.todo);
   }
 
   @override
   Widget build(BuildContext context) {
-
-    hasChanged = false;
-
-//    changer.addListener((){hasChanged = true;});
-
     return new Scaffold(
-      key: scaffoldKey,
-      appBar: AppBar(
-          title: Text(hasName ? eventName : 'Event Name TBD'),
-          actions: <Widget> [
-            FlatButton(
-                child: Text('SAVE', style: theme.textTheme.body1.copyWith(color: Colors.white)),
-                onPressed: () {
-
-//                  if (!this.formKey.currentState.validate()) return null;
-
-                  formKey.currentState.save();
-
-                  final todo = {'Item': eventName, 'DateTime': fromDateTime, 'Icon': icon};
-
-                  Controller.saveRec(todo, this.todo);
-
-//                  Map rec = Map();
-//
-//                  if(this.todo == null) {
-//
-//                    rec.addAll(todo);
-//                  }else {
-//
-//                    rec.addAll(this.todo);
-//
-//                    rec.addEntries(todo.entries);
-//                  }
-//
-//                  Controller.save(rec);
-
-////                  Navigator.pop(context, {'action':DismissDialogAction.save,'todo':todo});
-                  Navigator.pop(context);
-                }
-            )
-          ]
-      ),
+      key: Controller.edit.scaffoldKey,
+      appBar: AppBar(title: Controller.edit.title, actions: [
+        FlatButton(
+            child: Text('SAVE',
+                style: theme.textTheme.body1.copyWith(color: Colors.white)),
+            onPressed: () {
+              Controller.edit.onPressed();
+              Navigator.pop(context);
+            })
+      ]),
       body: Form(
-          key: formKey,
-          onWillPop: _onWillPop,
-          child: ListView(
-              padding: const EdgeInsets.all(16.0),
-              children: <Widget>[
-                Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    alignment: Alignment.bottomLeft,
-                    child: TextFormField(
-                        controller: changer,
-                        decoration: const InputDecoration(
-                          filled: true,
-                          labelText: 'Event name',
-                        ),
-                        style: theme.textTheme.headline,
-                        onSaved: (value) {
-//                          setState(() {
-//                            hasName = value.isNotEmpty;
-//                            if (hasName) {
-                              eventName = value;
-//                            }
-//                          });
-                        }
-                    )
-                ),
-                Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Center(child: Icon(IconData(int.tryParse(icon), fontFamily: 'MaterialIcons'))),
-                      Text('From', style: theme.textTheme.caption),
-                      DateTimeItem(
-                          dateTime: fromDateTime,
-                          onChanged: (DateTime value) {
-                            setState(() {
-                              fromDateTime = value;
-                            });
-                            saveNeeded = true;
-                          }
-                      )
-                    ]
-                ),
-                Container(
-                  height: 300.0,
-                  child: IconItems(icon: icon, onTap:(icon){
-                      setState((){this.icon = icon;});
-                      })
-                ),
-              ]
-//                  .map((Widget child) {
-//                return Container(
-////                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-//                    height: 100.0,
-//                    child: child
-//                );
-//              }).toList()
-          )
+        key: Controller.edit.formKey,
+        onWillPop: _onWillPop,
+        child: Controller.edit.child,
       ),
     );
   }
 
   @override
-  void dispose(){
-    /// Edit item widget
+  void dispose() {
+    Controller.edit.dispose();
     super.dispose();
   }
 
   Future<bool> _onWillPop() async {
-    saveNeeded = hasChanged; // hasName || saveNeeded;
-    if (!saveNeeded)
-      return true;
+    if (!Controller.edit.hasChanged) return true;
 
-//    final ThemeData theme = App.theme;
-    final TextStyle dialogTextStyle = theme.textTheme.subhead.copyWith(color: theme.textTheme.caption.color);
+    final TextStyle dialogTextStyle =
+        theme.textTheme.subhead.copyWith(color: theme.textTheme.caption.color);
 
     return await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Text(
-              'Discard new event?',
-              style: dialogTextStyle
-          ),
-          actions: <Widget>[
-            FlatButton(
-                child: const Text('CANCEL'),
-                onPressed: () {
-                  Navigator.of(context).pop(false); // Pops the confirmation dialog but not the page.
-                }
-            ),
-            FlatButton(
-                child: const Text('DISCARD'),
-                onPressed: () {
-                  Navigator.of(context).pop(true); // Returning true to _onWillPop will pop again.
-                }
-            )
-          ],
-        );
-      },
-    ) ?? false;
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              content: Text('Discard new event?', style: dialogTextStyle),
+              actions: <Widget>[
+                FlatButton(
+                    child: const Text('CANCEL'),
+                    onPressed: () {
+                      Navigator.of(context).pop(
+                          false); // Pops the confirmation dialog but not the page.
+                    }),
+                FlatButton(
+                    child: const Text('DISCARD'),
+                    onPressed: () {
+                      Navigator.of(context).pop(
+                          true); // Returning true to _onWillPop will pop again.
+                    })
+              ],
+            );
+          },
+        ) ??
+        false;
   }
 }
-
 
 enum DismissDialogAction {
   cancel,
   discard,
   save,
 }
-
-
-

@@ -19,19 +19,16 @@
 ///
 ///          Created  29 Aug 2018
 ///
-
-import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
 import 'package:workingmemory/src/model/Icons.dart' as List;
 
-import 'package:mvc/App.dart';
-
 class IconItems extends StatelessWidget {
   IconItems({Key key, @required this.icon, @required this.onTap}) : super(key: key);
 
-  String icon;
+  final String icon;
   final ValueChanged<String> onTap;
 
   final icons = List.Icons.code.keys;
@@ -51,7 +48,9 @@ class IconItems extends StatelessWidget {
               crossAxisSpacing: 4.0,
               padding: const EdgeInsets.all(4.0),
               childAspectRatio: (orientation == Orientation.portrait) ? 1.0 : 1.2,
-              children: icons.map((dynamic icon) {
+              children: icons.where((dynamic icon){
+                return IconData(int.tryParse(icon), fontFamily: 'MaterialIcons').fontFamily != null;
+              }).map((dynamic icon) {
                 return GestureDetector(
                     onTap: () {onTap(icon);},
                     child: Padding(padding: const EdgeInsets.all(2.0),
