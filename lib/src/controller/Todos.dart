@@ -48,7 +48,6 @@ import 'package:flutter/material.dart'
         ScaffoldState,
         SnackBar,
         SnackBarAction,
-        Navigator,
         Text,
         TextEditingController,
         TextFormField,
@@ -83,18 +82,18 @@ class Controller extends ControllerMVC {
 
   static final m.Model model = m.Model();
 
+  static void rebuild() => _this.refresh();
+
   @override
   void initState() {
-    super.initState();
+    edit.addState(this.stateMVC);
+    list.addState(this.stateMVC);
     model.initState();
   }
 
   @override
   void dispose() {
     model.dispose();
-    add.dispose();
-    edit.dispose();
-    list.dispose();
     super.dispose();
   }
 
@@ -103,16 +102,12 @@ class Controller extends ControllerMVC {
     if (state == AppLifecycleState.resumed) {
       model.sync();
     }
-
     /// Passing these possible values:
     /// AppLifecycleState.paused (may enter the suspending state at any time)
     /// AppLifecycleState.resumed
     /// AppLifecycleState.inactive (may be paused at any time)
     /// AppLifecycleState.suspending (Android only)
   }
-
-  static ToDoAdd get add => _addToDo;
-  static ToDoAdd _addToDo = ToDoAdd();
 
   static ToDoEdit get edit => _editToDo;
   static ToDoEdit _editToDo = ToDoEdit();
@@ -147,7 +142,6 @@ class Controller extends ControllerMVC {
   static get defaultIcon => model.defaultIcon;
 }
 
-class ToDoAdd extends ToDoEdit {}
 
 class ToDoEdit extends ToDoList {
   bool hasName;
@@ -239,7 +233,7 @@ class ToDoEdit extends ToDoList {
 
   Future<bool> save(Map diffRec, Map oldRec) async {
     bool save = await Controller().saveRec(diffRec, oldRec);
-    query();
+    refresh();
     return save;
   }
 
@@ -249,6 +243,7 @@ class ToDoEdit extends ToDoList {
       });
 
   Future<bool> undelete(Map data) => model.undelete(data);
+
 }
 
 typedef MapCallback = void Function(Map data);
@@ -262,25 +257,28 @@ class ToDoList extends ToDoFields {
 
   final m.Model model = m.Model();
 
-  Future<List<Map<String, dynamic>>> get future => _future;
-  Future<List<Map<String, dynamic>>> _future;
+  List<Map<String, dynamic>> get items => _items;
+  List<Map<String, dynamic>> _items = [];
 
-  void query() => _future = list();
+  Future<List<Map<String, dynamic>>> refresh() async {
+    _items = await model.list();
+    Controller.rebuild();
+    return _items;
+  }
 
-  Future<List<Map<String, dynamic>>> list() => model.list();
+//  List<Map<String, dynamic>> list() async => await model.list();
 
-  Widget items(List content, MapCallback onTap) {
-    List _content = content;
+  Widget view(MapCallback onTap) {
     return ListView.builder(
       scrollDirection: Axis.vertical,
       padding: EdgeInsets.all(6.0),
-      itemCount: _content.length,
+      itemCount: _items.length,
       itemBuilder: (BuildContext context, int index) {
         return Dismissible(
-          key: ObjectKey(_content[index]['rowid']),
+          key: ObjectKey(_items[index]['rowid']),
           direction: DismissDirection.endToStart,
           onDismissed: (DismissDirection direction) {
-            Controller.edit.delete(_content[index]);
+            Controller.edit.delete(_items[index]);
             final String action = (direction == DismissDirection.endToStart)
                 ? 'deleted'
                 : 'archived';
@@ -290,7 +288,7 @@ class ToDoList extends ToDoFields {
                     label: 'UNDO',
                     onPressed: () {
                       Controller.edit
-                          .undelete(_content[index])
+                          .undelete(_items[index])
                           .then((undelete) {
                         if (undelete) refresh();
                       });
@@ -306,12 +304,12 @@ class ToDoList extends ToDoFields {
                 color: _theme.canvasColor,
                 border: Border(bottom: BorderSide(color: _theme.dividerColor))),
             child: ListTile(
-              leading: Icon(IconData(int.tryParse(_content[index]['Icon']),
+              leading: Icon(IconData(int.tryParse(_items[index]['Icon']),
                   fontFamily: 'MaterialIcons')),
-              title: Text(_content[index]['Item']),
+              title: Text(_items[index]['Item']),
               subtitle: Text(_dateFormat
-                  .format(DateTime.tryParse(_content[index]['DateTime']))),
-              onTap: () => onTap(_content[index]),
+                  .format(DateTime.tryParse(_items[index]['DateTime']))),
+              onTap: () => onTap(_items[index]),
             ),
           ),
         );
@@ -320,7 +318,7 @@ class ToDoList extends ToDoFields {
   }
 }
 
-class ToDoFields extends StateObserver {
+class ToDoFields extends ControllerMVC {
   Map todo;
   String item;
   String icon;

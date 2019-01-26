@@ -1,7 +1,7 @@
 name: workingmemory
 description: A ToDo List for a not so working memory
 
-version: 0.1.0
+version: 0.2.0
 
 environment:
   sdk: '>=2.0.0 <3.0.0'
@@ -11,18 +11,17 @@ dependencies:
   flutter:
     sdk: flutter
 
-#  mvc_pattern:
-
   mvc_application:
-    path: ../../../packages/mvc_application
+    git:
+      url: git://github.com/AndriousSolutions/mvc_application.git
 
   firebase:
     path: ../../../libs/firebase
 
   auth:
-    path: ../../../libs/auth
-#    git:
-#      url: git://github.com/AndriousSolutions/auth.git
+#    path: ../../../libs/auth
+    git:
+      url: git://github.com/AndriousSolutions/auth.git
 
 
   # The following adds the Cupertino Icons font to your application.

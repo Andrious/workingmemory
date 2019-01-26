@@ -24,22 +24,19 @@
 import 'package:flutter/material.dart'
     show
         AppBar,
-        AsyncSnapshot,
         BuildContext,
         Center,
-        CircularProgressIndicator,
         Colors,
-        ConnectionState,
+        RaisedButton,
         FloatingActionButton,
-        FutureBuilder,
         Icon,
         Icons,
         Key,
         MaterialPageRoute,
         Navigator,
-        RaisedButton,
         Route,
         RouteSettings,
+        SafeArea,
         Scaffold,
         State,
         StatefulWidget,
@@ -67,16 +64,11 @@ class _TodosState extends StateMVC<TodosPage> {
   @override
   void initState() {
     super.initState();
-    addListener(Controller.edit);
-    addListener(Controller.list);
-    Controller.list.query();
+    Controller.list.refresh();
   }
 
   @override
   void dispose() {
-    removeListener(Controller.edit);
-    removeListener(Controller.list);
-//    Controller.list.dispose();
     super.dispose();
   }
 
@@ -96,23 +88,16 @@ class _TodosState extends StateMVC<TodosPage> {
           semanticLabel: 'Add',
         ),
       ),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-          future: Controller.list.future,
-          builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-            if (!snapshot.hasData || snapshot.data.length == 0) {
-              if (snapshot.connectionState != ConnectionState.done) {
-                return Center(child: CircularProgressIndicator());
-              } else {
-                return Center(
-                  child: RaisedButton(
-                    child: const Text('New Item'),
-                    onPressed: () => editToDo(),
-                  ),
-                );
-              }
-            }
-            return Controller.list.items(snapshot.data, editToDo);
-          }),
+      body: SafeArea(
+        child: Controller.list.items.length == 0
+            ? Center(
+                child: RaisedButton(
+                  child: const Text('New Item'),
+                  onPressed: () => editToDo(),
+                ),
+              )
+            : Controller.list.view(editToDo),
+      ),
     );
   }
 
@@ -124,6 +109,6 @@ class _TodosState extends StateMVC<TodosPage> {
     );
 
     await Navigator.of(context).push(route);
-//    Controller.list.refresh();
+    Controller.list.refresh();
   }
 }

@@ -58,7 +58,7 @@ class _TodoState extends StateMVC<TodoPage> {
   @override
   void initState() {
     super.initState();
-    addListener(Controller.edit);
+    Controller.edit.addState(this);
     Controller.edit.init(widget.todo);
   }
 
@@ -81,12 +81,6 @@ class _TodoState extends StateMVC<TodoPage> {
         child: Controller.edit.child,
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    Controller.edit.dispose();
-    super.dispose();
   }
 
   Future<bool> _onWillPop() async {
