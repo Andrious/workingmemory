@@ -20,9 +20,7 @@
 ///          Created  23 Jun 2018
 ///
 
-import 'package:flutter/material.dart' show BuildContext, Widget;
-
-import 'package:mvc_application/mvc.dart' show AppView;
+import 'package:mxc_application/mvc.dart' show ViewMVC;
 
 import 'package:workingmemory/src/controller/WorkingMemoryApp.dart' as con;
 
@@ -31,27 +29,25 @@ import 'package:workingmemory/src/view/TodosPage.dart' show TodosPage;
 //import 'package:workingmemory/src/view/LoginInfo.dart' show LoginInfo;
 
 /// Need to extend AppView to so to call controller's init() function.
-class WorkingMemoryApp extends AppView {
+class WorkingMemoryApp extends ViewMVC {
   factory WorkingMemoryApp() {
     if (_this == null) _this = WorkingMemoryApp._();
     return _this;
   }
   static WorkingMemoryApp _this;
 
-  /// Allow for easy access to 'the Controller' throughout the application.
+  /// Allow for easy access to 'the View' throughout the application.
   static WorkingMemoryApp get view => _this;
 
   WorkingMemoryApp._()
       : idKey = _app.keyId,
         super(
-          controller: _app,
+          con: _app,
           title: 'Working Memory',
+          home: TodosPage(),
         );
 
   /// Instantiate here so to get the 'keyId.'
   static final con.WorkingMemoryApp _app = con.WorkingMemoryApp();
   final String idKey;
-
-  @override
-  Widget build(BuildContext context) => TodosPage(); //LoginInfo.scaffold(this);
 }

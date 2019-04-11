@@ -20,29 +20,17 @@
 ///          Created  23 Jun 2018
 ///
 
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 
-import 'package:mvc_application/app.dart' show App;
+import 'package:workingmemory/src/model/model.dart' show AppModel, Model, SyncDB;
 
-//import 'package:mvc_application/auth.dart';
-//
-//import 'package:mvc_application/firebase.dart';
+import 'package:workingmemory/src/controller/controller.dart' show App, Controller;
 
 import 'package:firebase_database/firebase_database.dart' show DataSnapshot, DatabaseReference;
 
-import 'package:auth/auth.dart' show Auth;
+import 'package:auth070/auth.dart' show Auth;
 
 import 'package:firebase/firebase.dart' show FireBase;
-
-import 'package:workingmemory/src/controller/Todos.dart';
-
-import 'package:workingmemory/src/model/Model.dart';
-
-import 'package:workingmemory/src/model/db/AppModel.dart';
-
-import 'package:workingmemory/src/framework/db/SyncDB.dart';
 
 Controller _con = Controller.con;
 

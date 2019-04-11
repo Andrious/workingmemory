@@ -1,69 +1,60 @@
 name: workingmemory
 description: A ToDo List for a not so working memory
 
-version: 0.2.0
+version: 0.3.0
 
 environment:
-  sdk: '>=2.0.0 <3.0.0'
+  sdk: '>=2.2.0 <3.0.0'
 
 dependencies:
-
   flutter:
     sdk: flutter
 
-  mvc_application:
-    git:
-      url: git://github.com/AndriousSolutions/mvc_application.git
+  mxc_application:
+#    path: ../../../packages/mxc_application
+#    git:
+#      url: git://github.com/AndriousSolutions/mvc_application.git
 
   firebase:
-    path: ../../../libs/firebase
-
-  auth:
-#    path: ../../../libs/auth
+#    path: ../../../libs/firebase
     git:
-      url: git://github.com/AndriousSolutions/auth.git
+      url: git://github.com/AndriousSolutions/firebase.git
+
+  auth070:
+#  auth:
+#    path: ../../../libs/auth
+#    git:
+#      url: git://github.com/AndriousSolutions/auth.git
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.0
 
-  # https://pub.dartlang.org/packages/shared_preferences#-changelog-tab-
-  shared_preferences: "^0.4.1"
-
-  # https://pub.dartlang.org/packages/google_sign_in#-changelog-tab-
-  google_sign_in: "^3.0.3"
-
-  # https://pub.dartlang.org/packages/firebase_auth#-changelog-tab-
-  firebase_auth: "^0.5.20"
-
   # https://pub.dartlang.org/packages/firebase_database
-  firebase_database: "^1.0.4"
+  firebase_database: ^1.0.4
 
-  # https://pub.dartlang.org/packages/firebase_core
-  firebase_core: "^0.2.5"
+#  # https://pub.dartlang.org/packages/firebase_core
+#  firebase_core: ^0.3.0
 
   # https://pub.dartlang.org/packages/path_provider#-changelog-tab-
-  path_provider: "^0.4.0"
+  path_provider: ^0.4.0
 
-  # https://pub.dartlang.org/packages/uuid#-changelog-tab-
-  uuid: "^1.0.0"
-
-  # https://pub.dartlang.org/packages/package_info#-changelog-tab-
-  package_info: "^0.3.0"
-
-  # https://pub.dartlang.org/packages/connectivity#-changelog-tab-
-  connectivity: "^0.3.0"
-
-  # https://pub.dartlang.org/packages/sqflite#-changelog-tab-
-  sqflite: "0.11.2+2" #"^0.8.9"
+#  # https://pub.dartlang.org/packages/package_info#-changelog-tab-
+#  package_info: "^0.3.0"
+#
+#  # https://pub.dartlang.org/packages/connectivity#-changelog-tab-
+#  connectivity: "^0.3.0"
+#
+#  # https://pub.dartlang.org/packages/sqflite#-changelog-tab-
+#  sqflite: "0.11.2+2" #"^0.8.9"
 
   # https://pub.dartlang.org/packages/intl
   intl: 0.15.7
 
-  # https://pub.dartlang.org/packages/url_launcher
-  # AppSettings.dart
-  url_launcher: 3.0.3
+#  # https://pub.dartlang.org/packages/url_launcher
+#  # AppSettings.dart
+#  url_launcher: 3.0.3
 
 
 dev_dependencies:

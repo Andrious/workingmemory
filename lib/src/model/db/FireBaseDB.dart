@@ -21,16 +21,14 @@
 ///
 import 'dart:collection';
 
-import 'package:mvc_application/model.dart' show DBInterface;
+import 'package:workingmemory/src/model/model.dart' show DBInterface, Semaphore;
 
 import 'package:firebase_database/firebase_database.dart'
     show DataSnapshot, DatabaseReference;
 
-import 'package:auth/auth.dart' show Auth;
+import 'package:auth070/auth.dart' show Auth;
 
 import 'package:firebase/firebase.dart' show FireBase;
-
-import 'package:workingmemory/src/model/db/Semaphore.dart';
 
 class FireBaseDB {
   static LinkedHashMap mDataArrayList;

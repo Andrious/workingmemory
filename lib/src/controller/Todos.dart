@@ -56,15 +56,12 @@ import 'package:flutter/material.dart'
 
 import 'package:intl/intl.dart' show DateFormat;
 
-import 'package:workingmemory/src/view/DateTimeItem.dart';
+import 'package:workingmemory/src/model/model.dart' as m;
 
-import 'package:workingmemory/src/view/IconItems.dart';
+import 'package:workingmemory/src/view/view.dart';
 
-import 'package:mvc_application/app.dart';
+import 'package:workingmemory/src/controller/controller.dart';
 
-import 'package:mvc_application/controller.dart';
-
-import 'package:workingmemory/src/model/Model.dart' as m;
 
 final ThemeData theme = App.theme;
 
@@ -86,8 +83,8 @@ class Controller extends ControllerMVC {
 
   @override
   void initState() {
-    edit.addState(this.stateMVC);
-    list.addState(this.stateMVC);
+    _editKey = edit.addState(this.stateMVC);
+    _listKey = list.addState(this.stateMVC);
     model.initState();
   }
 
@@ -111,9 +108,13 @@ class Controller extends ControllerMVC {
 
   static ToDoEdit get edit => _editToDo;
   static ToDoEdit _editToDo = ToDoEdit();
+  static String get editKey => _editKey;
+  static String _editKey;
 
   static ToDoList get list => _listToDo;
   static ToDoList _listToDo = ToDoList();
+  static String get listKey => _listKey;
+  static String _listKey;
 
   Future<bool> save(Map data) => model.save(data);
 
@@ -223,17 +224,18 @@ class ToDoEdit extends ToDoList {
       ];
 
   Future<void> onPressed() async {
-    bool valid = Controller.edit.formKey.currentState.validate();
-    if (valid) {
+    bool save = Controller.edit.formKey.currentState.validate();
+    if (save) {
       Controller.edit.formKey.currentState.save();
-      await Controller.edit
+      save = await Controller.edit
           .save({'Item': item, 'DateTime': dateTime, 'Icon': icon}, this.todo);
     }
+    return Future.value(save);
   }
 
   Future<bool> save(Map diffRec, Map oldRec) async {
     bool save = await Controller().saveRec(diffRec, oldRec);
-    refresh();
+//    refresh();
     return save;
   }
 
@@ -260,13 +262,14 @@ class ToDoList extends ToDoFields {
   List<Map<String, dynamic>> get items => _items;
   List<Map<String, dynamic>> _items = [];
 
-  Future<List<Map<String, dynamic>>> refresh() async {
-    _items = await model.list();
+  /// Call the setState() function to 'refresh' the widget tree.
+  Future<void> refresh() async {
+    await retrieve();
     Controller.rebuild();
-    return _items;
   }
 
-//  List<Map<String, dynamic>> list() async => await model.list();
+  /// Retrieve the to-do items from the database
+  Future<void> retrieve() async => _items = await model.list();
 
   Widget view(MapCallback onTap) {
     return ListView.builder(

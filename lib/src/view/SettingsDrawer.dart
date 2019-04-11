@@ -22,7 +22,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:workingmemory/src/controller/settings.dart';
+import 'package:workingmemory/src/controller/controller.dart' show Settings;
 
 class SettingsDrawer extends StatefulWidget {
   @override

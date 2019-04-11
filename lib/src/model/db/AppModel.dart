@@ -19,11 +19,11 @@
 ///
 ///          Created  15 Nov 2018
 
-import 'package:auth/Auth.dart';
+import 'package:auth070/auth.dart';
 
 import 'package:workingmemory/src/controller/WorkingMemoryApp.dart';
 
-import 'package:workingmemory/src/model/db/CloudDB.dart';
+import 'package:workingmemory/src/model/model.dart' show OnLoginListener;
 
 class AppModel implements OnLoginListener{
 

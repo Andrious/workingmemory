@@ -1,5 +1,5 @@
 ///
-/// Copyright (C) 2018 Andrious Solutions
+/// Copyright (C) 2019 Andrious Solutions
 ///
 /// This program is free software; you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License
@@ -17,16 +17,20 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 ///
-///          Created  23 Jun 2018
+///          Created  10 Apr 2019
 ///
-///                   https://github.com/Andrious/workingmemory
+///           import 'package:workingmemory/controller.dart';
 
-import 'package:flutter/material.dart' show runApp;
+export 'package:mxc_application/app.dart' show App, AppController;
 
-import 'package:workingmemory/src/controller/controller.dart' show App;
+export 'package:mxc_application/app.dart' show AppDrawer;
 
-import 'package:workingmemory/src/view/view.dart' show WorkingMemoryApp;
+export 'package:mxc_application/settings.dart' show AppSettings, Prefs;
 
-void main() => runApp(App(WorkingMemoryApp()));
+export 'package:mxc_application/controller.dart';
 
+export 'package:workingmemory/src/controller/WorkingMemoryApp.dart';
 
+export 'package:workingmemory/src/controller/Todos.dart';
+
+export 'package:workingmemory/src/controller/Settings.dart';

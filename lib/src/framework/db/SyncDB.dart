@@ -19,7 +19,7 @@
 ///
 ///          Created  15 Nov 2018
 
-import 'package:mvc_application/model.dart' show DBInterface, Database;
+import 'package:workingmemory/src/model/model.dart' show DBInterface, Database;
 
 class SyncDB extends DBInterface {
   final String _table = 'sync';

@@ -18,13 +18,13 @@
 /// limitations under the License.
 ///
 ///          Created  22 Aug 2018
-import 'dart:async';
+import 'dart:async' show Future;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show AppBar, AsyncSnapshot, Color, Column, CrossAxisAlignment, FutureBuilder, Navigator, RaisedButton, Scaffold, Text, TextStyle, Widget;
 
-import 'package:mvc_application/app.dart';
+import 'package:workingmemory/src/controller/controller.dart' show AppDrawer, WorkingMemoryApp;
 
-import 'package:workingmemory/src/controller/WorkingMemoryApp.dart';
+import 'package:mxc_application/view.dart' show AppView;
 
 class LoginInfo {
   static Widget scaffold(AppView _vw) {

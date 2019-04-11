@@ -20,17 +20,18 @@
 ///          Created  23 Jun 2018
 ///
 
-import 'dart:async';
+import 'dart:async' show Future;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show AppLifecycleState;
 
-import 'package:mvc_application/app.dart' show AppController;
+import 'package:workingmemory/src/model/model.dart' show CloudDB;
 
-import 'package:auth/auth.dart' show Auth;
+import 'package:workingmemory/src/controller/controller.dart' show AppController, Controller;
+
+import 'package:auth070/auth.dart' show Auth;
 
 import 'package:firebase/firebase.dart' show FireBase;
 
-import 'package:workingmemory/src/model/db/CloudDB.dart';
 
 class WorkingMemoryApp extends AppController {
   factory WorkingMemoryApp() {
@@ -44,11 +45,14 @@ class WorkingMemoryApp extends AppController {
   /// Allow for easy access to 'the Controller' throughout the application.
   static WorkingMemoryApp get con => _this;
 
+  /// Provide the sign in and the loading database info.
   @override
   Future<bool> init() async {
     super.init();
     CloudDB.init();
-    return await signIn();
+    await signIn();
+    await Controller.list.retrieve();
+    return Future.value(true);
   }
 
   @override

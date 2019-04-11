@@ -23,27 +23,11 @@
 
 import 'dart:async' show Future;
 
-import 'package:flutter/material.dart'
-    show
-        AlertDialog,
-        AppBar,
-        BuildContext,
-        Colors,
-        FlatButton,
-        Form,
-        Key,
-        Navigator,
-        Scaffold,
-        State,
-        StatefulWidget,
-        Text,
-        TextStyle,
-        Widget,
-        showDialog;
+import 'package:flutter/material.dart';
 
-import 'package:mvc_application/view.dart' show StateMVC;
+import 'package:workingmemory/src/view/view.dart' show StateMVC;
 
-import 'package:workingmemory/src/controller/Todos.dart' show Controller, theme;
+import 'package:workingmemory/src/controller/controller.dart' show Controller, theme;
 
 class TodoPage extends StatefulWidget {
   TodoPage({Key key, this.todo}) : super(key: key);
@@ -55,6 +39,8 @@ class TodoPage extends StatefulWidget {
 }
 
 class _TodoState extends StateMVC<TodoPage> {
+  _TodoState() : super(Controller());
+
   @override
   void initState() {
     super.initState();
@@ -70,8 +56,8 @@ class _TodoState extends StateMVC<TodoPage> {
         FlatButton(
             child: Text('SAVE',
                 style: theme.textTheme.body1.copyWith(color: Colors.white)),
-            onPressed: () {
-              Controller.edit.onPressed();
+            onPressed: () async {
+              await Controller.edit.onPressed();
               Navigator.pop(context);
             })
       ]),

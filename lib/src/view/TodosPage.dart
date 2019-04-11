@@ -43,13 +43,11 @@ import 'package:flutter/material.dart'
         Text,
         Widget;
 
-import 'package:mvc_application/view.dart' show StateMVC;
+import 'package:workingmemory/src/view/view.dart' show AppMenu, SettingsDrawer, StateMVC;
 
-import 'package:workingmemory/src/controller/Todos.dart' show Controller;
+import 'package:workingmemory/src/controller/controller.dart' show Controller;
 
 import 'package:workingmemory/src/view/TodoPage.dart' show TodoPage;
-
-import 'package:workingmemory/src/view/SettingsDrawer.dart' show SettingsDrawer;
 
 class TodosPage extends StatefulWidget {
   TodosPage({Key key}) : super(key: key);
@@ -62,23 +60,15 @@ class _TodosState extends StateMVC<TodosPage> {
   _TodosState() : super(Controller());
 
   @override
-  void initState() {
-    super.initState();
-    Controller.list.refresh();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: Controller.list.scaffoldKey,
       endDrawer: SettingsDrawer(),
       appBar: AppBar(
         title: const Text("My ToDos"),
+        actions: <Widget>[
+          AppMenu.show(this),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => editToDo(),

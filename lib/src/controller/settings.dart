@@ -24,7 +24,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:mvc_application/settings.dart' show AppSettings, Prefs;
+import 'package:workingmemory/src/controller/controller.dart' show AppSettings, Prefs;
 
 //TODO: Write an article on this. 'Store concept.'
 class Settings{
