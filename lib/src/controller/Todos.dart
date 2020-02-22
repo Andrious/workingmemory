@@ -56,20 +56,17 @@ import 'package:flutter/material.dart'
 
 import 'package:intl/intl.dart' show DateFormat;
 
-import 'package:workingmemory/src/model/model.dart' as m;
+import 'package:workingmemory/src/model.dart' as m;
 
-import 'package:workingmemory/src/view/view.dart';
+import 'package:workingmemory/src/view.dart';
 
-import 'package:workingmemory/src/controller/controller.dart';
+import 'package:workingmemory/src/controller.dart';
 
 
 final ThemeData theme = App.theme;
 
 class Controller extends ControllerMVC {
-  factory Controller() {
-    if (_this == null) _this = Controller._();
-    return _this;
-  }
+  factory Controller() => _this ??= Controller._();
   static Controller _this;
 
   Controller._() : super();
@@ -79,7 +76,7 @@ class Controller extends ControllerMVC {
 
   static final m.Model model = m.Model();
 
-  static void rebuild() => _this.refresh();
+  void rebuild() => _this.refresh();
 
   @override
   void initState() {
@@ -116,10 +113,10 @@ class Controller extends ControllerMVC {
   static String get listKey => _listKey;
   static String _listKey;
 
-  Future<bool> save(Map data) => model.save(data);
+  Future<bool> save(Map<String, dynamic> data) => model.save(data);
 
-  Future<bool> saveRec(Map diffRec, Map oldRec) {
-    Map newRec = Map();
+  Future<bool> saveRec(Map<String, dynamic> diffRec, Map<String, dynamic> oldRec) {
+    Map newRec = Map<String, dynamic>();
 
     if (oldRec == null) {
       newRec.addAll(diffRec);
@@ -131,16 +128,9 @@ class Controller extends ControllerMVC {
     return save(newRec);
   }
 
-// No need now. In ToDoEdit class.
-//  Future<bool> delete(Map data) {
-//    return model.delete(data);
-//  }
-
-//  Future<bool> undelete(Map data) {
-//    return model.undelete(data);
-//  }
-
   static get defaultIcon => model.defaultIcon;
+
+  void reSync() => model.reSync();
 }
 
 
@@ -189,9 +179,9 @@ class ToDoEdit extends ToDoList {
                 filled: true,
                 labelText: 'Event name',
               ),
-              style: theme.textTheme.headline,
               validator: (v) {
-                if (v.isEmpty) return 'Cannot be empty.';
+                if (v.trim().isEmpty) return 'Cannot be empty.';
+                return null;
               },
               onSaved: (value) {
                 item = value;
@@ -229,22 +219,22 @@ class ToDoEdit extends ToDoList {
       Controller.edit.formKey.currentState.save();
       save = await Controller.edit
           .save({'Item': item, 'DateTime': dateTime, 'Icon': icon}, this.todo);
+      await Controller.list.retrieve();
     }
     return Future.value(save);
   }
 
-  Future<bool> save(Map diffRec, Map oldRec) async {
+  Future<bool> save(Map<String, dynamic> diffRec, Map<String, dynamic> oldRec) async {
     bool save = await Controller().saveRec(diffRec, oldRec);
-//    refresh();
     return save;
   }
 
-  Future<bool> delete(Map data) => model.delete(data).then((delete) {
+  Future<bool> delete(Map<String, dynamic> data) => model.delete(data).then((delete) {
         refresh();
         return delete;
       });
 
-  Future<bool> undelete(Map data) => model.undelete(data);
+  Future<bool> undelete(Map<String, dynamic> data) => model.undelete(data);
 
 }
 
@@ -262,11 +252,11 @@ class ToDoList extends ToDoFields {
   List<Map<String, dynamic>> get items => _items;
   List<Map<String, dynamic>> _items = [];
 
-  /// Call the setState() function to 'refresh' the widget tree.
-  Future<void> refresh() async {
-    await retrieve();
-    Controller.rebuild();
-  }
+//  /// Call the setState() function to 'refresh' the widget tree.
+//  Future<void> refresh() async {
+//    await retrieve();
+////    Controller.rebuild();
+//  }
 
   /// Retrieve the to-do items from the database
   Future<void> retrieve() async => _items = await model.list();

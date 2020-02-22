@@ -25,9 +25,9 @@ import 'dart:async' show Future;
 
 import 'package:flutter/material.dart';
 
-import 'package:workingmemory/src/view/view.dart' show StateMVC;
+import 'package:workingmemory/src/view.dart' show StateMVC;
 
-import 'package:workingmemory/src/controller/controller.dart' show Controller, theme;
+import 'package:workingmemory/src/controller.dart' show Controller, theme;
 
 class TodoPage extends StatefulWidget {
   TodoPage({Key key, this.todo}) : super(key: key);
@@ -55,7 +55,8 @@ class _TodoState extends StateMVC<TodoPage> {
       appBar: AppBar(title: Controller.edit.title, actions: [
         FlatButton(
             child: Text('SAVE',
-                style: theme.textTheme.body1.copyWith(color: Colors.white)),
+                style: theme.textTheme.body1.copyWith(color: Colors.white),
+            ),
             onPressed: () async {
               await Controller.edit.onPressed();
               Navigator.pop(context);

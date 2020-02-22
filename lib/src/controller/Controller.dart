@@ -24,23 +24,20 @@ import 'dart:async' show Future;
 
 import 'package:flutter/material.dart' show AppLifecycleState;
 
-import 'package:workingmemory/src/model/model.dart' show CloudDB;
+import 'package:workingmemory/src/model.dart' show CloudDB, FireBaseDB;
 
-import 'package:workingmemory/src/controller/controller.dart' show AppController, Controller;
+import 'package:workingmemory/src/controller.dart' show AppController, Controller;
 
-import 'package:auth070/auth.dart' show Auth;
-
-import 'package:firebase/firebase.dart' show FireBase;
-
+import 'package:auth/auth.dart' show Auth;
 
 class WorkingMemoryApp extends AppController {
-  factory WorkingMemoryApp() {
-    if (_this == null) _this = WorkingMemoryApp._();
-    return _this;
-  }
+  factory WorkingMemoryApp() => _this ??= WorkingMemoryApp._();
   static WorkingMemoryApp _this;
 
   WorkingMemoryApp._();
+  static Auth _auth;
+  FireBaseDB _fbDB;
+
 
   /// Allow for easy access to 'the Controller' throughout the application.
   static WorkingMemoryApp get con => _this;
@@ -49,8 +46,9 @@ class WorkingMemoryApp extends AppController {
   @override
   Future<bool> init() async {
     super.init();
-    CloudDB.init();
+    _auth = Auth.init();
     await signIn();
+//    _fbDB = FireBaseDB.init();
     await Controller.list.retrieve();
     return Future.value(true);
   }
@@ -58,40 +56,41 @@ class WorkingMemoryApp extends AppController {
   @override
   void initState() {
     super.initState();
-    FireBase.init();
+    CloudDB.init();
   }
 
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    FireBase.didChangeAppLifecycleState(state);
+    FireBaseDB.didChangeAppLifecycleState(state);
     CloudDB.didChangeAppLifecycleState(state);
   }
 
   @override
   void dispose() {
-    FireBase.dispose();
+    _fbDB?.dispose();
     CloudDB.dispose();
+    _auth?.dispose();
     super.dispose();
   }
 
-  static String get uid => Auth.uid;
+  static String get uid => _auth.uid;
 
-  static get email => Auth.email;
+  static get email => _auth.email;
 
-  static get name => Auth.displayName;
+  static get name => _auth.displayName;
 
-  static get provider => Auth.providerId;
+  static get provider => _auth.providerId;
 
-  static get isAnonymous => Auth.isAnonymous;
+  static get isAnonymous => _auth.isAnonymous;
 
-  static get photo => Auth.photoUrl;
+  static get photo => _auth.photoUrl;
 
-  static get token => Auth.accessToken;
+  static get token => _auth.accessToken;
 
-  static get tokenId => Auth.idToken;
+  static get tokenId => _auth.idToken;
 
-  static Future<bool> signIn() => Auth.signIn();
+  static Future<bool> signIn() => _auth.signInSilently();
 
-  static Future<bool> signInAnonymously() => Auth.signInAnonymously();
+  static Future<bool> signInAnonymously() => _auth.signInAnonymously();
 
-  static Future<bool> signInWithGoogle() => Auth.logInWithGoogle();
+  static Future<bool> signInWithGoogle() => _auth.signInGoogle();
 }

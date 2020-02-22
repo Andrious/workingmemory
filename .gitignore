@@ -50,3 +50,4 @@
 /.classpath
 /.settings/
 /.loadpath
+!/lib/src/controller/Controller.dart

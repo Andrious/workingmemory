@@ -43,11 +43,13 @@ import 'package:flutter/material.dart'
         Text,
         Widget;
 
-import 'package:workingmemory/src/view/view.dart' show AppMenu, SettingsDrawer, StateMVC;
+import 'package:workingmemory/src/view.dart' show AppMenu, SettingsDrawer, StateMVC;
 
-import 'package:workingmemory/src/controller/controller.dart' show Controller;
+import 'package:workingmemory/src/controller.dart' show Controller;
 
 import 'package:workingmemory/src/view/TodoPage.dart' show TodoPage;
+
+import 'package:workingmemory/src/view/home/menu/home.dart';
 
 class TodosPage extends StatefulWidget {
   TodosPage({Key key}) : super(key: key);
@@ -57,7 +59,10 @@ class TodosPage extends StatefulWidget {
 }
 
 class _TodosState extends StateMVC<TodosPage> {
-  _TodosState() : super(Controller());
+  _TodosState() : super(Controller()){
+    _menu = WorkMenu();
+  }
+  WorkMenu _menu;
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +72,7 @@ class _TodosState extends StateMVC<TodosPage> {
       appBar: AppBar(
         title: const Text("My ToDos"),
         actions: <Widget>[
-          AppMenu.show(this),
+          _menu.show(this),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -99,6 +104,7 @@ class _TodosState extends StateMVC<TodosPage> {
     );
 
     await Navigator.of(context).push(route);
-    Controller.list.refresh();
+//    Controller.list.refresh();
+//    await Controller.list.retrieve();
   }
 }

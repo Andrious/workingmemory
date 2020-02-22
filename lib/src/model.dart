@@ -21,13 +21,17 @@
 ///
 ///           import 'package:workingmemory/model.dart';
 
-export 'package:workingmemory/src/model/WorkingMemoryApp.dart';
+export 'package:workingmemory/src/model/Model.dart';
 
 export 'package:workingmemory/src/model/db/CloudDB.dart' show CloudDB, OnLoginListener;
 
-export 'package:mxc_application/model.dart' show DBInterface, Database;
+export 'package:mvc_application/model.dart' show SQLiteDB;
+
+export 'package:sqflite/sqflite.dart' show Database;
 
 export 'package:workingmemory/src/model/db/AppModel.dart' show AppModel;
+
+export 'package:workingmemory/src/model/db/FireBaseDB.dart' show FireBaseDB;
 
 export 'package:workingmemory/src/framework/db/SyncDB.dart' show SyncDB;
 

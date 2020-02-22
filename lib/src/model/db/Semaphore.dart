@@ -22,7 +22,7 @@
 
 import 'package:firebase_database/firebase_database.dart';
 
-import 'package:workingmemory/src/model/db/FireBaseDB.dart';
+import 'package:workingmemory/src/model.dart';
 
 class Semaphore {
   static const int STAMP_RESET = -1;
@@ -39,7 +39,6 @@ class Semaphore {
     } else {
       _timeStamp = STAMP_RESET;
     }
-
     return got();
   }
 

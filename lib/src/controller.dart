@@ -19,15 +19,18 @@
 ///
 ///          Created  10 Apr 2019
 ///
-///           import 'package:workingmemory/view.dart';
+///           import 'package:workingmemory/controller.dart';
 
+export 'package:mvc_application/app.dart' show App, AppController;
 
-export 'package:mxc_application/view.dart';
+export 'package:mvc_application/app.dart' show AppDrawer;
 
-export 'package:workingmemory/src/view/WorkingMemoryApp.dart' show WorkingMemoryApp;
+export 'package:mvc_application/settings.dart' show AppSettings, Prefs;
 
-export 'package:workingmemory/src/view/DateTimeItem.dart';
+export 'package:mvc_application/controller.dart';
 
-export 'package:workingmemory/src/view/IconItems.dart';
+export 'package:workingmemory/src/controller/Controller.dart';
 
-export 'package:workingmemory/src/view/SettingsDrawer.dart' show SettingsDrawer;
+export 'package:workingmemory/src/controller/Todos.dart';
+
+export 'package:workingmemory/src/controller/Settings.dart';

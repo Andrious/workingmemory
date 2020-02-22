@@ -19,11 +19,11 @@
 ///
 ///          Created  15 Nov 2018
 
-import 'package:auth070/auth.dart';
+import 'package:auth/auth.dart';
 
-import 'package:workingmemory/src/controller/WorkingMemoryApp.dart';
+import 'package:workingmemory/src/controller/Controller.dart';
 
-import 'package:workingmemory/src/model/model.dart' show OnLoginListener;
+import 'package:workingmemory/src/model.dart' show OnLoginListener;
 
 class AppModel implements OnLoginListener{
 

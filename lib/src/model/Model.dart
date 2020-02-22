@@ -22,19 +22,17 @@
 
 import 'dart:async' show Future;
 
-import 'package:workingmemory/src/model/model.dart' show CloudDB, DBInterface, Database;
+import 'package:workingmemory/src/model.dart'
+    show CloudDB, SQLiteDB, Database;
 
-import 'package:workingmemory/src/view/view.dart' show FieldWidgets;
+import 'package:workingmemory/src/view.dart' show FieldWidgets;
 
 import 'package:workingmemory/src/model/db/FireBaseDB.dart';
 
 import 'package:workingmemory/src/model/db/CloudDB.dart';
 
 class Model {
-  factory Model() {
-    if (_this == null) _this = Model._();
-    return _this;
-  }
+  factory Model() => _this ??= Model._();
   static Model _this;
 
   Model._() {
@@ -45,65 +43,74 @@ class Model {
 
   Future<List<Map<String, dynamic>>> list() => _tToDo.notDeleted();
 
-  Item get item{
-    if(_item == null) _item = Item();
+  Item get item {
+    if (_item == null) _item = Item();
     return _item;
   }
+
   Item _item;
 
   get defaultIcon => _tToDo.newrec[ToDo.TABLE_NAME]['Icon'];
 
-  Future<bool> save(Map data) async {
-    Map newRec = _tToDo.newRecord(data);
+  Future<bool> save(Map<String, dynamic> data) async {
+    Map<String, dynamic> newRec = validRec(data);
 
-    if (!newRec.containsKey('rowid')) return Future.value(false);
+    bool save = newRec.isNotEmpty;
+
+    if (save) save = await FireBaseDB.save(newRec);
+
+    if (save) save = await saveRec(newRec);
+
+    if (save) CloudDB.insert(newRec[FireBaseDB.key], "UPDATE");
+
+    return Future.value(save);
+  }
+
+  Future<bool> saveRec(Map<String, dynamic> data) async {
+    Map<String, dynamic> rec = await _tToDo.saveRec(ToDo.TABLE_NAME, data);
+    return rec.isNotEmpty;
+  }
+
+  Map<String, dynamic> validRec(Map<String, dynamic> data) {
+    Map<String, dynamic> newRec = _tToDo.newRecord(data);
+
+    if (!newRec.containsKey('rowid')) return {};
 
     if (!newRec.containsKey('Icon'))
       newRec['Icon'] = _tToDo.newrec[ToDo.TABLE_NAME]['Icon'];
 
-    if (!newRec.containsKey('Item')) return Future.value(false);
+    if (!newRec.containsKey('Item')) return {};
 
-    if (!newRec.containsKey('DateTime')) return Future.value(false);
+    if (!newRec.containsKey('DateTime')) return {};
 
-    if (newRec['DateTime'] is String) {
+    if (newRec['DateTime'] is String)
       newRec['DateTime'] = DateTime.parse(newRec['DateTime']);
-    }
 
-    if (newRec['DateTime'] is! DateTime) return Future.value(false);
+    if (newRec['DateTime'] is! DateTime) return {};
 
-    if (newRec['Item'] is! String) return Future.value(false);
+    if (newRec['Item'] is! String) return {};
 
     String item = newRec['Item'];
 
-    if (item.isEmpty) return Future.value(false);
+    if (item.isEmpty) return {};
 
-    if (newRec['DateTime'] is! DateTime) return Future.value(false);
+    if (newRec['DateTime'] is! DateTime) return {};
 
     DateTime dateTime = newRec['DateTime'];
 
-    _tToDo.values[ToDo.TABLE_NAME]['rowid'] = newRec['rowid'];
+    newRec['Item'] = item.trim();
 
-    _tToDo.values[ToDo.TABLE_NAME]['Icon'] = newRec['Icon'];
+    newRec['DateTime'] = dateTime.toString();
 
-    _tToDo.values[ToDo.TABLE_NAME]['Item'] = item.trim();
+    newRec['DateTimeEpoch'] = dateTime.millisecondsSinceEpoch;
 
-    _tToDo.values[ToDo.TABLE_NAME]['DateTime'] = dateTime.toString();
-
-    _tToDo.values[ToDo.TABLE_NAME]['DateTimeEpoch'] =
-        dateTime.millisecondsSinceEpoch;
-
-    _tToDo.values[ToDo.TABLE_NAME]['deleted'] = newRec['deleted'];
-
-    bool save = await FireBaseDB.save(_tToDo.values[ToDo.TABLE_NAME]);
-
-    if (save) {
-      Map rec = await _tToDo.saveRec(ToDo.TABLE_NAME);
-      save = rec.isNotEmpty;
-    }
-    return Future.value(save);
+    return newRec;
   }
 
-  Future<bool> delete(Map data) async {
+  Future<List<Map<String, dynamic>>> getRecord(String id) async =>
+      _tToDo.getRecord(ToDo.TABLE_NAME, int.parse(id));
+
+  Future<bool> delete(Map<String, dynamic> data) async {
     Map newRec = _tToDo.newRecord(data);
 
     newRec['deleted'] = 1;
@@ -120,11 +127,22 @@ class Model {
 //    return Future.value(rows > 0) ;
   }
 
-  Future<bool> undelete(Map data) async {
-
+  Future<bool> undelete(Map<String, dynamic> data) async {
     data['deleted'] = 0;
-
     return save(data);
+  }
+
+  Future<bool> deleteRec(String key) async {
+    List<Map<String, dynamic>> rec =
+        await _tToDo.getRecord(ToDo.TABLE_NAME, int.parse(key));
+
+    if (rec.length == 0) return false;
+
+    rec[0]['deleted'] = 1;
+
+    bool delete = await save(rec[0]);
+
+    return delete;
   }
 
   static void _dataMap(String key, Map map, Map records) {
@@ -153,44 +171,43 @@ class Model {
   void sync() {
     CloudDB.sync();
   }
+
+  void reSync() => CloudDB.reSync();
 }
 
-class Item extends FieldWidgets{
-  Item([Map rec])
-      : super(object: rec, label: 'Item', value: rec['Item']);
+class Item extends FieldWidgets {
+  Item([Map rec]) : super(object: rec, label: 'Item', value: rec['Item']);
 
   void onSaved(v) => object['Item'] = value = v;
 
   @override
   String onValidator(String v) {
     String errorText;
-    if(v.isEmpty) errorText = "Item cannot be empty!";
+    if (v.isEmpty) errorText = "Item cannot be empty!";
     return errorText;
   }
 }
 
-class Datetime extends FieldWidgets{
+class Datetime extends FieldWidgets {
   Datetime([Map rec])
       : super(object: rec, label: 'Date Time', value: rec['DateTime']);
 
   void onSaved(v) => object['DateTime'] = value = v;
 }
 
-class Icon extends FieldWidgets{
-  Icon([Map rec])
-      : super(object: rec, label: 'Icon', value: rec['Icon']);
+class Icon extends FieldWidgets {
+  Icon([Map rec]) : super(object: rec, label: 'Icon', value: rec['Icon']);
 
   void onSaved(v) => object['Icon'] = value = v;
 }
 
-class ToDo extends DBInterface {
-
-  ToDo(){
-    _selectNotDeleted = "SELECT $keyField, * FROM $TABLE_NAME" +
-        " WHERE deleted = 0";
-    _selectDeleted = "SELECT $keyField, * FROM $TABLE_NAME" +
-        " WHERE deleted = 1";
-    _selectAll = "SELECT $keyField, * FROM $TABLE_NAME";
+class ToDo extends SQLiteDB {
+  ToDo() {
+    keyField(TABLE_NAME).then((String keyFld){
+      _selectDeleted = "SELECT $keyFld, * FROM $TABLE_NAME" +
+          " WHERE deleted = 1";
+      _selectAll =  "SELECT $keyFld, * FROM $TABLE_NAME";
+    });
   }
   String _selectAll, _selectNotDeleted, _selectDeleted;
 
@@ -238,9 +255,15 @@ class ToDo extends DBInterface {
     return version;
   }
 
-  Future<List<Map>> list() => this.getTable(ToDo.TABLE_NAME);
+  Future<List<Map<String, dynamic>>> list() => this.getTable(ToDo.TABLE_NAME);
 
-  Future<List<Map<String, dynamic>>> notDeleted() => rawQuery(_selectNotDeleted);
+  Future<List<Map<String, dynamic>>> notDeleted() async {
+    String keyFld = await keyField(TABLE_NAME);
+    _selectNotDeleted =
+        "SELECT $keyFld, * FROM $TABLE_NAME" + " WHERE deleted = 0";
+    return rawQuery(_selectNotDeleted);
+  }
 
-  Map newRecord([Map data]) => super.newRec(ToDo.TABLE_NAME, data);
+  Map<String, dynamic> newRecord([Map<String, dynamic> data]) =>
+      super.newRec(ToDo.TABLE_NAME, data);
 }

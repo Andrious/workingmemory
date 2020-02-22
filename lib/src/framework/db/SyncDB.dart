@@ -19,9 +19,9 @@
 ///
 ///          Created  15 Nov 2018
 
-import 'package:workingmemory/src/model/model.dart' show DBInterface, Database;
+import 'package:workingmemory/src/model.dart';
 
-class SyncDB extends DBInterface {
+class SyncDB extends SQLiteDB {
   final String _table = 'sync';
 
   final int _version = 1;
@@ -48,6 +48,46 @@ class SyncDB extends DBInterface {
   Future onOpen(Database db) {
     _open = true;
     return super.onOpen(db);
+  }
+
+  Future<int> getRowID(int recId) async {
+    List<Map<String, dynamic>> recs = await rawQuery(
+        "SELECT id FROM $_table WHERE id = $recId ORDER BY id DESC LIMIT 1");
+
+    int rowID;
+
+    if (recs.isEmpty) {
+      rowID = 0;
+    } else {
+      rowID = recs[0]["id"];
+    }
+    return rowID;
+  }
+
+  Future<int> update(Map<String, dynamic> recValues, int id) async {
+    int result;
+
+    Map<String, dynamic> recs = await updateRec(_table, recValues);
+
+    if (recs.isEmpty) {
+      result = 0;
+    } else {
+      result = recs['id'];
+    }
+    return result;
+  }
+
+  Future<int> insert(Map<String, dynamic> recValues) async {
+    int result;
+
+    Map<String, dynamic> recs = await updateRec(_table, recValues);
+
+    if (recs.isEmpty) {
+      result = 0;
+    } else {
+      result = recs['id'];
+    }
+    return result;
   }
 }
 

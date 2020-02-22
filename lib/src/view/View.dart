@@ -20,26 +20,27 @@
 ///          Created  23 Jun 2018
 ///
 
-import 'package:mxc_application/mvc.dart' show ViewMVC;
+import 'package:mvc_application/mvc.dart' show ViewMVC;
 
-import 'package:workingmemory/src/controller/WorkingMemoryApp.dart' as con;
+import 'package:workingmemory/src/controller/Controller.dart' as con;
 
-import 'package:workingmemory/src/view/TodosPage.dart' show TodosPage;
+import 'package:workingmemory/src/view/home/TodosPage.dart' show TodosPage;
 
 //import 'package:workingmemory/src/view/LoginInfo.dart' show LoginInfo;
 
 /// Need to extend AppView to so to call controller's init() function.
-class WorkingMemoryApp extends ViewMVC {
-  factory WorkingMemoryApp() {
-    if (_this == null) _this = WorkingMemoryApp._();
+class View extends ViewMVC {
+  factory View() {
+//    if (_this == null) _this = WorkingMemoryApp._();
+    _this = View._();
     return _this;
   }
-  static WorkingMemoryApp _this;
+  static View _this;
 
   /// Allow for easy access to 'the View' throughout the application.
-  static WorkingMemoryApp get view => _this;
+  static View get view => _this;
 
-  WorkingMemoryApp._()
+  View._()
       : idKey = _app.keyId,
         super(
           con: _app,

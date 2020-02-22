@@ -17,20 +17,33 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 ///
-///          Created  10 Apr 2019
+///          Created  16 Aug 2019
 ///
-///           import 'package:workingmemory/controller.dart';
+///
 
-export 'package:mxc_application/app.dart' show App, AppController;
+import 'package:flutter/material.dart';
 
-export 'package:mxc_application/app.dart' show AppDrawer;
+import 'package:workingmemory/src/view.dart' show Menu;
 
-export 'package:mxc_application/settings.dart' show AppSettings, Prefs;
+import 'package:workingmemory/src/controller.dart' show Controller;
 
-export 'package:mxc_application/controller.dart';
+class WorkMenu extends Menu{
 
-export 'package:workingmemory/src/controller/WorkingMemoryApp.dart';
+  Controller _con = Controller();
 
-export 'package:workingmemory/src/controller/Todos.dart';
+  @override
+  List<PopupMenuItem<dynamic>> menuItems() => [
+    PopupMenuItem(value: "Resync", child: Text("Resync")),
+  ];
 
-export 'package:workingmemory/src/controller/Settings.dart';
+  @override
+  void onSelected(dynamic menuItem){
+    switch (menuItem) {
+      case 'Resync':
+        _con.reSync();
+        break;
+      default:
+    }
+  }
+}
+

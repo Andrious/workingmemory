@@ -62,7 +62,7 @@ class DateTimeItem extends StatelessWidget {
                               initialDate: date,
                               firstDate:
                                   date.subtract(const Duration(days: 30)),
-                              lastDate: date.add(const Duration(days: 30)))
+                              lastDate: date.add(const Duration(days: 2555)))
                           .then<Null>((DateTime value) {
                         if (value != null)
                           onChanged(DateTime(value.year, value.month, value.day,

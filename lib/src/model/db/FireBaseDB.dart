@@ -19,100 +19,199 @@
 ///
 ///          Created  29 Nov 2018
 ///
-import 'dart:collection';
+import 'dart:async' show Future, StreamSubscription;
 
-import 'package:workingmemory/src/model/model.dart' show DBInterface, Semaphore;
+import 'dart:collection' show LinkedHashMap;
+
+import 'package:workingmemory/src/model.dart' show Semaphore;
+
+import 'package:mvc_application/model.dart' as f;
+
+import 'package:workingmemory/src/controller.dart' show App, WorkingMemoryApp;
 
 import 'package:firebase_database/firebase_database.dart'
-    show DataSnapshot, DatabaseReference;
+    show DataSnapshot, DatabaseReference, Event, Query;
 
-import 'package:auth070/auth.dart' show Auth;
-
-import 'package:firebase/firebase.dart' show FireBase;
+import 'package:flutter/widgets.dart' show AppLifecycleState;
 
 class FireBaseDB {
+  factory FireBaseDB.init({
+    void once(DataSnapshot data),
+    void onChildAdded(Event event),
+    void onChildRemoved(Event event),
+    void onChildChanged(Event event),
+    void onChildMoved(Event event),
+    void onValue(Event event),
+  }) =>
+      _this ??= FireBaseDB._(
+        once,
+        onChildAdded,
+        onChildRemoved,
+        onChildChanged,
+        onChildMoved,
+        onValue,
+      );
+
+  FireBaseDB._(
+    var once,
+    var onChildAdded,
+    var onChildRemoved,
+    var onChildChanged,
+    var onChildMoved,
+    var onValue,
+  ) {
+    _db = f.FireBaseDB.init(
+      once: once,
+      onChildAdded: onChildAdded,
+      onChildRemoved: onChildRemoved,
+      onChildChanged: onChildChanged,
+      onChildMoved: onChildMoved,
+      onValue: onValue,
+    );
+    _reference = _db.reference();
+  }
+  static FireBaseDB _this;
+  static f.FireBaseDB _db;
+  static DatabaseReference _reference;
+
   static LinkedHashMap mDataArrayList;
 
   static bool mShowDeleted = false;
 
-  static Future<bool> save(Map rec) async {
-    String key = await updateRec(rec);
+  static String _keyFld = "KeyFld";
+  static String get key => _keyFld;
 
-    bool save = key.isNotEmpty;
+  static DatabaseReference reference() => _reference;
 
-    if (save) Semaphore.write();
+  static Future<bool> save(Map<String, dynamic> itemToDo) async {
+    bool save;
 
+    if (itemToDo.isEmpty) {
+      String key = await insertRec(itemToDo);
+
+      itemToDo['key'] = key;
+
+      save = key.isNotEmpty;
+    } else {
+      var key = await updateRec(itemToDo);
+
+      save = key.isNotEmpty;
+    }
+
+    if (save) {
+      Semaphore.write();
+    }
     return save;
+  }
+
+  static Future<String> insertRec(Map<String, dynamic> itemToDo) async {
+    String key = "";
+
+    DatabaseReference dbRef;
+
+    try {
+      dbRef = tasksRef;
+
+      key = dbRef.push().key;
+
+//      mLastRowID = key;
+
+      await dbRef.update(itemToDo);
+    } catch (ex) {
+      key = "";
+    }
+    return key;
   }
 
   static Future<String> updateRec(Map rec) async {
     String key = "";
 
-    if (!rec.containsKey('KeyFld')) return Future.value(key);
+    if (!rec.containsKey(_keyFld)) return Future.value(key);
 
     var foxRec = Map.from(rec);
 
-    key = foxRec['KeyFld'];
+    key = foxRec[_keyFld];
 
-    foxRec.remove('KeyFld');
+    foxRec.remove(_keyFld);
 
     try {
       DatabaseReference dbRef = FireBaseDB.tasksRef;
 
       if (key == null || key.isEmpty) {
         key = dbRef.push().key;
-        rec['KeyFld'] = key;
+        rec[_keyFld] = key;
       }
 
       await dbRef.update({key: foxRec}).catchError((ex) {
         key = "";
-        DBInterface.setError(ex);
+        _db?.setError(ex);
       });
     } catch (ex) {
       key = "";
-      DBInterface.setError(ex);
+      _db?.setError(ex);
     }
 
     return Future.value(key);
   }
 
   static DatabaseReference get tasksRef {
-    DatabaseReference dbRef;
+    DatabaseReference ref;
 
-    String id = Auth.uid;
+    String id = WorkingMemoryApp.uid;
 
-    if (id == null) {
-      dbRef = FireBase.reference().child("tasks").child("dummy");
+    if (id.isEmpty) {
+      ref = _db?.reference()?.child("tasks")?.child("dummy");
     } else {
-      dbRef = FireBase.reference().child("tasks").child(id);
+      ref = _db?.reference()?.child("tasks")?.child(id);
     }
-    return dbRef;
+    return ref;
+  }
+
+  Future<bool> createCurrentRecs() async {
+    if (Semaphore.got()) {
+      return true;
+    }
+
+    Query queryRef = tasksRef.orderByKey();
+
+    if (queryRef == null) {
+      return false;
+    }
+
+    DataSnapshot snapshot;
+    try {
+      // Just one query
+      snapshot = await queryRef.once();
+    } catch (ex) {
+      snapshot = null;
+    }
+
+    if (snapshot == null) {
+      return false;
+    }
+
+//    mDataArrayList = recArrayList(snapshot, mShowDeleted);
+
+    return true;
   }
 
   static Future<LinkedHashMap> records() async {
-
     if (Semaphore.got()) return mDataArrayList;
 
     DataSnapshot data;
 
     try {
-
-      data =
-          await FireBaseDB.tasksRef.orderByKey().once().catchError((ex) {
-
-        DBInterface.setError(ex);
+      data = await FireBaseDB.tasksRef.orderByKey().once().catchError((ex) {
+        _db?.setError(ex);
       });
     } catch (ex) {
-
       data = null;
-      DBInterface.setError(ex);
+      _db?.setError(ex);
     }
 
-    if (data == null) {
-
+    if (data?.value == null || data?.value is! Map) {
       mDataArrayList = LinkedHashMap<dynamic, dynamic>();
     } else {
-
       mDataArrayList = data.value;
     }
     return mDataArrayList;
@@ -198,4 +297,13 @@ class FireBaseDB {
     // Retain the semaphore.
     Semaphore.write();
   }
+
+  static void didChangeAppLifecycleState(AppLifecycleState state) =>
+      _db.didChangeAppLifecycleState(state);
+
+  void dispose() => _db.dispose();
+
+  static void goOnline() => _db.goOnline();
+
+  static void goOffline() => _db.goOffline();
 }
