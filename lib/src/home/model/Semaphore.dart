@@ -42,18 +42,22 @@ class Semaphore {
     return got();
   }
 
-  static void write() {
+  static Future<bool> write() async {
     _stamp = Semaphore.timeStamp;
-
-    dbRef.set(_stamp);
+    bool write;
+    try {
+      await dbRef.set(_stamp);
+      write = true;
+    } catch (ex) {
+      write = false;
+    }
+    return write;
   }
 
-  static int get timeStamp =>
-      (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+  static int get timeStamp => (DateTime.now().millisecondsSinceEpoch ~/ 1000);
 
   static DateTime getDateTime(int seconds) =>
       DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
 
-  static DatabaseReference get dbRef =>
-      FireBaseDB.tasksRef.child('semaphore');
+  static DatabaseReference get dbRef => FireBaseDB.init().tasksRef.child('semaphore');
 }

@@ -69,12 +69,15 @@ class FireBaseDB {
       onValue: onValue,
     );
     _reference = _db.reference();
+
+    _con = WorkingMemoryApp();
   }
   static FireBaseDB _this;
   static f.FireBaseDB _db;
   static DatabaseReference _reference;
+  static WorkingMemoryApp _con;
 
-  static LinkedHashMap mDataArrayList;
+  LinkedHashMap<dynamic, dynamic> mDataArrayList;
 
   static bool mShowDeleted = false;
 
@@ -83,7 +86,7 @@ class FireBaseDB {
 
   static DatabaseReference reference() => _reference;
 
-  static Future<bool> save(Map<String, dynamic> itemToDo) async {
+  Future<bool> save(Map<String, dynamic> itemToDo) async {
     bool save;
 
     if (itemToDo.isEmpty) {
@@ -104,7 +107,7 @@ class FireBaseDB {
     return save;
   }
 
-  static Future<String> insertRec(Map<String, dynamic> itemToDo) async {
+  Future<String> insertRec(Map<String, dynamic> itemToDo) async {
     String key = "";
 
     DatabaseReference dbRef;
@@ -123,7 +126,7 @@ class FireBaseDB {
     return key;
   }
 
-  static Future<String> updateRec(Map rec) async {
+  Future<String> updateRec(Map rec) async {
     String key = "";
 
     if (!rec.containsKey(_keyFld)) return Future.value(key);
@@ -135,7 +138,7 @@ class FireBaseDB {
     foxRec.remove(_keyFld);
 
     try {
-      DatabaseReference dbRef = FireBaseDB.tasksRef;
+      DatabaseReference dbRef = tasksRef;
 
       if (key == null || key.isEmpty) {
         key = dbRef.push().key;
@@ -154,10 +157,10 @@ class FireBaseDB {
     return Future.value(key);
   }
 
-  static DatabaseReference get tasksRef {
+  DatabaseReference get tasksRef {
     DatabaseReference ref;
 
-    String id = WorkingMemoryApp.uid;
+    String id = _con.uid;
 
     if (id.isEmpty) {
       ref = _db?.reference()?.child("tasks")?.child("dummy");
@@ -166,6 +169,8 @@ class FireBaseDB {
     }
     return ref;
   }
+
+
 
   Future<bool> createCurrentRecs() async {
     if (Semaphore.got()) {
@@ -195,15 +200,13 @@ class FireBaseDB {
     return true;
   }
 
-  static Future<LinkedHashMap> records() async {
+  Future<LinkedHashMap> records() async {
     if (Semaphore.got()) return mDataArrayList;
 
     DataSnapshot data;
 
     try {
-      data = await FireBaseDB.tasksRef.orderByKey().once().catchError((ex) {
-        _db?.setError(ex);
-      });
+      data = await tasksRef.orderByKey().once();
     } catch (ex) {
       data = null;
       _db?.setError(ex);
@@ -286,16 +289,22 @@ class FireBaseDB {
     return list;
   }
 
-  static Future<void> delete(final String key) async {
-    if (key == null || key.isEmpty) return;
-
-    DatabaseReference rec = FireBaseDB.tasksRef.child(key);
-
-    // Delete that record
-    rec.set(null);
-
-    // Retain the semaphore.
-    Semaphore.write();
+  Future<bool> delete(final String key) async {
+    if (key == null || key.isEmpty) return false;
+    final online = await _db.isOnline();
+    if (!online) return false;
+    bool delete;
+    try {
+      DatabaseReference rec = tasksRef.child(key);
+      // Delete that record
+      rec.set(null);
+      delete = true;
+      // Retain the semaphore.
+      Semaphore.write();
+    } catch (ex) {
+      delete = false;
+    }
+    return delete;
   }
 
   static void didChangeAppLifecycleState(AppLifecycleState state) =>
@@ -303,7 +312,9 @@ class FireBaseDB {
 
   void dispose() => _db.dispose();
 
-  static void goOnline() => _db.goOnline();
+  Future<bool> isOnline() => _db.isOnline();
 
-  static void goOffline() => _db.goOffline();
+  static Future<void> goOnline() => _db.goOnline();
+
+  static Future<void> goOffline() => _db.goOffline();
 }

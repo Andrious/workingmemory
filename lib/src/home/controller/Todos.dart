@@ -62,33 +62,61 @@ import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart';
 
-
 final ThemeData theme = App.theme;
 
 class Controller extends ControllerMVC {
   factory Controller() => _this ??= Controller._();
   static Controller _this;
 
-  Controller._() : super();
+  Controller._() : super() {
+    model = m.Model();
+    _editToDo = ToDoEdit();
+    _listToDo = ToDoList();
+    app = WorkingMemoryApp();
+  }
+  m.Model model;
+  WorkingMemoryApp app;
+
+  ToDoEdit get edit => _editToDo;
+  ToDoEdit _editToDo;
+  String get editKey => _editKey;
+  String _editKey;
+
+  ToDoList get list => _listToDo;
+  ToDoList _listToDo;
+  String get listKey => _listKey;
+  String _listKey;
 
   /// Allow for easy access to 'the Controller' throughout the application.
   static Controller get con => _this ?? Controller();
 
-  static final m.Model model = m.Model();
-
   void rebuild() => _this.refresh();
 
-  @override
-  void initState() {
+  Future<bool> init() async {
+    bool init = await model.init();
+    list.retrieve().then((_) {
+      // Display the list.
+      refresh();
+    });
     _editKey = edit.addState(this.stateMVC);
     _listKey = list.addState(this.stateMVC);
-    model.initState();
+    return init;
   }
+
+  m.CloudDB _cloud;
 
   @override
   void dispose() {
+    _cloud.dispose();
     model.dispose();
     super.dispose();
+  }
+
+  bool get loggedIn => app.loggedIn;
+
+  void logOut() {
+    app.logOut();
+    refresh();
   }
 
   @override
@@ -96,6 +124,7 @@ class Controller extends ControllerMVC {
     if (state == AppLifecycleState.resumed) {
       model.sync();
     }
+
     /// Passing these possible values:
     /// AppLifecycleState.paused (may enter the suspending state at any time)
     /// AppLifecycleState.resumed
@@ -103,19 +132,10 @@ class Controller extends ControllerMVC {
     /// AppLifecycleState.suspending (Android only)
   }
 
-  static ToDoEdit get edit => _editToDo;
-  static ToDoEdit _editToDo = ToDoEdit();
-  static String get editKey => _editKey;
-  static String _editKey;
-
-  static ToDoList get list => _listToDo;
-  static ToDoList _listToDo = ToDoList();
-  static String get listKey => _listKey;
-  static String _listKey;
-
   Future<bool> save(Map<String, dynamic> data) => model.save(data);
 
-  Future<bool> saveRec(Map<String, dynamic> diffRec, Map<String, dynamic> oldRec) {
+  Future<bool> saveRec(
+      Map<String, dynamic> diffRec, Map<String, dynamic> oldRec) {
     Map newRec = Map<String, dynamic>();
 
     if (oldRec == null) {
@@ -128,11 +148,10 @@ class Controller extends ControllerMVC {
     return save(newRec);
   }
 
-  static get defaultIcon => model.defaultIcon;
+  get defaultIcon => model.defaultIcon;
 
   void reSync() => model.reSync();
 }
-
 
 class ToDoEdit extends ToDoList {
   bool hasName;
@@ -154,7 +173,7 @@ class ToDoEdit extends ToDoList {
       icon = todo['Icon'];
     } else {
       item = ' ';
-      icon = Controller.defaultIcon;
+      icon = Controller().defaultIcon;
     }
 
     changer = TextEditingController(text: item);
@@ -167,7 +186,8 @@ class ToDoEdit extends ToDoList {
   Widget get title => Text(hasName ? item : 'Event Name TBD');
 
   Widget get child => ListView(
-      padding: const EdgeInsets.all(16.0), children: Controller.edit.children);
+      padding: const EdgeInsets.all(16.0),
+      children: Controller().edit.children);
 
   get children => <Widget>[
         Container(
@@ -214,28 +234,37 @@ class ToDoEdit extends ToDoList {
       ];
 
   Future<void> onPressed() async {
-    bool save = Controller.edit.formKey.currentState.validate();
+    var con = Controller();
+    bool save = con.edit.formKey.currentState.validate();
     if (save) {
-      Controller.edit.formKey.currentState.save();
-      save = await Controller.edit
+      con.edit.formKey.currentState.save();
+      save = await con.edit
           .save({'Item': item, 'DateTime': dateTime, 'Icon': icon}, this.todo);
-      await Controller.list.retrieve();
+      await con.list.retrieve();
+      refresh();
     }
     return Future.value(save);
   }
 
-  Future<bool> save(Map<String, dynamic> diffRec, Map<String, dynamic> oldRec) async {
+  Future<bool> save(
+      Map<String, dynamic> diffRec, Map<String, dynamic> oldRec) async {
     bool save = await Controller().saveRec(diffRec, oldRec);
     return save;
   }
 
-  Future<bool> delete(Map<String, dynamic> data) => model.delete(data).then((delete) {
+  Future<bool> delete(Map<String, dynamic> data) =>
+      model.delete(data).then((delete) async {
+        await Controller().list.retrieve();
         refresh();
         return delete;
       });
 
-  Future<bool> undelete(Map<String, dynamic> data) => model.undelete(data);
-
+  Future<bool> undelete(Map<String, dynamic> data) =>
+      model.undelete(data).then((un) async {
+        await Controller().list.retrieve();
+        refresh();
+        return un;
+      });
 }
 
 typedef MapCallback = void Function(Map data);
@@ -271,20 +300,16 @@ class ToDoList extends ToDoFields {
           key: ObjectKey(_items[index]['rowid']),
           direction: DismissDirection.endToStart,
           onDismissed: (DismissDirection direction) {
-            Controller.edit.delete(_items[index]);
+            Controller().edit.delete(_items[index]);
             final String action = (direction == DismissDirection.endToStart)
                 ? 'deleted'
                 : 'archived';
-            Controller.list.scaffoldKey.currentState?.showSnackBar(SnackBar(
+            Controller().list.scaffoldKey.currentState?.showSnackBar(SnackBar(
                 content: Text('You $action an item.'),
                 action: SnackBarAction(
                     label: 'UNDO',
                     onPressed: () {
-                      Controller.edit
-                          .undelete(_items[index])
-                          .then((undelete) {
-                        if (undelete) refresh();
-                      });
+                      Controller().edit.undelete(_items[index]);
                     })));
           },
           background: Container(

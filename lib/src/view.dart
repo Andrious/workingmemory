@@ -24,10 +24,20 @@
 
 export 'package:mvc_application/view.dart';
 
-export 'package:workingmemory/src/view/View.dart' show View;
+export 'package:workingmemory/src/app/view/view.dart';
 
-export 'package:workingmemory/src/view/DateTimeItem.dart';
+export 'package:workingmemory/src/app/view/settings_drawer.dart';
 
-export 'package:workingmemory/src/view/IconItems.dart';
+export 'package:workingmemory/src/app/view/sign_in.dart';
 
-export 'package:workingmemory/src/view/SettingsDrawer.dart' show SettingsDrawer;
+export 'package:workingmemory/src/home/view/TodoPage.dart';
+
+export 'package:workingmemory/src/home/view/TodosPage.dart';
+
+export 'package:workingmemory/src/home/view/DateTimeItem.dart';
+
+export 'package:workingmemory/src/home/view/IconItems.dart';
+
+export 'package:workingmemory/src/home/view/menu/home.dart';
+
+

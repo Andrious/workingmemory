@@ -22,7 +22,7 @@
 
 import 'dart:async' show Future;
 
-import 'package:flutter/material.dart' show AppLifecycleState;
+import 'package:flutter/material.dart';
 
 import 'package:workingmemory/src/model.dart' show CloudDB, FireBaseDB;
 
@@ -33,14 +33,9 @@ import 'package:auth/auth.dart' show Auth;
 class WorkingMemoryApp extends AppController {
   factory WorkingMemoryApp() => _this ??= WorkingMemoryApp._();
   static WorkingMemoryApp _this;
-
-  WorkingMemoryApp._();
-  static Auth _auth;
-  FireBaseDB _fbDB;
-
-
   /// Allow for easy access to 'the Controller' throughout the application.
   static WorkingMemoryApp get con => _this;
+  WorkingMemoryApp._();
 
   /// Provide the sign in and the loading database info.
   @override
@@ -48,16 +43,15 @@ class WorkingMemoryApp extends AppController {
     super.init();
     _auth = Auth.init();
     await signIn();
-//    _fbDB = FireBaseDB.init();
-    await Controller.list.retrieve();
+    _loggedIn = await _auth.isLoggedIn();
+    _con = Controller();
+    _con.init();
     return Future.value(true);
   }
-
-  @override
-  void initState() {
-    super.initState();
-    CloudDB.init();
-  }
+  Controller _con;
+  bool _loggedIn;
+  Auth _auth;
+  FireBaseDB _fbDB;
 
   void didChangeAppLifecycleState(AppLifecycleState state) {
     FireBaseDB.didChangeAppLifecycleState(state);
@@ -67,30 +61,62 @@ class WorkingMemoryApp extends AppController {
   @override
   void dispose() {
     _fbDB?.dispose();
-    CloudDB.dispose();
+    _con.dispose();
     _auth?.dispose();
     super.dispose();
   }
 
-  static String get uid => _auth.uid;
+  bool get loggedIn => _loggedIn;
 
-  static get email => _auth.email;
+  void logOut() async {
+    await _auth.disconnect();
+    rebuild();
+  }
 
-  static get name => _auth.displayName;
+  Future<bool> signInWithFacebook() async {
+    bool signIn = await _auth.signInWithFacebook();
+    rebuild();
+    return signIn;
+  }
 
-  static get provider => _auth.providerId;
+  Future<bool> signInWithTwitter() async {
+    bool signIn = await _auth.signInWithTwitter();
+    rebuild();
+    return signIn;
+  }
 
-  static get isAnonymous => _auth.isAnonymous;
+  Future<bool> signInEmailPassword(BuildContext context) async {
+//    bool signIn = await _auth.signInWithEmailAndPassword();
+//    rebuild();
+//    return signIn;
+  }
 
-  static get photo => _auth.photoUrl;
+  Future<bool> signInWithGoogle() async {
+    bool signIn = await _auth.signInGoogle();
+    rebuild();
+    return signIn;
+  }
 
-  static get token => _auth.accessToken;
+  void rebuild() async {
+    _loggedIn = await _auth.isLoggedIn();
+    _con.refresh();
+  }
 
-  static get tokenId => _auth.idToken;
+  String get uid => _auth.uid;
 
-  static Future<bool> signIn() => _auth.signInSilently();
+  get email => _auth.email;
 
-  static Future<bool> signInAnonymously() => _auth.signInAnonymously();
+  get name => _auth.displayName;
 
-  static Future<bool> signInWithGoogle() => _auth.signInGoogle();
+  get provider => _auth.providerId;
+
+  get isAnonymous => _auth.isAnonymous;
+
+  get photo => _auth.photoUrl;
+
+  get token => _auth.accessToken;
+
+  get tokenId => _auth.idToken;
+
+  Future<bool> signIn() => _auth.signInSilently();
 }

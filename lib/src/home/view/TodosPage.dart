@@ -25,9 +25,8 @@ import 'package:flutter/material.dart'
     show
         AppBar,
         BuildContext,
-        Center,
-        Colors,
-        RaisedButton,
+        Container,
+        FlutterErrorDetails,
         FloatingActionButton,
         Icon,
         Icons,
@@ -43,13 +42,9 @@ import 'package:flutter/material.dart'
         Text,
         Widget;
 
-import 'package:workingmemory/src/view.dart' show AppMenu, SettingsDrawer, StateMVC;
+import 'package:workingmemory/src/view.dart';
 
-import 'package:workingmemory/src/controller.dart' show Controller;
-
-import 'package:workingmemory/src/view/TodoPage.dart' show TodoPage;
-
-import 'package:workingmemory/src/view/home/menu/home.dart';
+import 'package:workingmemory/src/controller.dart';
 
 class TodosPage extends StatefulWidget {
   TodosPage({Key key}) : super(key: key);
@@ -59,16 +54,19 @@ class TodosPage extends StatefulWidget {
 }
 
 class _TodosState extends StateMVC<TodosPage> {
-  _TodosState() : super(Controller()){
+  _TodosState() : super(Controller()) {
+    con = controller;
     _menu = WorkMenu();
   }
+  Controller con;
   WorkMenu _menu;
 
   @override
   Widget build(BuildContext context) {
+    if (!con.loggedIn) return SignIn();
     return Scaffold(
-      key: Controller.list.scaffoldKey,
-      endDrawer: SettingsDrawer(),
+      key: con.list.scaffoldKey,
+      drawer: SettingsDrawer(),
       appBar: AppBar(
         title: const Text("My ToDos"),
         actions: <Widget>[
@@ -77,21 +75,15 @@ class _TodosState extends StateMVC<TodosPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => editToDo(),
-        backgroundColor: Colors.redAccent,
         child: const Icon(
           Icons.add,
           semanticLabel: 'Add',
         ),
       ),
       body: SafeArea(
-        child: Controller.list.items.length == 0
-            ? Center(
-                child: RaisedButton(
-                  child: const Text('New Item'),
-                  onPressed: () => editToDo(),
-                ),
-              )
-            : Controller.list.view(editToDo),
+        child: con.list.items.length == 0
+            ? Container()
+            : con.list.view(editToDo),
       ),
     );
   }
@@ -106,5 +98,10 @@ class _TodosState extends StateMVC<TodosPage> {
     await Navigator.of(context).push(route);
 //    Controller.list.refresh();
 //    await Controller.list.retrieve();
+  }
+
+  @override
+  void onError(FlutterErrorDetails details) {
+    print(details.exception.toString());
   }
 }

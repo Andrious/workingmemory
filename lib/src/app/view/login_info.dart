@@ -27,15 +27,18 @@ import 'package:workingmemory/src/controller.dart' show AppDrawer, WorkingMemory
 import 'package:mvc_application/view.dart' show AppView;
 
 class LoginInfo {
-  static Widget scaffold(AppView _vw) {
+
+  final WorkingMemoryApp con = WorkingMemoryApp();
+
+  Widget scaffold(AppView _vw) {
     return Scaffold(
         appBar: AppBar(title: Text("My Home Page")),
         endDrawer: AppDrawer(),
-        body: LoginInfo.body(_vw));
+        body: body(_vw));
   }
 
-  static Widget body(AppView _vw) {
-    Future<String> _uid = Future.value(WorkingMemoryApp.uid);
+  Widget body(AppView _vw) {
+    Future<String> _uid = Future.value(con.uid);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,17 +53,8 @@ class LoginInfo {
             child: const Text('Test signIn'),
             onPressed: () {
               _vw.setState(() {
-                _uid = WorkingMemoryApp.signIn().then((log){
-                  return WorkingMemoryApp.uid;
-                });
-              });
-            }),
-        RaisedButton(
-            child: const Text('Test signInAnonymously'),
-            onPressed: () {
-              _vw.setState(() {
-                _uid = WorkingMemoryApp.signInAnonymously().then((log){
-                  return WorkingMemoryApp.uid;
+                _uid = con.signIn().then((log){
+                  return con.uid;
                 });
               });
             }),
@@ -68,17 +62,17 @@ class LoginInfo {
             child: const Text('Test signInWithGoogle'),
             onPressed: () {
               _vw.setState(() {
-                _uid = WorkingMemoryApp.signInWithGoogle().then((log){
-                  return WorkingMemoryApp.uid;
+                _uid = con.signInWithGoogle().then((log){
+                  return con.uid;
                 });
               });
             }),
-    Text('User id: ${WorkingMemoryApp.uid}'),
-    Text('User Name: ${WorkingMemoryApp.name}'),
-    Text('Anonymous: ${WorkingMemoryApp.isAnonymous}'),
-    Text('Email:     ${WorkingMemoryApp.email}'),
-    Text('Provider:  ${WorkingMemoryApp.provider}'),
-    Text('Photo:     ${WorkingMemoryApp.photo}'),
+    Text('User id: ${con.uid}'),
+    Text('User Name: ${con.name}'),
+    Text('Anonymous: ${con.isAnonymous}'),
+    Text('Email:     ${con.email}'),
+    Text('Provider:  ${con.provider}'),
+    Text('Photo:     ${con.photo}'),
 //          Text('Token Id:  ${Controller.tokenId}'),
 //          Text('AcessToken:${Controller.token}'),
         FutureBuilder<String>(

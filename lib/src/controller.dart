@@ -29,8 +29,8 @@ export 'package:mvc_application/settings.dart' show AppSettings, Prefs;
 
 export 'package:mvc_application/controller.dart';
 
-export 'package:workingmemory/src/controller/Controller.dart';
+export 'package:workingmemory/src/app/controller/controller.dart';
 
-export 'package:workingmemory/src/controller/Todos.dart';
+export 'package:workingmemory/src/home/controller/Todos.dart';
 
-export 'package:workingmemory/src/controller/Settings.dart';
+export 'package:workingmemory/src/home/controller/settings.dart';

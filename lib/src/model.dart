@@ -21,19 +21,19 @@
 ///
 ///           import 'package:workingmemory/model.dart';
 
-export 'package:workingmemory/src/model/Model.dart';
+export 'package:workingmemory/src/home/model/Model.dart';
 
-export 'package:workingmemory/src/model/db/CloudDB.dart' show CloudDB, OnLoginListener;
+export 'package:workingmemory/src/home/model/CloudDB.dart' show CloudDB, OnLoginListener;
 
 export 'package:mvc_application/model.dart' show SQLiteDB;
 
 export 'package:sqflite/sqflite.dart' show Database;
 
-export 'package:workingmemory/src/model/db/AppModel.dart' show AppModel;
+export 'package:workingmemory/src/home/model/AppModel.dart' show AppModel;
 
-export 'package:workingmemory/src/model/db/FireBaseDB.dart' show FireBaseDB;
+export 'package:workingmemory/src/home/model/FireBaseDB.dart' show FireBaseDB;
 
-export 'package:workingmemory/src/framework/db/SyncDB.dart' show SyncDB;
+export 'package:workingmemory/src/home/model/SyncDB.dart' show SyncDB;
 
-export 'package:workingmemory/src/model/db/Semaphore.dart';
+export 'package:workingmemory/src/home/model/Semaphore.dart' show Semaphore;
 

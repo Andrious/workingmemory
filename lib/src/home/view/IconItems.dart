@@ -23,7 +23,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
-import 'package:workingmemory/src/model/Icons.dart' as List;
+import 'file:///C:/Programs/Tools/Projects/Flutter/apps/reminders/workingmemory/lib/src/home/model/Icons.dart' as List;
 
 class IconItems extends StatelessWidget {
   IconItems({Key key, @required this.icon, @required this.onTap}) : super(key: key);

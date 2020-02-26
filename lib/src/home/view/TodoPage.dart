@@ -39,42 +39,45 @@ class TodoPage extends StatefulWidget {
 }
 
 class _TodoState extends StateMVC<TodoPage> {
-  _TodoState() : super(Controller());
+  _TodoState() : super(Controller()){
+    con = controller;
+  }
+  Controller con;
 
   @override
   void initState() {
     super.initState();
-    Controller.edit.addState(this);
-    Controller.edit.init(widget.todo);
+    con.edit.addState(this);
+    con.edit.init(widget.todo);
   }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      key: Controller.edit.scaffoldKey,
-      appBar: AppBar(title: Controller.edit.title, actions: [
+      key: con.edit.scaffoldKey,
+      appBar: AppBar(title: con.edit.title, actions: [
         FlatButton(
             child: Text('SAVE',
-                style: theme.textTheme.body1.copyWith(color: Colors.white),
+                style: theme.textTheme.bodyText2.copyWith(color: Colors.white),
             ),
             onPressed: () async {
-              await Controller.edit.onPressed();
+              await con.edit.onPressed();
               Navigator.pop(context);
             })
       ]),
       body: Form(
-        key: Controller.edit.formKey,
+        key: con.edit.formKey,
         onWillPop: _onWillPop,
-        child: Controller.edit.child,
+        child: con.edit.child,
       ),
     );
   }
 
   Future<bool> _onWillPop() async {
-    if (!Controller.edit.hasChanged) return true;
+    if (!con.edit.hasChanged) return true;
 
     final TextStyle dialogTextStyle =
-        theme.textTheme.subhead.copyWith(color: theme.textTheme.caption.color);
+        theme.textTheme.subtitle1.copyWith(color: theme.textTheme.caption.color);
 
     return await showDialog<bool>(
           context: context,

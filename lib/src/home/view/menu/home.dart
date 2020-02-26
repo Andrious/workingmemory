@@ -28,8 +28,10 @@ import 'package:workingmemory/src/view.dart' show Menu;
 import 'package:workingmemory/src/controller.dart' show Controller;
 
 class WorkMenu extends Menu{
-
-  Controller _con = Controller();
+  WorkMenu():super(){
+    _con = Controller();
+  }
+  Controller _con;
 
   @override
   List<PopupMenuItem<dynamic>> menuItems() => [
@@ -37,10 +39,18 @@ class WorkMenu extends Menu{
   ];
 
   @override
+  List<PopupMenuItem<dynamic>> tailItems = [
+    PopupMenuItem(value: "Logout", child: Text("Logout")),
+  ];
+
+  @override
   void onSelected(dynamic menuItem){
     switch (menuItem) {
       case 'Resync':
         _con.reSync();
+        break;
+      case 'Logout':
+        _con.logOut();
         break;
       default:
     }

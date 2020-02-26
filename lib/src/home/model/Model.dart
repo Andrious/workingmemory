@@ -23,23 +23,28 @@
 import 'dart:async' show Future;
 
 import 'package:workingmemory/src/model.dart'
-    show CloudDB, SQLiteDB, Database;
+    show CloudDB, FireBaseDB, SQLiteDB, Database;
 
 import 'package:workingmemory/src/view.dart' show FieldWidgets;
-
-import 'package:workingmemory/src/model/db/FireBaseDB.dart';
-
-import 'package:workingmemory/src/model/db/CloudDB.dart';
 
 class Model {
   factory Model() => _this ??= Model._();
   static Model _this;
-
-  Model._() {
-    _tToDo = ToDo();
-    FireBaseDB.records();
-  }
+  Model._();
   ToDo _tToDo;
+  CloudDB _cloud;
+  FireBaseDB _fbDB;
+
+  Future<bool> init() async {
+    _fbDB = FireBaseDB.init();
+    _fbDB.records();
+    _cloud = CloudDB();
+    _tToDo = ToDo();
+    bool init = await _cloud.init();
+    if (init) _cloud.sync();
+    if (init) init = await _tToDo.init();
+    return init;
+  }
 
   Future<List<Map<String, dynamic>>> list() => _tToDo.notDeleted();
 
@@ -57,13 +62,16 @@ class Model {
 
     bool save = newRec.isNotEmpty;
 
-    if (save) save = await FireBaseDB.save(newRec);
+ //   await _tToDo.runTxn(() async {
+      //
+      if (save) save = await saveRec(newRec);
 
-    if (save) save = await saveRec(newRec);
+      if (save) _cloud.insert(newRec[FireBaseDB.key], "UPDATE");
 
-    if (save) CloudDB.insert(newRec[FireBaseDB.key], "UPDATE");
+      if (save) save = await _fbDB.save(newRec);
 
-    return Future.value(save);
+ //   });
+    return save;
   }
 
   Future<bool> saveRec(Map<String, dynamic> data) async {
@@ -115,16 +123,21 @@ class Model {
 
     newRec['deleted'] = 1;
 
-    bool delete = await save(newRec);
+    bool delete = await saveRec(newRec);
 
     if (delete) {
-      FireBaseDB.delete(newRec['KeyFld']);
+      // Remove from tasks Firebase collection.
+      bool syncDelete = await _fbDB.delete(newRec['KeyFld']);
+      if(syncDelete) {
+        // Record the deletion for the next sync.
+        _cloud.insert(newRec['KeyFld'], "DELETE");
+      }else{
+        // Record the deletion for the next sync.
+        _cloud.delete(newRec['id'], newRec['KeyFld']);
+      }
     }
+
     return delete;
-
-//    var rows = await _tToDo.delete(ToDo.TABLE_NAME, data['rowid']);
-
-//    return Future.value(rows > 0) ;
   }
 
   Future<bool> undelete(Map<String, dynamic> data) async {
@@ -158,21 +171,29 @@ class Model {
     records[key] = rec;
   }
 
-  Future<bool> initState() async {
-    bool init = await _tToDo.init();
-    sync();
-    return init;
-  }
-
   void dispose() {
     _tToDo.disposed();
   }
 
-  void sync() {
-    CloudDB.sync();
-  }
+  Future<void> sync() => _cloud.sync();
 
-  void reSync() => CloudDB.reSync();
+  void reSync() => _cloud.reSync();
+
+  Future<bool> recordDump() async {
+    List<Map<String, dynamic>> records = await list();
+    Set<String> keys = Set();
+    records.forEach((Map<String, dynamic> rec){
+       keys.add(rec["keyFld"]);
+    });
+    Iterable<Map<String, dynamic>> cloud = _fbDB.mDataArrayList.values;
+
+    cloud.forEach((Map<String, dynamic> rec) {
+       if(!keys.remove(rec["keyFld"])) {
+         save(rec);
+       }
+   });
+   return true;
+  }
 }
 
 class Item extends FieldWidgets {
@@ -202,13 +223,8 @@ class Icon extends FieldWidgets {
 }
 
 class ToDo extends SQLiteDB {
-  ToDo() {
-    keyField(TABLE_NAME).then((String keyFld){
-      _selectDeleted = "SELECT $keyFld, * FROM $TABLE_NAME" +
-          " WHERE deleted = 1";
-      _selectAll =  "SELECT $keyFld, * FROM $TABLE_NAME";
-    });
-  }
+  final _cloud = CloudDB();
+
   String _selectAll, _selectNotDeleted, _selectDeleted;
 
   bool finished;
@@ -220,11 +236,12 @@ class ToDo extends SQLiteDB {
   get version => 1;
 
   @override
-  Future<bool> init() {
-    var init = super.init().then((init) {
-//      if (init) notDeleted();
-      return init;
-    });
+  Future<bool> init() async {
+    bool init = await super.init();
+    String keyFld = await keyField(TABLE_NAME);
+    _selectDeleted =
+        "SELECT $keyFld, * FROM $TABLE_NAME" + " WHERE deleted = 1";
+    _selectAll = "SELECT $keyFld, * FROM $TABLE_NAME";
     return init;
   }
 
@@ -250,7 +267,7 @@ class ToDo extends SQLiteDB {
   Future onConfigure(Database db) async {
     int version = await db.getVersion();
     if (version == 0) {
-      CloudDB.setDeviceDirectory();
+      _cloud.setDeviceDirectory();
     }
     return version;
   }

@@ -20,11 +20,14 @@
 ///          Created  23 Jun 2018
 ///
 
+// What is done, with every change, it's recorded in every other device
+// to be synced when those devices start up.
 import 'package:flutter/material.dart';
 
 import 'dart:collection' show LinkedHashMap;
 
-import 'package:workingmemory/src/model.dart' show AppModel, FireBaseDB, Model, SyncDB;
+import 'package:workingmemory/src/model.dart'
+    show AppModel, FireBaseDB, Model, Semaphore, SyncDB;
 
 import 'package:workingmemory/src/controller.dart'
     show App, Controller, WorkingMemoryApp;
@@ -34,77 +37,76 @@ import 'package:firebase_database/firebase_database.dart'
 
 import 'package:auth/auth.dart' show Auth;
 
-
-
 class CloudDB {
   factory CloudDB() => _this ??= CloudDB._();
-
-  CloudDB._(){
-    _db = FireBaseDB.init();
-
-    _con = Controller.con;
-
-    _model = Controller.model;
-
-    _appModel = AppModel();
-
-    _fireDBRef = FireBaseDB.reference();
-
-    _dbHelper = SyncDB();
-  }
   static CloudDB _this;
-  FireBaseDB _db;
-  Controller _con;
-  Model _model;
-  AppModel _appModel;
-  DatabaseReference _fireDBRef;
-  static SyncDB _dbHelper;
+  CloudDB._();
 
+  final FireBaseDB _db = FireBaseDB.init();
+
+  final AppModel _appModel = AppModel();
+
+  final DatabaseReference _fireDBRef = FireBaseDB.reference();
+
+  final SyncDB _dbHelper = SyncDB();
+
+  final DataSync _dataSync = DataSync();
 
   /// Allow for easy access to 'this singular instance' throughout the application.
-  static CloudDB get object => _this ?? CloudDB();
+//  static CloudDB get object => _this ?? CloudDB();
 
   static final String _dbName = "sync";
 
-  static Future<bool> init() {
-    return _dbHelper.init();
-  }
+  Future<bool> init() => _dbHelper.open();
 
   // Set the device entry in the cloud with an assigned timestamp.
-  static void setDeviceDirectory() {
-    DataSync.deviceDirectory();
-  }
+  Future<void> setDeviceDirectory() => _dataSync.deviceDirectory();
 
   static void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
     } else if (state == AppLifecycleState.resumed) {}
   }
 
-  static void dispose() {
+  void dispose() {
     _dbHelper.disposed();
     DataSync.dispose();
     FireBaseDB.goOffline();
   }
 
-  static void sync() => DataSync.sync();
+  Future<void> sync() => _dataSync.sync(this);
 
-  static void reSync() => DataSync.reSync();
+  void reSync() => _dataSync.reSync();
 
-  static bool insert(String key, String action) {
-    return DataSync.insert(key, action);
+  Future<bool> insert(String key, String action) => _dataSync.insert(key, action);
+
+  Future<bool> delete(int recId, String key) async {
+    Map<String, dynamic> recValues;
+
+    recValues["id"] = recId;
+
+    recValues["key"] = key;
+
+    recValues["action"] = "DELETE";
+
+    // time is seconds
+    recValues["timestamp"] = Semaphore.timeStamp;
+
+    int count = await _dbHelper.update(recValues, recId);
+
+    return count > 0;
   }
 
-  static Future<List<Map<String, dynamic>>> getRecs() async {
+  Future<List<Map<String, dynamic>>> getRecs() async {
     return await _dbHelper.rawQuery("SELECT * FROM " + _dbName);
   }
 
-  static Future<List<Map<String, dynamic>>> getRec(String key) {
+  Future<List<Map<String, dynamic>>> getRec(String key) {
     String stmt = "SELECT * from $_dbName  WHERE key = \"${key.trim()}\"";
 
     return _dbHelper.rawQuery(stmt);
   }
 
-  static Future<bool> save(int recId, String key) async {
+  Future<bool> save(int recId, String key) async {
     bool save = false;
 
     save = _dbHelper.isOpen;
@@ -129,7 +131,7 @@ class CloudDB {
     return save;
   }
 
-  static Future<String> getAction(int recId) async {
+  Future<String> getAction(int recId) async {
     String action;
 
     List<Map<String, dynamic>> recs = await _dbHelper
@@ -143,7 +145,7 @@ class CloudDB {
     return action;
   }
 
-  static Future<bool> update(Map<String, dynamic> recValues, int recId) async {
+  Future<bool> update(Map<String, dynamic> recValues, int recId) async {
     int rowId = await _dbHelper.getRowID(recId);
 
     bool update = rowId > 0;
@@ -161,8 +163,7 @@ class CloudDB {
     return update;
   }
 
-  static Future<bool> insertNew(
-      Map<String, dynamic> recValues, int recId) async {
+  Future<bool> insertNew(Map<String, dynamic> recValues, int recId) async {
     int rowId = await _dbHelper.getRowID(recId);
 
     bool insert = rowId < 1;
@@ -187,26 +188,21 @@ abstract class OnLoginListener {
 
 class DataSync {
   final String installNum = App.installNum;
-
+  static final WorkingMemoryApp _con = WorkingMemoryApp();
+  final FireBaseDB _fireDB = FireBaseDB.init();
   void init() {}
 
-  static void deviceDirectory() {
-    devRef.set(timeStamp);
-  }
+  Future<void> deviceDirectory() => devRef.set(timeStamp);
 
-  static DatabaseReference get devRef {
-    _devRef ??= getDevRef();
-    return _devRef;
-  }
+  static DatabaseReference get devRef => _devRef ??= getDevRef();
 
   //todo What to do about this mess.
-  static Model _model = Controller.model;
-
+  static Model _model = Controller().model;
 
   static DatabaseReference _devRef;
 
   static DatabaseReference getDevRef() {
-    String id = WorkingMemoryApp.uid;
+    String id = _con.uid;
 
     if (id == null || id.isEmpty) {
       id = null;
@@ -220,12 +216,15 @@ class DataSync {
       // Important to provide a reference that is not likely there in case called by deletion routine.
       ref = FireBaseDB.reference().child("devices").child(App.installNum);
     } else {
-      ref =
-          FireBaseDB.reference().child("devices").child(id).child(App.installNum);
+      ref = FireBaseDB.reference()
+          .child("devices")
+          .child(id)
+          .child(App.installNum);
     }
     return ref;
   }
 
+  // Set the timeStamp this program was last run.
   static int get timeStamp => (DateTime.now().millisecondsSinceEpoch ~/ 1000);
 
   @override
@@ -236,17 +235,15 @@ class DataSync {
   @override
   int get hashCode => 0;
 
-  static DatabaseReference get syncRef {
-    _syncRef ??= getSyncRef();
-    return _syncRef;
-  }
-
-  static DatabaseReference _syncRef;
-
-  static DatabaseReference getSyncRef() {
-    if (!isOnline()) FireBaseDB.goOnline();
-
-    String id = WorkingMemoryApp.uid;
+  Future<DatabaseReference> getSyncRef() async {
+    final online = await isOnline();
+//    if (!isOnline()) FireBaseDB.goOnline();
+    String id;
+    if (online){
+      id = _con.uid;
+    }else{
+      id = null;
+    }
 
     if (id == null || id.trim().isEmpty) {
       id = null;
@@ -263,20 +260,20 @@ class DataSync {
           .child("dummy")
           .child(App.installNum);
     } else {
-      ref = FireBaseDB.reference().child("sync").child(id).child(App.installNum);
+      ref =
+          FireBaseDB.reference().child("sync").child(id).child(App.installNum);
     }
     return ref;
   }
 
-  static bool isOnline() {
-    // Is connected to the Internet.
-    return App.isOnline;
-  }
+  // Is connected to the Internet.
+  Future<bool> isOnline() => _fireDB.isOnline();
 
-  static void sync() async {
-    if (!isOnline()) return;
+  Future<void> sync(CloudDB cloud) async {
+    final online = await isOnline();
+    if (!online) return;
 
-    final DatabaseReference syncRef = DataSync.syncRef;
+    final DatabaseReference syncRef = await getSyncRef();
 
     final DataSnapshot syncINRef = await syncRef.child("IN").once();
 
@@ -293,7 +290,7 @@ class DataSync {
 
       var timestamp = v["timestamp"];
 
-      List<Map<String, dynamic>> recs = await CloudDB.getRec(key);
+      List<Map<String, dynamic>> recs = await cloud.getRec(key);
 
       if (recs.isNotEmpty) {
         Map<String, dynamic> rec = recs[0];
@@ -308,103 +305,94 @@ class DataSync {
           _model.deleteRec(key);
         }
 
-        if(!synced){
-
+        if (!synced) {
           List<Map<String, dynamic>> local = await _model.getRecord(key);
 
-          LinkedHashMap<String, dynamic> cloud = await FireBaseDB.records();
+          LinkedHashMap<String, dynamic> cloud = await _fireDB.records();
 
           // Add to the local device.
-          if (local.length == 0){
-
-            if (action == "DELETE"){
-
+          if (local.length == 0) {
+            if (action == "DELETE") {
               // It's been deleted and not to be added anyway.
               synced = true;
-            }else{
-
+            } else {
               synced = await _model.saveRec(rec);
             }
             // Update the appropriate database with the most recent copy.
-          }else{
-            if (action == "DELETE"){
-
-              if (cloud.length == 0){
-
-                 //It has been deleted already
+          } else {
+            if (action == "DELETE") {
+              if (cloud.length == 0) {
+                //It has been deleted already
                 synced = true;
-              }else{
-
-                 // Delete the local copy
+              } else {
+                // Delete the local copy
                 synced = await _model.deleteRec(cloud['key']);
               }
-            }else{
-
+            } else {
               // Update the local copy
               synced = await _model.saveRec(cloud);
             }
           }
-
         }
       }
     });
   }
 
-  static void reSync() async {
-    LinkedHashMap recs = await FireBaseDB.records();
-    recs.forEach((key, value){
-      
+  void reSync() async {
+    LinkedHashMap recs = await _fireDB.records();
+    recs.forEach((key, value) {
+      insert(key, "UPDATE");
     });
   }
 
-  static bool insert(final String key, final String action) {
+  Future<bool> insert(final String key, final String action) async {
     if (key == null || key.trim().isEmpty) {
       return false;
     }
-
     if (action == null || action.trim().isEmpty) {
       return false;
     }
-
-    deviceDirectory();
-
-    replace(key, {"key": key, "action": action, "timestamp": timeStamp});
-
-    return true;
+    bool insert;
+    try {
+      deviceDirectory();
+      await replace(key, {"key": key, "action": action, "timestamp": timeStamp});
+      insert = true;
+    } catch (ex) {
+      insert = false;
+    }
+    return insert;
   }
 
-  static void replace(String key, Map<String, dynamic> recValues) async {
-    final DatabaseReference syncRef = DataSync.syncRef;
+  Future<void> replace(
+      String key, Map<String, dynamic> recValues) async {
+    final DatabaseReference syncRef = await getSyncRef();
 
     DataSnapshot snapshot =
         await syncRef.child("OUT").orderByChild("key").equalTo(key).once();
 
-    if (snapshot.value == null || snapshot.value is! Map) return;
-
-    snapshot.value.forEach((k, v) {
-      syncRef.child("OUT").child(k).remove();
-    });
-
-//    syncRef.child("OUT").child(snapshot.key).remove();
-
-    insertRef(syncRef.child("OUT"), recValues);
+    if (snapshot.value == null || snapshot.value is! Map) {
+      insertRef(syncRef.child("OUT"), recValues);
+    } else {
+      Map<String, dynamic> data = snapshot.value;
+      data.forEach((k, v) {
+        syncRef.child("OUT").child(k).update({k: recValues});
+      });
+    }
   }
 
-  static String insertRef(
-      DatabaseReference dbRef, Map<dynamic, dynamic> recValues) {
-    String key = "";
-
+  static Future<String> insertRef(
+      DatabaseReference dbRef, Map<dynamic, dynamic> recValues) async {
+    String key;
     try {
       key = dbRef.push().key;
-
-      dbRef.update({key: recValues});
-    } catch (ex) {}
-
+      await dbRef.update({key: recValues});
+    } catch (ex) {
+      key = "";
+    }
     return key;
   }
 
   static void dispose() {
     _devRef = null;
-    _syncRef = null;
   }
 }

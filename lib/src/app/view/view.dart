@@ -20,35 +20,38 @@
 ///          Created  23 Jun 2018
 ///
 
-import 'package:mvc_application/mvc.dart' show ViewMVC;
+import 'package:flutter/material.dart';
 
-import 'package:workingmemory/src/controller/Controller.dart' as con;
+import 'package:mvc_application/view.dart' show AppView;
 
-import 'package:workingmemory/src/view/home/TodosPage.dart' show TodosPage;
+import 'package:workingmemory/src/controller.dart';
+
+import 'package:workingmemory/src/view.dart';
 
 //import 'package:workingmemory/src/view/LoginInfo.dart' show LoginInfo;
 
-/// Need to extend AppView to so to call controller's init() function.
-class View extends ViewMVC {
-  factory View() {
-//    if (_this == null) _this = WorkingMemoryApp._();
-    _this = View._();
-    return _this;
+class View extends AppView {
+  View()
+      : super(
+          con: _app,
+          title: 'Working Memory',
+          home: TodosPage(),
+          debugShowCheckedModeBanner: false,
+        ) {
+    _this = this;
+    idKey = _app.keyId;
   }
   static View _this;
 
   /// Allow for easy access to 'the View' throughout the application.
   static View get view => _this;
 
-  View._()
-      : idKey = _app.keyId,
-        super(
-          con: _app,
-          title: 'Working Memory',
-          home: TodosPage(),
-        );
-
   /// Instantiate here so to get the 'keyId.'
-  static final con.WorkingMemoryApp _app = con.WorkingMemoryApp();
-  final String idKey;
+  static final WorkingMemoryApp _app = WorkingMemoryApp();
+  String idKey;
+
+  @override
+  ThemeData onTheme() => ThemeData(
+        primarySwatch: App.colorTheme,
+      );
 }
