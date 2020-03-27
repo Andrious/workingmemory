@@ -19,7 +19,7 @@
 ///
 ///          Created  29 Nov 2018
 ///
-import 'dart:async' show Future, StreamSubscription;
+import 'dart:async' show Future;
 
 import 'dart:collection' show LinkedHashMap;
 
@@ -35,7 +35,7 @@ import 'package:firebase_database/firebase_database.dart'
 import 'package:flutter/widgets.dart' show AppLifecycleState;
 
 class FireBaseDB {
-  factory FireBaseDB.init({
+  factory FireBaseDB({
     void once(DataSnapshot data),
     void onChildAdded(Event event),
     void onChildRemoved(Event event),
@@ -69,22 +69,18 @@ class FireBaseDB {
       onValue: onValue,
     );
     _reference = _db.reference();
-
-    _con = WorkingMemoryApp();
   }
   static FireBaseDB _this;
   static f.FireBaseDB _db;
-  static DatabaseReference _reference;
-  static WorkingMemoryApp _con;
-
-  LinkedHashMap<dynamic, dynamic> mDataArrayList;
+  DatabaseReference _reference;
+  Map<String, dynamic> mDataArrayList;
 
   static bool mShowDeleted = false;
 
-  static String _keyFld = "KeyFld";
-  static String get key => _keyFld;
+  String _keyFld = "KeyFld";
+  String get key => _keyFld;
 
-  static DatabaseReference reference() => _reference;
+  DatabaseReference reference() => _reference;
 
   Future<bool> save(Map<String, dynamic> itemToDo) async {
     bool save;
@@ -129,7 +125,7 @@ class FireBaseDB {
   Future<String> updateRec(Map rec) async {
     String key = "";
 
-    if (!rec.containsKey(_keyFld)) return Future.value(key);
+    if (!rec.containsKey(_keyFld)) return key;
 
     var foxRec = Map.from(rec);
 
@@ -154,13 +150,61 @@ class FireBaseDB {
       _db?.setError(ex);
     }
 
-    return Future.value(key);
+    return key;
+  }
+
+  DatabaseReference get userRef {
+
+    // infinite loop if instantiated in constructor.
+    String id = WorkingMemoryApp().uid;
+
+    if (id == null || id.trim().isEmpty) {
+      id = null;
+    } else {
+      id = id.trim();
+    }
+
+    DatabaseReference ref = reference().child("users");
+
+    if (id == null) {
+      ref = ref.child("dummy");
+    } else {
+      ref = ref.child(id);
+    }
+    return ref;
+  }
+
+  DatabaseReference get yourDeviceRef => yourDevicesRef.child(App.installNum);
+
+  DatabaseReference get yourDevicesRef {
+
+    // infinite loop if instantiated in constructor.
+    String id = WorkingMemoryApp().uid;
+
+    if (id == null || id.trim().isEmpty) {
+      id = null;
+    } else {
+      id = id.trim();
+    }
+
+    DatabaseReference ref;
+
+    if (id == null) {
+      // Important to provide a reference that is not likely there in case called by deletion routine.
+      ref = reference().child("devices").child("dummy");
+    } else {
+      ref = reference()
+          .child("devices")
+          .child(id);
+    }
+    return ref;
   }
 
   DatabaseReference get tasksRef {
     DatabaseReference ref;
 
-    String id = _con.uid;
+    // infinite loop if instantiated in constructor.
+    String id = WorkingMemoryApp().uid;
 
     if (id.isEmpty) {
       ref = _db?.reference()?.child("tasks")?.child("dummy");
@@ -169,8 +213,6 @@ class FireBaseDB {
     }
     return ref;
   }
-
-
 
   Future<bool> createCurrentRecs() async {
     if (Semaphore.got()) {
@@ -200,7 +242,8 @@ class FireBaseDB {
     return true;
   }
 
-  Future<LinkedHashMap> records() async {
+  Future<Map<String, dynamic>> records() async {
+    // You have the recent data?
     if (Semaphore.got()) return mDataArrayList;
 
     DataSnapshot data;
@@ -213,12 +256,30 @@ class FireBaseDB {
     }
 
     if (data?.value == null || data?.value is! Map) {
-      mDataArrayList = LinkedHashMap<dynamic, dynamic>();
+      mDataArrayList = Map();
     } else {
-      mDataArrayList = data.value;
+      mDataArrayList = Map<String,dynamic>.from(data.value);
     }
     return mDataArrayList;
   }
+
+  Future<Map<String,dynamic>> record(String key) async{
+    Map<String, dynamic> fbRecs = await records();
+    Map<String, dynamic> rec;
+    if(fbRecs[key] == null){
+      rec = Map();
+    }else{
+       rec = Map<String, dynamic>.from(fbRecs[key]);
+       rec["KeyFld"] = key;
+    }
+    return rec;
+  }
+
+//  // Not a getter since it returns a Future. gp
+//  Future<Iterable<dynamic>> recordValues() async {
+//    Map<dynamic, dynamic> recs = await records();
+//    return recs?.values;
+//  }
 
   static List<Map<String, String>> recArrayList(
       DataSnapshot data, bool showDeleted) {
@@ -317,4 +378,21 @@ class FireBaseDB {
   static Future<void> goOnline() => _db.goOnline();
 
   static Future<void> goOffline() => _db.goOffline();
+
+  bool userStamp(){
+    bool stamp = true;
+    WorkingMemoryApp con = WorkingMemoryApp();
+    try {
+      DatabaseReference dbRef = userRef.child("profile");
+      dbRef.child("name").set(con.name);
+      dbRef.child("isAnonymous").set(con.isAnonymous);
+      dbRef.child("provider").set(con.provider);
+      dbRef.child("new user").set(con.isNewUser);
+      dbRef.child("photo").set(con.photo);
+    }catch(ex){
+      stamp = false;
+      con.getError(ex);
+    }
+    return stamp;
+  }
 }

@@ -21,13 +21,9 @@
 /// place: "/todos/todo"
 ///
 
-import 'dart:async' show Future;
-
 import 'package:flutter/material.dart';
 
-import 'package:workingmemory/src/view.dart' show StateMVC;
-
-import 'package:workingmemory/src/controller.dart' show Controller, theme;
+import 'package:workingmemory/src/view.dart' show App, TodoAndroid, TodoiOS;
 
 class TodoPage extends StatefulWidget {
   TodoPage({Key key, this.todo}) : super(key: key);
@@ -35,78 +31,5 @@ class TodoPage extends StatefulWidget {
   final Map todo;
 
   @override
-  State createState() => _TodoState();
-}
-
-class _TodoState extends StateMVC<TodoPage> {
-  _TodoState() : super(Controller()){
-    con = controller;
-  }
-  Controller con;
-
-  @override
-  void initState() {
-    super.initState();
-    con.edit.addState(this);
-    con.edit.init(widget.todo);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      key: con.edit.scaffoldKey,
-      appBar: AppBar(title: con.edit.title, actions: [
-        FlatButton(
-            child: Text('SAVE',
-                style: theme.textTheme.bodyText2.copyWith(color: Colors.white),
-            ),
-            onPressed: () async {
-              await con.edit.onPressed();
-              Navigator.pop(context);
-            })
-      ]),
-      body: Form(
-        key: con.edit.formKey,
-        onWillPop: _onWillPop,
-        child: con.edit.child,
-      ),
-    );
-  }
-
-  Future<bool> _onWillPop() async {
-    if (!con.edit.hasChanged) return true;
-
-    final TextStyle dialogTextStyle =
-        theme.textTheme.subtitle1.copyWith(color: theme.textTheme.caption.color);
-
-    return await showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              content: Text('Discard new event?', style: dialogTextStyle),
-              actions: <Widget>[
-                FlatButton(
-                    child: const Text('CANCEL'),
-                    onPressed: () {
-                      Navigator.of(context).pop(
-                          false); // Pops the confirmation dialog but not the page.
-                    }),
-                FlatButton(
-                    child: const Text('DISCARD'),
-                    onPressed: () {
-                      Navigator.of(context).pop(
-                          true); // Returning true to _onWillPop will pop again.
-                    })
-              ],
-            );
-          },
-        ) ??
-        false;
-  }
-}
-
-enum DismissDialogAction {
-  cancel,
-  discard,
-  save,
+  State createState() => App.useMaterial ? TodoAndroid() : TodoiOS();
 }

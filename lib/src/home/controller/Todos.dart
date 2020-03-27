@@ -19,38 +19,16 @@
 ///
 ///          Created  04 Nov 2018
 
+import "dart:async" show Future;
+
 import 'package:flutter/material.dart'
     show
-        Alignment,
         AppLifecycleState,
-        Axis,
-        Border,
-        BorderSide,
-        BoxDecoration,
-        BuildContext,
-        Center,
-        Colors,
-        Column,
-        Container,
-        CrossAxisAlignment,
-        DismissDirection,
-        Dismissible,
-        EdgeInsets,
         FormState,
         GlobalKey,
-        Icon,
-        IconData,
-        Icons,
-        InputDecoration,
-        ListTile,
-        ListView,
-        ObjectKey,
         ScaffoldState,
-        SnackBar,
-        SnackBarAction,
         Text,
         TextEditingController,
-        TextFormField,
         ThemeData,
         Widget;
 
@@ -58,7 +36,7 @@ import 'package:intl/intl.dart' show DateFormat;
 
 import 'package:workingmemory/src/model.dart' as m;
 
-import 'package:workingmemory/src/view.dart';
+import 'package:workingmemory/src/view.dart' show App;
 
 import 'package:workingmemory/src/controller.dart';
 
@@ -72,10 +50,9 @@ class Controller extends ControllerMVC {
     model = m.Model();
     _editToDo = ToDoEdit();
     _listToDo = ToDoList();
-    app = WorkingMemoryApp();
   }
   m.Model model;
-  WorkingMemoryApp app;
+  WorkingMemoryApp _app;
 
   ToDoEdit get edit => _editToDo;
   ToDoEdit _editToDo;
@@ -90,39 +67,46 @@ class Controller extends ControllerMVC {
   /// Allow for easy access to 'the Controller' throughout the application.
   static Controller get con => _this ?? Controller();
 
+  WorkingMemoryApp get app => _app ??= WorkingMemoryApp();
+
   void rebuild() => _this.refresh();
 
   Future<bool> init() async {
     bool init = await model.init();
-    list.retrieve().then((_) {
-      // Display the list.
-      refresh();
-    });
+//    list.retrieve().then((list) {
+//      // Display the list.
+//      refresh();
+//      setAlarms(list);
+//    });
+    List<Map<String, dynamic>> recs = await list.retrieve();
+    // Display the list.
+//    refresh();
+    setAlarms(recs);
     _editKey = edit.addState(this.stateMVC);
     _listKey = list.addState(this.stateMVC);
     return init;
   }
 
-  m.CloudDB _cloud;
-
   @override
   void dispose() {
-    _cloud.dispose();
     model.dispose();
     super.dispose();
   }
 
-  bool get loggedIn => app.loggedIn;
-
-  void logOut() {
-    app.logOut();
+  void signIn() {
+    app.signIn();
     refresh();
   }
+
+  void logOut() => app.logOut();
+
+  Future<void> signOut() => app.signOut();
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      model.sync();
+//      if(app.loggedIn)
+//      model.sync();
     }
 
     /// Passing these possible values:
@@ -151,6 +135,50 @@ class Controller extends ControllerMVC {
   get defaultIcon => model.defaultIcon;
 
   void reSync() => model.reSync();
+
+  void setAlarms(List<Map<String, dynamic>> list) async {
+    recs = list;
+    Iterator it = list.iterator;
+    String sDateTime;
+    DateTime time;
+    DateTime threshold = DateTime.now();
+    bool oneShot;
+    while (it.moveNext()) {
+      int id = it.current["rowid"];
+      if (id == null) continue;
+      sDateTime = it.current["DateTime"];
+      if (sDateTime == null) continue;
+      time = DateTime.parse(sDateTime);
+      if (time.isAfter(threshold)) {
+        oneShot = await AlarmManager.oneShotAt(
+          time,
+          id,
+          (int id) async {
+            Iterator it = recs.iterator;
+            int rowid;
+            while (it.moveNext()) {
+              rowid = it.current["rowid"];
+              if (rowid == null) continue;
+              if (rowid == id) {
+                break;
+              }
+            }
+          },
+          exact: true,
+        );
+        if (!oneShot) {
+          getError(Exception("AlarmManager.oneShotAt returned false."));
+          break;
+        }
+//        AlarmManager.cancel(id).then((cancel) {
+//          print(cancel);
+//        });
+      }
+      break;
+    }
+  }
+
+  static List<Map<String, dynamic>> recs;
 }
 
 class ToDoEdit extends ToDoList {
@@ -178,72 +206,26 @@ class ToDoEdit extends ToDoList {
 
     changer = TextEditingController(text: item);
     changer.addListener(() {
-      hasChanged = true;
+      hasChanged = changer.value.text != item;
     });
+
     dateTime = dateTime ?? DateTime.now();
   }
 
-  Widget get title => Text(hasName ? item : 'Event Name TBD');
+  Widget get title => Text(hasName ? item : 'New');
 
-  Widget get child => ListView(
-      padding: const EdgeInsets.all(16.0),
-      children: Controller().edit.children);
-
-  get children => <Widget>[
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          alignment: Alignment.bottomLeft,
-          child: TextFormField(
-              controller: changer,
-              decoration: const InputDecoration(
-                filled: true,
-                labelText: 'Event name',
-              ),
-              validator: (v) {
-                if (v.trim().isEmpty) return 'Cannot be empty.';
-                return null;
-              },
-              onSaved: (value) {
-                item = value;
-              }),
-        ),
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-          Center(
-              child: Icon(
-                  IconData(int.tryParse(icon), fontFamily: 'MaterialIcons'))),
-          Text('From', style: theme.textTheme.caption),
-          DateTimeItem(
-            dateTime: dateTime,
-            onChanged: (DateTime value) {
-              setState(() {
-                dateTime = value;
-              });
-              saveNeeded = true;
-            },
-          )
-        ]),
-        Container(
-            height: 300.0,
-            child: IconItems(
-                icon: icon,
-                onTap: (icon) {
-                  setState(() {
-                    this.icon = icon;
-                  });
-                })),
-      ];
-
-  Future<void> onPressed() async {
-    var con = Controller();
-    bool save = con.edit.formKey.currentState.validate();
+  Future<bool> onPressed() async {
+    bool save = formKey.currentState.validate();
     if (save) {
-      con.edit.formKey.currentState.save();
-      save = await con.edit
-          .save({'Item': item, 'DateTime': dateTime, 'Icon': icon}, this.todo);
-      await con.list.retrieve();
-      refresh();
+      formKey.currentState.save();
+      save = await this.save(
+          {'Item': changer.text.trim(), 'DateTime': dateTime, 'Icon': icon},
+          this.todo);
+// Let's see if this is necessary.
+//      await con.list.retrieve();
+//      refresh();
     }
-    return Future.value(save);
+    return save;
   }
 
   Future<bool> save(
@@ -259,8 +241,8 @@ class ToDoEdit extends ToDoList {
         return delete;
       });
 
-  Future<bool> undelete(Map<String, dynamic> data) =>
-      model.undelete(data).then((un) async {
+  Future<bool> unDelete(Map<String, dynamic> data) =>
+      model.unDelete(data).then((un) async {
         await Controller().list.retrieve();
         refresh();
         return un;
@@ -270,69 +252,21 @@ class ToDoEdit extends ToDoList {
 typedef MapCallback = void Function(Map data);
 
 class ToDoList extends ToDoFields {
-  final ThemeData _theme = App.theme;
-
-  final _dateFormat = DateFormat('EEEE, MMM dd  h:mm a');
-
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-
-  final m.Model model = m.Model();
+  ToDoList() : super() {
+    scaffoldKey = GlobalKey<ScaffoldState>();
+    model = m.Model();
+  }
+  final DateFormat dateFormat = DateFormat('EEEE, MMM dd  h:mm a');
+  GlobalKey<ScaffoldState> scaffoldKey;
+  m.Model model;
 
   List<Map<String, dynamic>> get items => _items;
   List<Map<String, dynamic>> _items = [];
 
-//  /// Call the setState() function to 'refresh' the widget tree.
-//  Future<void> refresh() async {
-//    await retrieve();
-////    Controller.rebuild();
-//  }
-
   /// Retrieve the to-do items from the database
-  Future<void> retrieve() async => _items = await model.list();
-
-  Widget view(MapCallback onTap) {
-    return ListView.builder(
-      scrollDirection: Axis.vertical,
-      padding: EdgeInsets.all(6.0),
-      itemCount: _items.length,
-      itemBuilder: (BuildContext context, int index) {
-        return Dismissible(
-          key: ObjectKey(_items[index]['rowid']),
-          direction: DismissDirection.endToStart,
-          onDismissed: (DismissDirection direction) {
-            Controller().edit.delete(_items[index]);
-            final String action = (direction == DismissDirection.endToStart)
-                ? 'deleted'
-                : 'archived';
-            Controller().list.scaffoldKey.currentState?.showSnackBar(SnackBar(
-                content: Text('You $action an item.'),
-                action: SnackBarAction(
-                    label: 'UNDO',
-                    onPressed: () {
-                      Controller().edit.undelete(_items[index]);
-                    })));
-          },
-          background: Container(
-              color: Colors.red,
-              child: const ListTile(
-                  trailing: const Icon(Icons.delete,
-                      color: Colors.white, size: 36.0))),
-          child: Container(
-            decoration: BoxDecoration(
-                color: _theme.canvasColor,
-                border: Border(bottom: BorderSide(color: _theme.dividerColor))),
-            child: ListTile(
-              leading: Icon(IconData(int.tryParse(_items[index]['Icon']),
-                  fontFamily: 'MaterialIcons')),
-              title: Text(_items[index]['Item']),
-              subtitle: Text(_dateFormat
-                  .format(DateTime.tryParse(_items[index]['DateTime']))),
-              onTap: () => onTap(_items[index]),
-            ),
-          ),
-        );
-      },
-    );
+  Future<List<Map<String, dynamic>>> retrieve() async {
+    _items = await model.list();
+    return _items;
   }
 }
 

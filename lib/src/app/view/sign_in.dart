@@ -29,18 +29,17 @@ import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart';
 
-
 class SignIn extends StatefulWidget {
   SignIn({Key key}) : super(key: key);
   @override
   State createState() => SignInState();
 }
 
-class SignInState extends StateMVC<SignIn>{
-  SignInState():super(){
-    con = WorkingMemoryApp.con;
+class SignInState extends StateMVC<SignIn> {
+  SignInState() : super() {
+    app = WorkingMemoryApp();
   }
-  WorkingMemoryApp con;
+  WorkingMemoryApp app;
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +53,7 @@ class SignInState extends StateMVC<SignIn>{
       Padding(
         padding: EdgeInsets.only(top: 10.0, right: 40.0),
         child: GestureDetector(
-          onTap: () => con.signInWithFacebook(),
+          onTap: () => app.signInWithFacebook(),
           child: Container(
             padding: const EdgeInsets.all(15.0),
             decoration: new BoxDecoration(
@@ -71,7 +70,7 @@ class SignInState extends StateMVC<SignIn>{
       Padding(
         padding: EdgeInsets.only(top: 10.0, right: 40.0),
         child: GestureDetector(
-          onTap: () => con.signInWithTwitter(),
+          onTap: () => app.signInWithTwitter(),
           child: Container(
             padding: const EdgeInsets.all(15.0),
             decoration: new BoxDecoration(
@@ -88,7 +87,7 @@ class SignInState extends StateMVC<SignIn>{
       Padding(
         padding: EdgeInsets.only(top: 10.0, right: 40.0),
         child: GestureDetector(
-          onTap: () => con.signInEmailPassword(context),
+          onTap: () => app.signInEmailPassword(context),
           child: Container(
             padding: const EdgeInsets.all(15.0),
             decoration: new BoxDecoration(
@@ -105,7 +104,7 @@ class SignInState extends StateMVC<SignIn>{
       Padding(
         padding: EdgeInsets.only(top: 10.0),
         child: GestureDetector(
-          onTap: () => con.signInWithGoogle(),
+          onTap: () => app.signInWithGoogle(),
           child: Container(
             padding: const EdgeInsets.all(15.0),
             decoration: new BoxDecoration(
@@ -125,6 +124,4 @@ class SignInState extends StateMVC<SignIn>{
       children: children,
     );
   }
-
 }
-

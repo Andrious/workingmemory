@@ -1,7 +1,7 @@
 name: workingmemory
 description: A ToDo List for a not so working memory
 
-version: 0.5.0
+version: 0.6.0
 
 environment:
   sdk: '>=2.6.0 <3.0.0'
@@ -10,19 +10,16 @@ dependencies:
   flutter:
     sdk: flutter
 
-  mvc_application: #^1.0.0
-      path: ../../../packages/mvc_application
+  mvc_application: ^1.0.0
+#      path: ../../../packages/mvc_application
 #    git:
 #      url: git://github.com/AndriousSolutions/mvc_application.git
 
   # Facebook entry in AndroidManifest.xml
-  auth: #^4.0.0
-    path: ../../../libs/auth
+  auth: ^5.0.0
+#    path: ../../../libs/auth
 #    git:
 #      url: git://github.com/AndriousSolutions/auth.git
-
-  dbutils: #^1.0.0
-    path: ../../../libs/dbutils
 
   sqflite: ^1.0.0
 
@@ -30,30 +27,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: any #^0.1.0
 
-  # https://pub.dartlang.org/packages/firebase_database
-#  firebase_database: any #^3.0.5
-
-#  # https://pub.dartlang.org/packages/firebase_core
-#  firebase_core: ^0.3.0
-
   # https://pub.dartlang.org/packages/path_provider#-changelog-tab-
-  path_provider: ^1.0.0
-
-#  # https://pub.dartlang.org/packages/package_info#-changelog-tab-
-#  package_info: "^0.3.0"
-#
-#  # https://pub.dartlang.org/packages/connectivity#-changelog-tab-
-#  connectivity: "^0.3.0"
-#
-#  # https://pub.dartlang.org/packages/sqflite#-changelog-tab-
-#  sqflite: "0.11.2+2" #"^0.8.9"
+#  path_provider: ^1.0.0
 
   # https://pub.dartlang.org/packages/intl
   intl: any #^0.15.7
-
-#  # https://pub.dartlang.org/packages/url_launcher
-#  # AppSettings.dart
-#  url_launcher: 3.0.3
 
   # https://pub.dev/packages/font_awesome_flutter
   font_awesome_flutter: ^8.0.0
@@ -80,7 +58,8 @@ flutter:
   #  - images/a_dot_ham.jpeg
   assets:
      - assets/sql/create.sql
-
+     - assets/i10n/i10n.csv
+    
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
 

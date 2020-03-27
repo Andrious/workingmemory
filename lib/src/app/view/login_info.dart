@@ -50,10 +50,10 @@ class LoginInfo {
           },
         ),
         RaisedButton(
-            child: const Text('Test signIn'),
+            child: const Text('Test signInSilently'),
             onPressed: () {
               _vw.setState(() {
-                _uid = con.signIn().then((log){
+                _uid = con.signInSilently().then((log){
                   return con.uid;
                 });
               });

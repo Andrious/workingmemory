@@ -25,7 +25,7 @@ export 'package:workingmemory/src/home/model/Model.dart';
 
 export 'package:workingmemory/src/home/model/CloudDB.dart' show CloudDB, OnLoginListener;
 
-export 'package:mvc_application/model.dart' show SQLiteDB;
+export 'package:mvc_application/model.dart' show RemoteConfig, RemoteConfigValue, SQLiteDB;
 
 export 'package:sqflite/sqflite.dart' show Database;
 

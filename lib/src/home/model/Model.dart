@@ -30,16 +30,19 @@ import 'package:workingmemory/src/view.dart' show FieldWidgets;
 class Model {
   factory Model() => _this ??= Model._();
   static Model _this;
-  Model._();
+  Model._() {
+    _fbDB = FireBaseDB();
+    _cloud = CloudDB();
+    _tToDo = ToDo();
+  }
   ToDo _tToDo;
   CloudDB _cloud;
   FireBaseDB _fbDB;
 
+  static final fbKeyField = "KeyFld";
+
   Future<bool> init() async {
-    _fbDB = FireBaseDB.init();
     _fbDB.records();
-    _cloud = CloudDB();
-    _tToDo = ToDo();
     bool init = await _cloud.init();
     if (init) _cloud.sync();
     if (init) init = await _tToDo.init();
@@ -47,6 +50,19 @@ class Model {
   }
 
   Future<List<Map<String, dynamic>>> list() => _tToDo.notDeleted();
+
+  Future<Map<String, dynamic>> recordByKey(String key) async {
+    List<Map<String, dynamic>> recs = await list();
+    Map<String, dynamic> rec = Map();
+    Iterator<Map<String, dynamic>> it = recs.iterator;
+    while(it.moveNext()){
+       if(it.current[fbKeyField] == key) {
+         rec = it.current;
+         break;
+       }
+    }
+    return rec;
+  }
 
   Item get item {
     if (_item == null) _item = Item();
@@ -62,19 +78,23 @@ class Model {
 
     bool save = newRec.isNotEmpty;
 
- //   await _tToDo.runTxn(() async {
-      //
-      if (save) save = await saveRec(newRec);
+    //   await _tToDo.runTxn(() async {
+    //  Save to SQLite
+    if (save) save = await saveRec(newRec);
+    // Save to Firebase
+    if (save) save = await _fbDB.save(newRec);
+    // Sync changes
+    if (save) _cloud.insert(newRec[_fbDB.key], "UPDATE");
 
-      if (save) _cloud.insert(newRec[FireBaseDB.key], "UPDATE");
-
-      if (save) save = await _fbDB.save(newRec);
-
- //   });
+    //   });
     return save;
   }
 
   Future<bool> saveRec(Map<String, dynamic> data) async {
+//    DateTime dTime = data["DateTime"];
+//    if(dTime != null){
+//      data["DateTime"] = dTime.toUtc();
+//    }
     Map<String, dynamic> rec = await _tToDo.saveRec(ToDo.TABLE_NAME, data);
     return rec.isNotEmpty;
   }
@@ -127,20 +147,20 @@ class Model {
 
     if (delete) {
       // Remove from tasks Firebase collection.
-      bool syncDelete = await _fbDB.delete(newRec['KeyFld']);
-      if(syncDelete) {
+      bool syncDelete = await _fbDB.delete(newRec[fbKeyField]);
+      if (syncDelete) {
         // Record the deletion for the next sync.
-        _cloud.insert(newRec['KeyFld'], "DELETE");
-      }else{
+        _cloud.insert(newRec[fbKeyField], "DELETE");
+      } else {
         // Record the deletion for the next sync.
-        _cloud.delete(newRec['id'], newRec['KeyFld']);
+        _cloud.delete(newRec['rowid'], newRec[fbKeyField]);
       }
     }
 
     return delete;
   }
 
-  Future<bool> undelete(Map<String, dynamic> data) async {
+  Future<bool> unDelete(Map<String, dynamic> data) async {
     data['deleted'] = 0;
     return save(data);
   }
@@ -181,18 +201,32 @@ class Model {
 
   Future<bool> recordDump() async {
     List<Map<String, dynamic>> records = await list();
+    // There's records already. Don't bother.
+    if(records.isNotEmpty) return false;
     Set<String> keys = Set();
-    records.forEach((Map<String, dynamic> rec){
-       keys.add(rec["keyFld"]);
+    records.forEach((Map<String, dynamic> rec) {
+      keys.add(rec[fbKeyField]);
     });
-    Iterable<Map<String, dynamic>> cloud = _fbDB.mDataArrayList.values;
+    Map<dynamic, dynamic> fireDB = await _fbDB.records();
 
-    cloud.forEach((Map<String, dynamic> rec) {
-       if(!keys.remove(rec["keyFld"])) {
-         save(rec);
-       }
-   });
-   return true;
+    bool dump = fireDB.isNotEmpty;
+
+    Iterator<dynamic> it = fireDB.entries.iterator;
+
+    while (it.moveNext()) {
+      if (!keys.remove(it.current.key)) {
+        if(it.current.value is! Map) continue;
+        Map<String, dynamic> rec = Map.from(it.current.value);
+        if(rec["deleted"] == 1) continue;
+        rec[fbKeyField] = it.current.key;
+        rec["rowid"] = null;
+        dump = await saveRec(rec);
+      }
+      if (!dump) {
+        break;
+      }
+    }
+    return dump;
   }
 }
 
@@ -223,7 +257,14 @@ class Icon extends FieldWidgets {
 }
 
 class ToDo extends SQLiteDB {
-  final _cloud = CloudDB();
+  factory ToDo() => _this ??= ToDo._();
+  ToDo._(){
+    _cloud = CloudDB();
+    _fbDB = FireBaseDB();
+  }
+  static ToDo _this;
+  CloudDB _cloud;
+  FireBaseDB _fbDB;
 
   String _selectAll, _selectNotDeleted, _selectDeleted;
 
@@ -267,7 +308,7 @@ class ToDo extends SQLiteDB {
   Future onConfigure(Database db) async {
     int version = await db.getVersion();
     if (version == 0) {
-      _cloud.setDeviceDirectory();
+      _cloud.timeStampDevice();
     }
     return version;
   }

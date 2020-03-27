@@ -20,77 +20,21 @@
 ///          Created  29 Aug 2018
 ///
 
-import 'package:intl/intl.dart';
-
 import 'package:flutter/material.dart';
 
-class DateTimeItem extends StatelessWidget {
-  DateTimeItem({Key key, DateTime dateTime, @required this.onChanged})
-      : assert(onChanged != null),
-        date = DateTime(dateTime.year, dateTime.month, dateTime.day),
-        time = TimeOfDay(hour: dateTime.hour, minute: dateTime.minute),
-        super(key: key);
+import 'package:workingmemory/src/view.dart'
+    show App, DTAndroid, DTiOS;
 
-  final DateTime date;
-  final TimeOfDay time;
+class DateTimeItem extends StatelessWidget {
+  DateTimeItem({this.key, this.dateTime, @required this.onChanged});
+  final Key key;
+  final DateTime dateTime;
   final ValueChanged<DateTime> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-
-    return DefaultTextStyle(
-        style: theme.textTheme.subhead,
-        child: Row(children: <Widget>[
-          Expanded(
-              child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  decoration: BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(color: theme.dividerColor))),
-                  child: InkWell(
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(DateFormat('EEE, MMM d yyyy').format(date)),
-                          const Icon(Icons.arrow_drop_down,
-                              color: Colors.black54),
-                        ]),
-                    onTap: () {
-                      showDatePicker(
-                              context: context,
-                              initialDate: date,
-                              firstDate:
-                                  date.subtract(const Duration(days: 30)),
-                              lastDate: date.add(const Duration(days: 2555)))
-                          .then<Null>((DateTime value) {
-                        if (value != null)
-                          onChanged(DateTime(value.year, value.month, value.day,
-                              time.hour, time.minute));
-                      });
-                    },
-                  ))),
-          Container(
-              margin: const EdgeInsets.only(left: 8.0),
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              decoration: BoxDecoration(
-                  border:
-                      Border(bottom: BorderSide(color: theme.dividerColor))),
-              child: InkWell(
-                child: Row(children: <Widget>[
-                  Text('${time.format(context)}'),
-                  const Icon(Icons.arrow_drop_down, color: Colors.black54),
-                ]),
-                onTap: () {
-                  showTimePicker(context: context, initialTime: time)
-                      .then<Null>((TimeOfDay value) {
-                    if (value != null)
-                      onChanged(DateTime(date.year, date.month, date.day,
-                          value.hour, value.minute));
-                  });
-                },
-              ))
-        ])
-    );
+    return App.useCupertino
+        ? DTiOS(key: key, dateTime: dateTime, onChanged: onChanged)
+        : DTAndroid(key: key, dateTime: dateTime, onChanged: onChanged);
   }
 }

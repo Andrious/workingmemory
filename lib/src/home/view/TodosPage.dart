@@ -20,88 +20,13 @@
 ///          Created  16 Jun 2018
 
 /// place: "/todos"
+import 'package:flutter/material.dart' show Key, State, StatefulWidget;
 
-import 'package:flutter/material.dart'
-    show
-        AppBar,
-        BuildContext,
-        Container,
-        FlutterErrorDetails,
-        FloatingActionButton,
-        Icon,
-        Icons,
-        Key,
-        MaterialPageRoute,
-        Navigator,
-        Route,
-        RouteSettings,
-        SafeArea,
-        Scaffold,
-        State,
-        StatefulWidget,
-        Text,
-        Widget;
-
-import 'package:workingmemory/src/view.dart';
-
-import 'package:workingmemory/src/controller.dart';
+import 'package:workingmemory/src/view.dart'
+    show App, TodosAndroid, TodosiOS;
 
 class TodosPage extends StatefulWidget {
   TodosPage({Key key}) : super(key: key);
-
   @override
-  State createState() => _TodosState();
-}
-
-class _TodosState extends StateMVC<TodosPage> {
-  _TodosState() : super(Controller()) {
-    con = controller;
-    _menu = WorkMenu();
-  }
-  Controller con;
-  WorkMenu _menu;
-
-  @override
-  Widget build(BuildContext context) {
-    if (!con.loggedIn) return SignIn();
-    return Scaffold(
-      key: con.list.scaffoldKey,
-      drawer: SettingsDrawer(),
-      appBar: AppBar(
-        title: const Text("My ToDos"),
-        actions: <Widget>[
-          _menu.show(this),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => editToDo(),
-        child: const Icon(
-          Icons.add,
-          semanticLabel: 'Add',
-        ),
-      ),
-      body: SafeArea(
-        child: con.list.items.length == 0
-            ? Container()
-            : con.list.view(editToDo),
-      ),
-    );
-  }
-
-  void editToDo([Map todo]) async {
-    Route route = MaterialPageRoute<Map<String, dynamic>>(
-      settings: RouteSettings(name: "/todos/todo"),
-      builder: (BuildContext context) => TodoPage(todo: todo),
-      fullscreenDialog: true,
-    );
-
-    await Navigator.of(context).push(route);
-//    Controller.list.refresh();
-//    await Controller.list.retrieve();
-  }
-
-  @override
-  void onError(FlutterErrorDetails details) {
-    print(details.exception.toString());
-  }
+  State createState() => App.useMaterial ? TodosAndroid() : TodosiOS();
 }

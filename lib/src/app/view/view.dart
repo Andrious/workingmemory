@@ -31,14 +31,15 @@ import 'package:workingmemory/src/view.dart';
 //import 'package:workingmemory/src/view/LoginInfo.dart' show LoginInfo;
 
 class View extends AppView {
-  View()
+  factory View() => _this ??= View._();
+  View._()
       : super(
           con: _app,
           title: 'Working Memory',
           home: TodosPage(),
+//          switchUI: true,
           debugShowCheckedModeBanner: false,
         ) {
-    _this = this;
     idKey = _app.keyId;
   }
   static View _this;

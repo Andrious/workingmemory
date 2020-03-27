@@ -19,11 +19,13 @@
 ///
 ///          Created  29 Aug 2018
 ///
-import 'dart:developer';
+//import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
-import 'file:///C:/Programs/Tools/Projects/Flutter/apps/reminders/workingmemory/lib/src/home/model/Icons.dart' as List;
+//import 'package:mvc_application/view.dart' show SnappingListScrollPhysics;
+
+import 'package:workingmemory/src/home/model/Icons.dart' as List;
 
 class IconItems extends StatelessWidget {
   IconItems({Key key, @required this.icon, @required this.onTap}) : super(key: key);
@@ -46,6 +48,7 @@ class IconItems extends StatelessWidget {
               crossAxisCount: (orientation == Orientation.portrait) ? 10 : 20,
               mainAxisSpacing: 4.0,
               crossAxisSpacing: 4.0,
+              physics: ClampingScrollPhysics(),
               padding: const EdgeInsets.all(4.0),
               childAspectRatio: (orientation == Orientation.portrait) ? 1.0 : 1.2,
               children: icons.where((dynamic icon){

@@ -21,6 +21,7 @@
 ///
 ///           import 'package:workingmemory/view.dart';
 
+export 'dart:io' show Platform;
 
 export 'package:mvc_application/view.dart';
 
@@ -30,14 +31,28 @@ export 'package:workingmemory/src/app/view/settings_drawer.dart';
 
 export 'package:workingmemory/src/app/view/sign_in.dart';
 
-export 'package:workingmemory/src/home/view/TodoPage.dart';
-
 export 'package:workingmemory/src/home/view/TodosPage.dart';
 
+export 'package:workingmemory/src/home/view/android/TodosPage.dart';
+
+export 'package:workingmemory/src/home/view/ios/TodosPage.dart';
+
+export 'package:workingmemory/src/home/view/TodoPage.dart';
+
+export 'package:workingmemory/src/home/view/android/TodoPage.dart';
+
+export 'package:workingmemory/src/home/view/ios/TodoPage.dart';
+
+export 'package:workingmemory/src/home/view/android/DateTimeItem.dart';
+
+export 'package:workingmemory/src/home/view/ios/DateTimeItem.dart';
+
 export 'package:workingmemory/src/home/view/DateTimeItem.dart';
+
+export 'package:workingmemory/src/home/view/ios/Settings.dart';
+
+export 'package:workingmemory/src/home/view/ios/settings/notification_settings.dart';
 
 export 'package:workingmemory/src/home/view/IconItems.dart';
 
 export 'package:workingmemory/src/home/view/menu/home.dart';
-
-

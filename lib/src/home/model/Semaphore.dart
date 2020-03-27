@@ -25,6 +25,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:workingmemory/src/model.dart';
 
 class Semaphore {
+  //
+  static const String _SIGNAL = "semaphore";
+
   static const int STAMP_RESET = -1;
 
   static int _timeStamp = STAMP_RESET;
@@ -34,7 +37,7 @@ class Semaphore {
   static bool got() => _stamp == _timeStamp;
 
   static bool gotIt(DataSnapshot snapshot) {
-    if (snapshot.key.endsWith("semaphore")) {
+    if (snapshot.key.endsWith(_SIGNAL)) {
       _timeStamp = snapshot.value;
     } else {
       _timeStamp = STAMP_RESET;
@@ -47,6 +50,7 @@ class Semaphore {
     bool write;
     try {
       await dbRef.set(_stamp);
+      await CloudDB().timeStampDevice();
       write = true;
     } catch (ex) {
       write = false;
@@ -59,5 +63,7 @@ class Semaphore {
   static DateTime getDateTime(int seconds) =>
       DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
 
-  static DatabaseReference get dbRef => FireBaseDB.init().tasksRef.child('semaphore');
+//  static DatabaseReference get dbRef => FireBaseDB().tasksRef.child('semaphore');
+
+  static DatabaseReference get dbRef => FireBaseDB().userRef.child(_SIGNAL);
 }

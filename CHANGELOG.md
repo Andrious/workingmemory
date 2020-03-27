@@ -1,3 +1,11 @@
+## 0.6.0
+- class CloudDB, class RemoteConfig, class DateTimeItem
+- class WorkMenu, class Icons, class LoginInfo signInSilently(), class Model FireBaseDB()
+- class Semaphore, class Settings getLeftHanded()
+- class SignIn signInWithFacebook(), signInWithTwitter(), signInEmailPassword(), signInWithGoogle()
+- class SyncDB
+- class TodoPage ? TodoAndroid() : TodoiOS();
+
 ## 0.5.0
  Feb. 26, 2020
 - Changed from all Static methods.

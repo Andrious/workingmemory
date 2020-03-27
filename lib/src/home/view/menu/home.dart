@@ -23,28 +23,39 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:workingmemory/src/view.dart' show Menu;
+import 'package:workingmemory/src/view.dart' show Menu, SignIn;
 
 import 'package:workingmemory/src/controller.dart' show Controller;
 
-class WorkMenu extends Menu{
-  WorkMenu():super(){
+class WorkMenu extends Menu {
+  WorkMenu() : super() {
     _con = Controller();
+
+    if (_con.app.loggedIn) {
+      if (_con.app.isAnonymous) {
+        tailItems = [
+          PopupMenuItem(value: "SignIn", child: Text("Sign in...")),
+        ];
+      } else {
+        tailItems = [
+          PopupMenuItem(value: "Logout", child: Text("Logout")),
+        ];
+      }
+    } else {
+      tailItems = [
+        PopupMenuItem(value: "SignIn", child: Text("Sign in...")),
+      ];
+    }
   }
   Controller _con;
 
   @override
   List<PopupMenuItem<dynamic>> menuItems() => [
-    PopupMenuItem(value: "Resync", child: Text("Resync")),
-  ];
+        PopupMenuItem(value: "Resync", child: Text("Resync")),
+      ];
 
   @override
-  List<PopupMenuItem<dynamic>> tailItems = [
-    PopupMenuItem(value: "Logout", child: Text("Logout")),
-  ];
-
-  @override
-  void onSelected(dynamic menuItem){
+  void onSelected(dynamic menuItem) {
     switch (menuItem) {
       case 'Resync':
         _con.reSync();
@@ -52,8 +63,12 @@ class WorkMenu extends Menu{
       case 'Logout':
         _con.logOut();
         break;
+      case 'SignIn':
+        _con.signOut();
+        Navigator.push(
+            _con.context, MaterialPageRoute(builder: (context) => SignIn()));
+        break;
       default:
     }
   }
 }
-
