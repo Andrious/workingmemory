@@ -21,13 +21,11 @@
 ///
 ///           import 'package:workingmemory/controller.dart';
 
-export 'package:mvc_application/app.dart' show App, AppController;
 
-export 'package:mvc_application/app.dart' show AppDrawer;
+export 'package:mvc_application/controller.dart'
+    show App, AppController, AppDrawer, ControllerMVC hide runApp;
 
 export 'package:mvc_application/settings.dart' show AppSettings, Prefs;
-
-export 'package:mvc_application/controller.dart';
 
 export 'package:workingmemory/src/app/controller/controller.dart';
 

@@ -55,7 +55,7 @@ class WorkMenu extends Menu {
       ];
 
   @override
-  void onSelected(dynamic menuItem) {
+  Future<void> onSelected(dynamic menuItem) async {
     switch (menuItem) {
       case 'Resync':
         _con.reSync();
@@ -64,7 +64,7 @@ class WorkMenu extends Menu {
         _con.logOut();
         break;
       case 'SignIn':
-        _con.signOut();
+        await _con.signOut();
         Navigator.push(
             _con.context, MaterialPageRoute(builder: (context) => SignIn()));
         break;

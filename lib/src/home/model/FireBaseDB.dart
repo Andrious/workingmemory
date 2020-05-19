@@ -25,7 +25,7 @@ import 'dart:collection' show LinkedHashMap;
 
 import 'package:workingmemory/src/model.dart' show Semaphore;
 
-import 'package:mvc_application/model.dart' as f;
+import 'package:dbutils/firebase_db.dart' as f;
 
 import 'package:workingmemory/src/controller.dart' show App, WorkingMemoryApp;
 

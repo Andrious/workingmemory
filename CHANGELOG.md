@@ -1,3 +1,7 @@
+## 0.7.0
+- Updated to mvc_application 5.0.0 
+- Crashlytics
+
 ## 0.6.0
 - class CloudDB, class RemoteConfig, class DateTimeItem
 - class WorkMenu, class Icons, class LoginInfo signInSilently(), class Model FireBaseDB()

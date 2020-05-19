@@ -71,8 +71,8 @@ class Controller extends ControllerMVC {
 
   void rebuild() => _this.refresh();
 
-  Future<bool> init() async {
-    bool init = await model.init();
+  Future<bool> initAsync() async {
+    bool init = await model.initAsync();
 //    list.retrieve().then((list) {
 //      // Display the list.
 //      refresh();
@@ -150,26 +150,26 @@ class Controller extends ControllerMVC {
       if (sDateTime == null) continue;
       time = DateTime.parse(sDateTime);
       if (time.isAfter(threshold)) {
-        oneShot = await AlarmManager.oneShotAt(
-          time,
-          id,
-          (int id) async {
-            Iterator it = recs.iterator;
-            int rowid;
-            while (it.moveNext()) {
-              rowid = it.current["rowid"];
-              if (rowid == null) continue;
-              if (rowid == id) {
-                break;
-              }
-            }
-          },
-          exact: true,
-        );
-        if (!oneShot) {
-          getError(Exception("AlarmManager.oneShotAt returned false."));
-          break;
-        }
+//        oneShot = await AlarmManager.oneShotAt(
+//          time,
+//          id,
+//          (int id) async {
+//            Iterator it = recs.iterator;
+//            int rowid;
+//            while (it.moveNext()) {
+//              rowid = it.current["rowid"];
+//              if (rowid == null) continue;
+//              if (rowid == id) {
+//                break;
+//              }
+//            }
+//          },
+//          exact: true,
+//        );
+//        if (!oneShot) {
+//          getError(Exception("AlarmManager.oneShotAt returned false."));
+//          break;
+//        }
 //        AlarmManager.cancel(id).then((cancel) {
 //          print(cancel);
 //        });
@@ -221,9 +221,6 @@ class ToDoEdit extends ToDoList {
       save = await this.save(
           {'Item': changer.text.trim(), 'DateTime': dateTime, 'Icon': icon},
           this.todo);
-// Let's see if this is necessary.
-//      await con.list.retrieve();
-//      refresh();
     }
     return save;
   }

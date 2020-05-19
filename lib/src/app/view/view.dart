@@ -22,11 +22,17 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart'
+    show
+        GlobalCupertinoLocalizations,
+        GlobalMaterialLocalizations,
+        GlobalWidgetsLocalizations;
+
 import 'package:mvc_application/view.dart' show AppView;
 
-import 'package:workingmemory/src/controller.dart';
+import 'package:workingmemory/src/controller.dart' show App, WorkingMemoryApp;
 
-import 'package:workingmemory/src/view.dart';
+import 'package:workingmemory/src/view.dart' show App, AppView, TodosPage;
 
 //import 'package:workingmemory/src/view/LoginInfo.dart' show LoginInfo;
 
@@ -34,12 +40,16 @@ class View extends AppView {
   factory View() => _this ??= View._();
   View._()
       : super(
-          con: _app,
-          title: 'Working Memory',
-          home: TodosPage(),
-//          switchUI: true,
-          debugShowCheckedModeBanner: false,
-        ) {
+            con: _app,
+            title: 'Working Memory',
+            home: TodosPage(),
+            debugShowCheckedModeBanner: false,
+//            localizationsDelegates: [
+//              GlobalCupertinoLocalizations.delegate,
+//              GlobalMaterialLocalizations.delegate,
+//              GlobalWidgetsLocalizations.delegate,
+//            ],
+            ) {
     idKey = _app.keyId;
   }
   static View _this;

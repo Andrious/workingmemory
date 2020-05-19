@@ -61,13 +61,14 @@ import 'package:workingmemory/src/controller.dart' show App, Controller;
 class TodosAndroid extends StateMVC<TodosPage> {
   TodosAndroid() : super(Controller()) {
     con = controller;
-    _menu = WorkMenu();
   }
   Controller con;
   WorkMenu _menu;
 
   @override
   Widget build(BuildContext context) {
+    // Rebuilt the menu if state changes.
+    _menu = WorkMenu();
     if (!con.app.loggedIn) return SignIn();
     return Scaffold(
       key: con.list.scaffoldKey,
@@ -95,15 +96,10 @@ class TodosAndroid extends StateMVC<TodosPage> {
                 itemBuilder: (BuildContext context, int index) {
                   return Dismissible(
                     key: ObjectKey(con.list.items[index]['rowid']),
-                    direction: DismissDirection.endToStart,
                     onDismissed: (DismissDirection direction) {
                       con.edit.delete(con.list.items[index]);
-                      final String action =
-                          (direction == DismissDirection.endToStart)
-                              ? 'deleted'
-                              : 'archived';
                       con.list.scaffoldKey.currentState?.showSnackBar(SnackBar(
-                          content: Text('You $action an item.'),
+                          content: Text('You deleted an item.'),
                           action: SnackBarAction(
                               label: 'UNDO',
                               onPressed: () {
@@ -113,6 +109,8 @@ class TodosAndroid extends StateMVC<TodosPage> {
                     background: Container(
                         color: Colors.red,
                         child: const ListTile(
+                            leading: const Icon(Icons.delete,
+                                color: Colors.white, size: 36.0),
                             trailing: const Icon(Icons.delete,
                                 color: Colors.white, size: 36.0))),
                     child: Container(

@@ -56,6 +56,8 @@ class TodoAndroid extends StateMVC<TodoPage> {
               bool save = await con.edit.onPressed();
               if(save) {
                 Navigator.pop(context);
+                await con.list.retrieve();
+                refresh();
               }else{
                 Controller().list.scaffoldKey.currentState?.showSnackBar(SnackBar(
                     content: Text('There is an error.'),));

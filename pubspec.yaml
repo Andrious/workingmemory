@@ -1,23 +1,29 @@
 name: workingmemory
 description: A ToDo List for a not so working memory
 
-version: 0.6.0
+version: 0.7.0
 
 environment:
-  sdk: '>=2.6.0 <3.0.0'
+  sdk: '>=2.7.0 <3.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
-  mvc_application: ^1.0.0
-#      path: ../../../packages/mvc_application
+  mvc_application: ^5.0.0
+  #    path: ../../../packages/mvc_application
 #    git:
 #      url: git://github.com/AndriousSolutions/mvc_application.git
 
+  remote_config: #1.0.0
+    path: ../../../packages/remote_config
+
+  # https://pub.dev/packages/dbutils
+  dbutils: ^2.0.0
+
   # Facebook entry in AndroidManifest.xml
   auth: ^5.0.0
-#    path: ../../../libs/auth
+  #  path: ../../../libs/auth
 #    git:
 #      url: git://github.com/AndriousSolutions/auth.git
 
@@ -36,10 +42,16 @@ dependencies:
   # https://pub.dev/packages/font_awesome_flutter
   font_awesome_flutter: ^8.0.0
 
+  # https://pub.dev/packages/firebase_crashlytics
+  # Missing iOS Integration.
+  firebase_crashlytics: ^0.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  flutter_localizations:
+    sdk: flutter
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

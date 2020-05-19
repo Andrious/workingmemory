@@ -71,7 +71,15 @@ class CloudDB {
     FireBaseDB.goOffline();
   }
 
-  Future<void> sync() => _dataSync.sync(this);
+  Future<void> sync() async {
+    //
+    try {
+      await _dataSync.sync(this);
+    } catch (ex) {
+      App.catchError(ex);
+    }
+    return;
+  }
 
   void reSync() => _dataSync.reSync();
 
@@ -100,10 +108,11 @@ class CloudDB {
 
   Future<List<Map<String, dynamic>>> getRec(String key) async {
     List<Map<String, dynamic>> recs;
-    if(key == null || key.trim().isEmpty){
+    if (key == null || key.trim().isEmpty) {
       recs = [{}];
-    }else{
-      recs = await _dbHelper.rawQuery("SELECT * from $_dbName  WHERE key = \"${key.trim()}\"");
+    } else {
+      recs = await _dbHelper
+          .rawQuery("SELECT * from $_dbName  WHERE key = \"${key.trim()}\"");
     }
     return recs;
   }
@@ -248,7 +257,9 @@ class DataSync {
   Future<bool> isOnline() => _fireDB.isOnline();
 
   Future<void> sync(CloudDB cloud) async {
+    //
     final online = await isOnline();
+
     if (!online) return;
 
     final DatabaseReference syncRef = await getSyncRef();
@@ -316,8 +327,7 @@ class DataSync {
         }
       }
 
-      if (!synced){
-
+      if (!synced) {
         //  Get the online copy of the record.
         Map<String, dynamic> cloudRec = await _fireDB.record(key);
 
@@ -325,41 +335,32 @@ class DataSync {
         Map<String, dynamic> localRec = await Model().recordByKey(key);
 
         // Add to the local device.
-        if (localRec.isEmpty){
-
-          if (action == "DELETE"){
-
+        if (localRec.isEmpty) {
+          if (action == "DELETE") {
             // It's been deleted and not to be added anyway.
             synced = true;
-          }else{
-
+          } else {
             synced = await Model().saveRec(cloudRec);
           }
 
           // Update the appropriate database with the most recent copy.
-        }else{
-
-          if (action == "DELETE"){
-
-            if (cloudRec.isEmpty){
-
+        } else {
+          if (action == "DELETE") {
+            if (cloudRec.isEmpty) {
               // It has been deleted already
               synced = true;
-            }else{
-
+            } else {
               // Delete the local copy
               synced = await Model().delete(cloudRec);
             }
-          }else{
-
+          } else {
             // Update the local copy
             synced = await Model().saveRec(cloudRec);
           }
         }
       }
 
-      if (synced){
-
+      if (synced) {
         DatabaseReference dbRef = syncRef.child("IN").child(k);
 
         // Delete that record
@@ -442,24 +443,23 @@ class DataSync {
       // Remove devices that are more than a year old.
       DateTime timeStamp = Semaphore.getDateTime(it.current.value);
       int daysOld = DateTime.now().difference(timeStamp).inDays;
-      if(daysOld > 365){
+      if (daysOld > 365) {
         try {
           // Delete that record
           await dRef.child(it.current.key).set(null);
           await syncRef.child(it.current.key).set(null);
-        }catch(ex){
+        } catch (ex) {
           // there's no such child.
           continue;
         }
-         continue;
+        continue;
       }
       // Go through the sync entries.
       DatabaseReference ref = syncRef.child(it.current.key);
       snapshot = await dRef.once();
       if (snapshot.value == null || snapshot.value is! Map) continue;
       // Is there already a sync record.
-      snapshot =
-          await ref.child("IN").orderByChild("key").equalTo(key).once();
+      snapshot = await ref.child("IN").orderByChild("key").equalTo(key).once();
       if (snapshot.value == null || snapshot.value is! Map) {
         key = await insertRef(ref.child("IN"), recValues);
       } else {

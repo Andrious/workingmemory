@@ -41,10 +41,10 @@ class Model {
 
   static final fbKeyField = "KeyFld";
 
-  Future<bool> init() async {
+  Future<bool> initAsync() async {
     _fbDB.records();
     bool init = await _cloud.init();
-    if (init) _cloud.sync();
+    if (init) await _cloud.sync();
     if (init) init = await _tToDo.init();
     return init;
   }

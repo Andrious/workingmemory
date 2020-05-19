@@ -21,19 +21,14 @@
 ///
 ///                   https://github.com/Andrious/workingmemory
 
-import 'package:flutter/material.dart' show runApp;
-
-import 'package:workingmemory/src/controller.dart' show App;
 
 import 'package:workingmemory/src/view.dart' show View;
 
+import 'package:workingmemory/src/controller.dart' show App, runApp;
+
 void main() => runApp(WorkingMemory());
 
-
-class WorkingMemory extends App{
-
+class WorkingMemory extends App {
   @override
   createView() => View();
 }
-
-
