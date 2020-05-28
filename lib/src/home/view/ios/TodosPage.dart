@@ -61,7 +61,7 @@ class TodosiOS extends StateMVC<TodosPage> {
   Widget build(BuildContext context) {
     if (!con.app.loggedIn) return SignIn();
     return CupertinoTabScaffold(
-      key: con.list.scaffoldKey,
+      key: con.data.scaffoldKey,
       tabBar: CupertinoTabBar(items: [
         BottomNavigationBarItem(
           icon: Icon(CupertinoIcons.home),
@@ -112,7 +112,7 @@ class TodosiOS extends StateMVC<TodosPage> {
     );
 
     await Navigator.of(context).push(route);
-    await con.list.retrieve();
+    await con.data.retrieve();
     refresh();
   }
 
@@ -127,10 +127,10 @@ class MemoryList extends StatelessWidget {
   final TodosiOS parent;
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> _items = parent.con.list.items;
+    List<Map<String, dynamic>> _items = parent.con.data.items;
     bool leftHanded = Settings.getLeftHanded();
     return SafeArea(
-      child: parent.con.list.items.length == 0
+      child: parent.con.data.items.length == 0
           ? Container()
           : CustomScrollView(
               scrollDirection: Axis.vertical,
@@ -153,13 +153,13 @@ class MemoryList extends StatelessWidget {
                               ? DismissDirection.startToEnd
                               : DismissDirection.endToStart,
                           onDismissed: (DismissDirection direction) {
-                            Controller().edit.delete(_items[index]);
+                            Controller().data.delete(_items[index]);
                             final String action =
                                 (direction == DismissDirection.endToStart)
                                     ? 'deleted'
                                     : 'archived';
                             Controller()
-                                .list
+                                .data
                                 .scaffoldKey
                                 .currentState
                                 ?.showSnackBar(SnackBar(
@@ -168,8 +168,8 @@ class MemoryList extends StatelessWidget {
                                         label: 'UNDO',
                                         onPressed: () {
                                           Controller()
-                                              .edit
-                                              .unDelete(_items[index]);
+                                              .data
+                                              .undo(_items[index]);
                                         })));
                           },
                           background: Container(
@@ -194,7 +194,7 @@ class MemoryList extends StatelessWidget {
                                       int.tryParse(_items[index]['Icon']),
                                       fontFamily: 'MaterialIcons')),
                                   title: Text(_items[index]['Item']),
-                                  subtitle: Text(parent.con.list.dateFormat
+                                  subtitle: Text(parent.con.data.dateFormat
                                       .format(DateTime.tryParse(
                                           _items[index]['DateTime']))),
                                   onTap: () => parent.editToDo(_items[index]),

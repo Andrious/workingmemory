@@ -1,7 +1,7 @@
 name: workingmemory
 description: A ToDo List for a not so working memory
 
-version: 0.7.0
+version: 0.8.0
 
 environment:
   sdk: '>=2.7.0 <3.0.0'
@@ -11,21 +11,19 @@ dependencies:
     sdk: flutter
 
   mvc_application: ^5.0.0
-  #    path: ../../../packages/mvc_application
+#      path: ../../../packages/mvc_application
 #    git:
 #      url: git://github.com/AndriousSolutions/mvc_application.git
 
-  remote_config: #1.0.0
-    path: ../../../packages/remote_config
+  remote_config: ^1.0.0
+  #  path: ../../../packages/remote_config
 
   # https://pub.dev/packages/dbutils
   dbutils: ^2.0.0
 
   # Facebook entry in AndroidManifest.xml
-  auth: ^5.0.0
-  #  path: ../../../libs/auth
-#    git:
-#      url: git://github.com/AndriousSolutions/auth.git
+  auth: ^6.0.0
+#    path: ../../../packages/auth
 
   sqflite: ^1.0.0
 

@@ -1,3 +1,10 @@
+## 0.8.0
+- _auth.listener = _con.recordDump;
+- Save favourite icons data table
+- remote_config: ^1.0.0
+- auth: ^6.0.0
+- class DataFields
+
 ## 0.7.0
 - Updated to mvc_application 5.0.0 
 - Crashlytics

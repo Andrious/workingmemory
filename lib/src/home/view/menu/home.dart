@@ -23,7 +23,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:workingmemory/src/view.dart' show Menu, SignIn;
+import 'package:workingmemory/src/view.dart' show Menu;
 
 import 'package:workingmemory/src/controller.dart' show Controller;
 
@@ -64,9 +64,7 @@ class WorkMenu extends Menu {
         _con.logOut();
         break;
       case 'SignIn':
-        await _con.signOut();
-        Navigator.push(
-            _con.context, MaterialPageRoute(builder: (context) => SignIn()));
+        _con.signIn();
         break;
       default:
     }

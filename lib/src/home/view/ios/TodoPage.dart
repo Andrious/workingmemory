@@ -41,16 +41,16 @@ class TodoiOS extends StateMVC<TodoPage> {
   @override
   void initState() {
     super.initState();
-    con.edit.addState(this);
-    con.edit.init(widget.todo);
+//    con.edit.addState(this);
+    con.data.init(widget.todo);
   }
 
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      key: con.edit.scaffoldKey,
+      key: con.data.scaffoldKey,
       navigationBar: CupertinoNavigationBar(
-          middle: con.edit.title,
+          middle: con.data.title,
           trailing: CupertinoButton(
               child: Text(
                 'Save',
@@ -58,11 +58,11 @@ class TodoiOS extends StateMVC<TodoPage> {
               padding: EdgeInsets.all(
                   10), // https://github.com/flutter/flutter/issues/32701
               onPressed: () async {
-                await con.edit.onPressed();
+                await con.data.onPressed();
                 Navigator.pop(context);
               })),
       child: Form(
-        key: con.edit.formKey,
+        key: con.data.formKey,
         onWillPop: _onWillPop,
         child: ListView(shrinkWrap: true,
 //            padding: const EdgeInsets.all(16.0),
@@ -72,17 +72,17 @@ class TodoiOS extends StateMVC<TodoPage> {
                 padding: const EdgeInsets.only(bottom: 25.0),
                 alignment: Alignment.bottomLeft,
                 child: FormField<String>(
-                  initialValue: con.edit.changer.text,
+                  initialValue: con.data.changer.text,
                     validator: (v) {
                       if (v.trim().isEmpty) return 'Cannot be empty.';
                       return null;
                     },
                     onSaved: (value) {
-                      con.edit.item = value;
+                      con.data.item = value;
                     },
                   builder: (FormFieldState<String> field) {
                     return CupertinoTextField(
-                      controller: con.edit.changer,
+                      controller: con.data.changer,
                       autofocus: true,
                       decoration: BoxDecoration(
                           border: Border.all(
@@ -98,26 +98,26 @@ class TodoiOS extends StateMVC<TodoPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
                     Center(
-                        child: Icon(IconData(int.tryParse(con.edit.icon),
+                        child: Icon(IconData(int.tryParse(con.data.icon),
                             fontFamily: 'MaterialIcons'))),
 //                    Text('From', style: theme.textTheme.caption),
                     DTiOS(
-                      dateTime: con.edit.dateTime,
+                      dateTime: con.data.dateTime,
                       onChanged: (DateTime value) {
                         setState(() {
-                          con.edit.dateTime = value;
+                          con.data.dateTime = value;
                         });
-                        con.edit.saveNeeded = true;
+                        con.data.saveNeeded = true;
                       },
                     )
                   ]),
               Container(
                   height: 600.0,
                   child: IconItems(
-                      icon: con.edit.icon,
+                      icon: con.data.icon,
                       onTap: (icon) {
                         setState(() {
-                          con.edit.icon = icon;
+                          con.data.icon = icon;
                         });
                       })),
             ]),
@@ -126,7 +126,7 @@ class TodoiOS extends StateMVC<TodoPage> {
   }
 
   Future<bool> _onWillPop() async {
-    if (!con.edit.hasChanged) return true;
+    if (!con.data.hasChanged) return true;
 
     final TextStyle dialogTextStyle = theme.textTheme.subtitle1
         .copyWith(color: theme.textTheme.caption.color);

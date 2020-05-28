@@ -42,7 +42,7 @@ class Model {
   static final fbKeyField = "KeyFld";
 
   Future<bool> initAsync() async {
-    _fbDB.records();
+    await _fbDB.records();
     bool init = await _cloud.init();
     if (init) await _cloud.sync();
     if (init) init = await _tToDo.init();
@@ -55,11 +55,11 @@ class Model {
     List<Map<String, dynamic>> recs = await list();
     Map<String, dynamic> rec = Map();
     Iterator<Map<String, dynamic>> it = recs.iterator;
-    while(it.moveNext()){
-       if(it.current[fbKeyField] == key) {
-         rec = it.current;
-         break;
-       }
+    while (it.moveNext()) {
+      if (it.current[fbKeyField] == key) {
+        rec = it.current;
+        break;
+      }
     }
     return rec;
   }
@@ -72,6 +72,10 @@ class Model {
   Item _item;
 
   get defaultIcon => _tToDo.newrec[ToDo.TABLE_NAME]['Icon'];
+
+  Future<List<Map<String, dynamic>>> listIcons() => _tToDo.icons();
+
+  Future<bool> saveIcon(String icon) => _tToDo.saveIcon(icon);
 
   Future<bool> save(Map<String, dynamic> data) async {
     Map<String, dynamic> newRec = validRec(data);
@@ -202,7 +206,7 @@ class Model {
   Future<bool> recordDump() async {
     List<Map<String, dynamic>> records = await list();
     // There's records already. Don't bother.
-    if(records.isNotEmpty) return false;
+    if (records.isNotEmpty) return false;
     Set<String> keys = Set();
     records.forEach((Map<String, dynamic> rec) {
       keys.add(rec[fbKeyField]);
@@ -215,9 +219,9 @@ class Model {
 
     while (it.moveNext()) {
       if (!keys.remove(it.current.key)) {
-        if(it.current.value is! Map) continue;
+        if (it.current.value is! Map) continue;
         Map<String, dynamic> rec = Map.from(it.current.value);
-        if(rec["deleted"] == 1) continue;
+        if (rec["deleted"] == 1) continue;
         rec[fbKeyField] = it.current.key;
         rec["rowid"] = null;
         dump = await saveRec(rec);
@@ -258,13 +262,15 @@ class Icon extends FieldWidgets {
 
 class ToDo extends SQLiteDB {
   factory ToDo() => _this ??= ToDo._();
-  ToDo._(){
+  ToDo._() {
     _cloud = CloudDB();
     _fbDB = FireBaseDB();
+    _iconDB = _IconFavourites(this);
   }
   static ToDo _this;
   CloudDB _cloud;
   FireBaseDB _fbDB;
+  _IconFavourites _iconDB;
 
   String _selectAll, _selectNotDeleted, _selectDeleted;
 
@@ -287,8 +293,8 @@ class ToDo extends SQLiteDB {
   }
 
   @override
-  Future onCreate(Database db, int version) {
-    return db.execute("""
+  Future<void> onCreate(Database db, int version) async {
+    await db.execute("""
        CREATE TABLE IF NOT EXISTS $TABLE_NAME(
        Icon VARCHAR DEFAULT 0xe15b,
        Item VARCHAR, 
@@ -302,6 +308,7 @@ class ToDo extends SQLiteDB {
        Fired integer default 0, 
        deleted integer default 0)
     """);
+    await db.execute(_IconFavourites.CREATE_TABLE);
   }
 
   @override
@@ -324,4 +331,42 @@ class ToDo extends SQLiteDB {
 
   Map<String, dynamic> newRecord([Map<String, dynamic> data]) =>
       super.newRec(ToDo.TABLE_NAME, data);
+
+  Future<List<Map<String, dynamic>>> icons() => _iconDB.query();
+  
+  Future<bool> saveIcon(String icon) => _iconDB.saveRec(icon);
+}
+
+class _IconFavourites {
+  _IconFavourites(this.db);
+  final SQLiteDB db;
+
+  static const TABLE_NAME = "icons";
+
+  static const CREATE_TABLE = """
+       CREATE TABLE IF NOT EXISTS $TABLE_NAME(
+       icon VARCHAR DEFAULT 0xe15b,
+       deleted INTEGER DEFAULT 0)
+    """;
+
+  Future<List<Map<String, dynamic>>> list() => db.getTable(TABLE_NAME);
+
+  Future<List<Map<String, dynamic>>> query([String icon]) {
+//    String keyFld = await db.keyField(_IconFavourites.TABLE_NAME);
+   if(icon == null){
+     icon = '';
+   }else{
+     icon = ' icon = "$icon" AND ';
+   }
+    String select =
+        "SELECT icon FROM ${_IconFavourites.TABLE_NAME} WHERE $icon deleted = 0";
+    return db.rawQuery(select);
+  }
+
+  Future<bool> saveRec(String icon) async {
+    var icons = await query(icon);
+    if(icons.length > 0) return true;
+    var rec = await db.saveRec(TABLE_NAME, {'icon': icon});
+    return rec.isNotEmpty;
+  }
 }

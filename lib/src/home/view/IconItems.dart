@@ -21,22 +21,22 @@
 ///
 //import 'dart:developer';
 
-import 'package:flutter/material.dart';
-
-//import 'package:mvc_application/view.dart' show SnappingListScrollPhysics;
-
-import 'package:workingmemory/src/home/model/Icons.dart' as List;
+import 'package:workingmemory/src/view.dart';
 
 class IconItems extends StatelessWidget {
-  IconItems({Key key, @required this.icon, @required this.onTap}) : super(key: key);
-
+  IconItems(
+      {Key key,
+      @required this.icon,
+      @required this.onTap,
+      @required this.icons})
+      : super(key: key);
   final String icon;
   final ValueChanged<String> onTap;
-
-  final icons = List.Icons.code.keys;
+  final Map icons;
 
   @override
   Widget build(BuildContext context) {
+    var icons = this.icons.keys;
     final Orientation orientation = MediaQuery.of(context).orientation;
     return Column(
       children: <Widget>[
@@ -50,14 +50,22 @@ class IconItems extends StatelessWidget {
               crossAxisSpacing: 4.0,
               physics: ClampingScrollPhysics(),
               padding: const EdgeInsets.all(4.0),
-              childAspectRatio: (orientation == Orientation.portrait) ? 1.0 : 1.2,
-              children: icons.where((dynamic icon){
-                return IconData(int.tryParse(icon), fontFamily: 'MaterialIcons').fontFamily != null;
+              childAspectRatio:
+                  (orientation == Orientation.portrait) ? 1.0 : 1.2,
+              children: icons.where((dynamic icon) {
+                return IconData(int.tryParse(icon), fontFamily: 'MaterialIcons')
+                        .fontFamily !=
+                    null;
               }).map((dynamic icon) {
                 return GestureDetector(
-                    onTap: () {onTap(icon);},
-                    child: Padding(padding: const EdgeInsets.all(2.0),
-                      child: Icon(IconData(int.tryParse(icon), fontFamily: 'MaterialIcons')),),
+                  onTap: () {
+                    onTap(icon);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(2.0),
+                    child: Icon(IconData(int.tryParse(icon),
+                        fontFamily: 'MaterialIcons')),
+                  ),
                 );
               }).toList(),
             ),
@@ -66,5 +74,4 @@ class IconItems extends StatelessWidget {
       ],
     );
   }
-
 }

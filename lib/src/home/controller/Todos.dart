@@ -21,11 +21,15 @@
 
 import "dart:async" show Future;
 
+import 'package:auth/auth.dart';
+
 import 'package:flutter/material.dart'
     show
         AppLifecycleState,
         FormState,
         GlobalKey,
+        MaterialPageRoute,
+        Navigator,
         ScaffoldState,
         Text,
         TextEditingController,
@@ -36,7 +40,7 @@ import 'package:intl/intl.dart' show DateFormat;
 
 import 'package:workingmemory/src/model.dart' as m;
 
-import 'package:workingmemory/src/view.dart' show App;
+import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart';
 
@@ -47,55 +51,85 @@ class Controller extends ControllerMVC {
   static Controller _this;
 
   Controller._() : super() {
-    model = m.Model();
-    _editToDo = ToDoEdit();
-    _listToDo = ToDoList();
+    _model = m.Model();
+    _dataFields = ToDoEdit(this);
+    //   _editToDo = ToDoEdit();
+    //   _listToDo = _editToDo;
   }
-  m.Model model;
-  WorkingMemoryApp _app;
 
-  ToDoEdit get edit => _editToDo;
-  ToDoEdit _editToDo;
-  String get editKey => _editKey;
-  String _editKey;
-
-  ToDoList get list => _listToDo;
-  ToDoList _listToDo;
-  String get listKey => _listKey;
-  String _listKey;
+  // External access to the Model component.
+  m.Model get model => _model;
+  m.Model _model;
 
   /// Allow for easy access to 'the Controller' throughout the application.
   static Controller get con => _this ?? Controller();
 
+  ToDoEdit get data => _dataFields;
+  ToDoEdit _dataFields;
+
+//  ToDoEdit get edit => _editToDo;
+//  ToDoEdit _editToDo;
+
+  String get editKey => _editKey;
+  String _editKey;
+
+//  _ToDoList get list => _listToDo;
+//  _ToDoList _listToDo;
+
+  String get listKey => _listKey;
+  String _listKey;
+
   WorkingMemoryApp get app => _app ??= WorkingMemoryApp();
+  WorkingMemoryApp _app;
 
   void rebuild() => _this.refresh();
 
   Future<bool> initAsync() async {
-    bool init = await model.initAsync();
+    bool init = await _model.initAsync();
 //    list.retrieve().then((list) {
 //      // Display the list.
 //      refresh();
 //      setAlarms(list);
 //    });
-    List<Map<String, dynamic>> recs = await list.retrieve();
+//    List<Map<String, dynamic>> recs = await list.retrieve();
+    List<Map<String, dynamic>> records = await data.query();
     // Display the list.
 //    refresh();
-    setAlarms(recs);
-    _editKey = edit.addState(this.stateMVC);
-    _listKey = list.addState(this.stateMVC);
+    setAlarms(records);
+//    _editKey = edit.addState(this.stateMVC);
+//    _listKey = list.addState(this.stateMVC);
+
+    // Return the list of favourite icons.
+    _favIcons = await _model.listIcons();
+
     return init;
+  }
+
+  List<Map<String, dynamic>> get favIcons => _favIcons;
+  List<Map<String, dynamic>> _favIcons;
+
+  Map<String, String> get icons => _icons;
+  Map<String, String> _icons = m.Icons.code;
+
+  Future<bool> saveIcon(String icon) async {
+    data.icon = icon;
+    bool save = await _model.saveIcon(icon);
+    _favIcons = await _model.listIcons();
+    return save;
   }
 
   @override
   void dispose() {
-    model.dispose();
+    _model.dispose();
     super.dispose();
   }
 
-  void signIn() {
-    app.signIn();
-    refresh();
+  void signIn() async {
+//    app.signIn();
+    signOut();
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => SignIn()));
+//   refresh();
   }
 
   void logOut() => app.logOut();
@@ -104,23 +138,26 @@ class Controller extends ControllerMVC {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-//      if(app.loggedIn)
-//      model.sync();
-    }
-
     /// Passing these possible values:
     /// AppLifecycleState.paused (may enter the suspending state at any time)
     /// AppLifecycleState.resumed
     /// AppLifecycleState.inactive (may be paused at any time)
     /// AppLifecycleState.suspending (Android only)
+    if (state == AppLifecycleState.resumed) {
+//      if(app.loggedIn)
+//      _model.sync();
+    }
   }
 
-  Future<bool> save(Map<String, dynamic> data) => model.save(data);
+  Future<bool> save(Map<String, dynamic> data) => _model.save(data);
 
   Future<bool> saveRec(
+          Map<String, dynamic> diffRec, Map<String, dynamic> oldRec) =>
+      save(newRec(diffRec, oldRec));
+
+  Map<String, dynamic> newRec(
       Map<String, dynamic> diffRec, Map<String, dynamic> oldRec) {
-    Map newRec = Map<String, dynamic>();
+    Map<String, dynamic> newRec = Map();
 
     if (oldRec == null) {
       newRec.addAll(diffRec);
@@ -129,12 +166,20 @@ class Controller extends ControllerMVC {
 
       newRec.addEntries(diffRec.entries);
     }
-    return save(newRec);
+    return newRec;
   }
 
-  get defaultIcon => model.defaultIcon;
+  recordDump(FirebaseUser user) async {
+    if (user == null) return;
+    bool dump = await _model.recordDump();
+    if (dump) {
+      await data.retrieve();
+    }
+  }
 
-  void reSync() => model.reSync();
+  get defaultIcon => _model.defaultIcon;
+
+  void reSync() => _model.reSync();
 
   void setAlarms(List<Map<String, dynamic>> list) async {
     recs = list;
@@ -181,14 +226,126 @@ class Controller extends ControllerMVC {
   static List<Map<String, dynamic>> recs;
 }
 
-class ToDoEdit extends ToDoList {
+//class ToDoEdit extends _ToDoList {
+//  bool hasName;
+//  TextEditingController changer;
+//  bool hasChanged = false;
+//
+////  final scaffoldKey = GlobalKey<ScaffoldState>();
+//
+//  final formKey = GlobalKey<FormState>();
+//
+//  void init([Map todo]) {
+//    this.todo = todo;
+//
+//    hasName = this.todo?.isNotEmpty ?? false;
+//
+//    if (hasName) {
+//      item = todo['Item'];
+//      dateTime = DateTime.tryParse(todo['DateTime']);
+//      icon = todo['Icon'];
+//    } else {
+//      item = ' ';
+//      icon = Controller().defaultIcon;
+//    }
+//
+//    changer = TextEditingController(text: item);
+//    changer.addListener(() {
+//      hasChanged = changer.value.text != item;
+//    });
+//
+//    dateTime = dateTime ?? DateTime.now();
+//  }
+//
+//  Widget get title => Text(hasName ? item : 'New');
+//
+//  Future<bool> onPressed() async {
+//    bool save = formKey.currentState.validate();
+//    if (save) {
+//      formKey.currentState.save();
+//      save = await this.save(
+//          {'Item': changer.text.trim(), 'DateTime': dateTime, 'Icon': icon},
+//          this.todo);
+//      await retrieve();
+//    }
+//    return save;
+//  }
+//
+//  Future<bool> save(
+//      Map<String, dynamic> diffRec, Map<String, dynamic> oldRec) async {
+//    bool save = await Controller().saveRec(diffRec, oldRec);
+//    return save;
+//  }
+//
+//  Future<bool> delete(Map<String, dynamic> data) =>
+//      _model.delete(data).then((delete) async {
+//        await Controller().data.query();
+//        return delete;
+//      });
+//
+//  Future<bool> unDelete(Map<String, dynamic> data) =>
+//      _model.unDelete(data).then((un) async {
+//        await Controller().data.query();
+//        return un;
+//      });
+//}
+//
+//typedef MapCallback = void Function(Map data);
+//
+//class _ToDoList extends _ToDoFields {
+//  _ToDoList() : super() {
+//    scaffoldKey = GlobalKey<ScaffoldState>();
+//    _model = m.Model();
+//  }
+//  final DateFormat dateFormat = DateFormat('EEEE, MMM dd  h:mm a');
+//  GlobalKey<ScaffoldState> scaffoldKey;
+//  m.Model _model;
+//
+//  List<Map<String, dynamic>> get items => _items;
+//  List<Map<String, dynamic>> _items = [];
+//
+//  /// Retrieve the to-do items from the database
+//  Future<List<Map<String, dynamic>>> retrieve() async {
+//    _items = await _model.list();
+//    return _items;
+//  }
+//}
+
+class _ToDoFields {
+  Map todo;
+  String item;
+  String icon;
+  DateTime dateTime;
+  bool saveNeeded;
+  bool hasChanged;
+}
+
+class ToDoEdit extends DataFields {
+  ToDoEdit(this.con) {
+    _model = m.Model();
+  }
+  final Controller con;
+
+  m.Model get model => _model;
+  m.Model _model;
+
   bool hasName;
   TextEditingController changer;
   bool hasChanged = false;
 
+  Map todo;
+  String item;
+  String icon;
+  DateTime dateTime;
+  bool saveNeeded;
+
+  final DateFormat dateFormat = DateFormat('EEEE, MMM dd  h:mm a');
+
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   final formKey = GlobalKey<FormState>();
+
+  Widget get title => Text(hasName ? item : 'New');
 
   void init([Map todo]) {
     this.todo = todo;
@@ -201,7 +358,7 @@ class ToDoEdit extends ToDoList {
       icon = todo['Icon'];
     } else {
       item = ' ';
-      icon = Controller().defaultIcon;
+      icon = con.defaultIcon;
     }
 
     changer = TextEditingController(text: item);
@@ -212,66 +369,44 @@ class ToDoEdit extends ToDoList {
     dateTime = dateTime ?? DateTime.now();
   }
 
-  Widget get title => Text(hasName ? item : 'New');
+  /// Retrieve the to-do items from the database
+  @override
+  Future<List<Map<String, dynamic>>> retrieve() => _model.list();
 
   Future<bool> onPressed() async {
     bool save = formKey.currentState.validate();
     if (save) {
       formKey.currentState.save();
-      save = await this.save(
+      save = await this.saveRec(
           {'Item': changer.text.trim(), 'DateTime': dateTime, 'Icon': icon},
           this.todo);
+      await query();
     }
     return save;
   }
 
-  Future<bool> save(
-      Map<String, dynamic> diffRec, Map<String, dynamic> oldRec) async {
-    bool save = await Controller().saveRec(diffRec, oldRec);
-    return save;
+  Future<bool> saveRec(
+          Map<String, dynamic> diffRec, Map<String, dynamic> oldRec) =>
+      save(con?.newRec(diffRec, oldRec));
+
+  @override
+  Future<bool> save(Map<String, dynamic> rec) => _model.save(rec);
+
+  @override
+  Future<bool> delete(Map<String, dynamic> rec) async {
+    bool delete = await _model.delete(rec);
+    await con?.data?.query();
+    return delete;
   }
 
-  Future<bool> delete(Map<String, dynamic> data) =>
-      model.delete(data).then((delete) async {
-        await Controller().list.retrieve();
-        refresh();
-        return delete;
-      });
-
-  Future<bool> unDelete(Map<String, dynamic> data) =>
-      model.unDelete(data).then((un) async {
-        await Controller().list.retrieve();
-        refresh();
-        return un;
-      });
-}
-
-typedef MapCallback = void Function(Map data);
-
-class ToDoList extends ToDoFields {
-  ToDoList() : super() {
-    scaffoldKey = GlobalKey<ScaffoldState>();
-    model = m.Model();
+  @override
+  Future<bool> undo(Map<String, dynamic> rec) async {
+    bool undo = await _model.unDelete(rec);
+    await con?.data?.query();
+    return undo;
   }
-  final DateFormat dateFormat = DateFormat('EEEE, MMM dd  h:mm a');
-  GlobalKey<ScaffoldState> scaffoldKey;
-  m.Model model;
 
-  List<Map<String, dynamic>> get items => _items;
-  List<Map<String, dynamic>> _items = [];
-
-  /// Retrieve the to-do items from the database
-  Future<List<Map<String, dynamic>>> retrieve() async {
-    _items = await model.list();
-    return _items;
+  Future<bool> favIcon() {
+    return Future.value(true);
   }
-}
-
-class ToDoFields extends ControllerMVC {
-  Map todo;
-  String item;
-  String icon;
-  DateTime dateTime;
-  bool saveNeeded;
-  bool hasChanged;
 }

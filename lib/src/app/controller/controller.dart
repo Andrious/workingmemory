@@ -63,8 +63,9 @@ class WorkingMemoryApp extends AppController {
 //  /// Allow for easy access to 'the Controller' throughout the application.
 //  static WorkingMemoryApp get con => _this;
   WorkingMemoryApp._() {
-    _auth = Auth();
+    _auth = Auth(listener: _logInUser);
     _con = Controller();
+    _auth.listener = _con.recordDump;
     _remoteConfig = RemoteConfig();
   }
 
@@ -112,10 +113,7 @@ class WorkingMemoryApp extends AppController {
   void _logInUser(dynamic user) {
     //
     if (user != null) {
-
       userStamp();
-      
-      recordDump();
     }
 
     Crashlytics.instance.setUserEmail(_auth.email);
@@ -123,8 +121,6 @@ class WorkingMemoryApp extends AppController {
     Crashlytics.instance.setUserIdentifier(_auth.displayName);
 
     Crashlytics.instance.setUserName(_auth.displayName);
-
-    _con.refresh();
   }
 
   // 'disconnect' from Firebase
@@ -136,17 +132,11 @@ class WorkingMemoryApp extends AppController {
     return _loggedIn;
   }
 
-  Future<bool> signInAnonymously() => _auth.signInAnonymously(
-      listener: (FirebaseUser user) => _logInUser(user));
+  Future<bool> signInAnonymously() => _auth.signInAnonymously();
 
-  Future<bool> signInSilently() =>
-      _auth.signInSilently(listener: (FirebaseUser user) => _logInUser(user));
+  Future<bool> signInSilently() => _auth.signInSilently();
 
-  Future<bool> signInWithFacebook() async {
-    bool signIn = await _auth.signInWithFacebook(
-        listener: (FirebaseUser user) => _logInUser(user));
-    return signIn;
-  }
+  Future<bool> signInWithFacebook() => _auth.signInWithFacebook();
   //    List<String> items = App.packageName.split(".");
 
   Future<bool> signInWithTwitter() async {
@@ -165,9 +155,9 @@ class WorkingMemoryApp extends AppController {
     }
     bool signIn = await _auth
         .signInWithTwitter(
-            key: one,
-            secret: two,
-            listener: (FirebaseUser user) => _logInUser(user))
+      key: one,
+      secret: two,
+    )
         .catchError((error) {
       getError(error);
     });
@@ -186,9 +176,9 @@ class WorkingMemoryApp extends AppController {
     String password = "";
 
     bool signIn = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-        listener: (FirebaseUser user) => _logInUser(user));
+      email: email,
+      password: password,
+    );
 
     if (!signIn) {
       Exception ex = _auth.getError();
@@ -198,8 +188,7 @@ class WorkingMemoryApp extends AppController {
   }
 
   Future<bool> signInWithGoogle() async {
-    bool signIn = await _auth.signInWithGoogle(
-        listen: (GoogleSignInAccount user) => _logInUser(user));
+    bool signIn = await _auth.signInWithGoogle();
 
     if (!signIn) {
       Exception ex = _auth.getError();
@@ -211,17 +200,11 @@ class WorkingMemoryApp extends AppController {
   // Stamp the user information to the firebase database.
   void userStamp() => FireBaseDB().userStamp();
 
-  Future<void> recordDump() async {
-    await _con.model.recordDump();
-//    rebuild();
-  }
-
   void rebuild() async {
     _loggedIn = await _auth.isLoggedIn();
 //    _con.refresh();
     // Pops only if on the stack and not on the first screen.
-    if(_con.context != null)
-    Navigator.of(_con.context).maybePop();
+    if (_con.context != null) Navigator.of(_con.context).maybePop();
   }
 
   String get uid => _auth.uid;

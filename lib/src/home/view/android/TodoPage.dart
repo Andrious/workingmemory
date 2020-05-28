@@ -38,87 +38,47 @@ class TodoAndroid extends StateMVC<TodoPage> {
   @override
   void initState() {
     super.initState();
-    con.edit.addState(this);
-    con.edit.init(widget.todo);
+//    con.edit.addState(this);
+    con.data.init(widget.todo);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: con.edit.scaffoldKey,
-      appBar: AppBar(title: con.edit.title, actions: [
+      appBar: AppBar(title: con.data.title, actions: [
         FlatButton(
             child: Text(
               'SAVE',
               style: theme.textTheme.bodyText2.copyWith(color: Colors.white),
             ),
             onPressed: () async {
-              bool save = await con.edit.onPressed();
-              if(save) {
+              bool save = await con.data.onPressed();
+              if (save) {
                 Navigator.pop(context);
-                await con.list.retrieve();
-                refresh();
-              }else{
-                Controller().list.scaffoldKey.currentState?.showSnackBar(SnackBar(
-                    content: Text('There is an error.'),));
+              } else {
+                Controller()
+                    .data
+                    .scaffoldKey
+                    .currentState
+                    ?.showSnackBar(SnackBar(
+                      content: Text('There is an error.'),
+                    ));
               }
             })
       ]),
       body: Form(
-        key: con.edit.formKey,
+        key: con.data.formKey,
         onWillPop: _onWillPop,
         child: ListView(
           padding: const EdgeInsets.all(16.0),
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              alignment: Alignment.bottomLeft,
-              child: TextFormField(
-                  controller: con.edit.changer,
-                  decoration: const InputDecoration(
-                    filled: true,
-                  ),
-                  validator: (v) {
-                    if (v.isEmpty) return 'Cannot be empty.';
-                    return null;
-                  },
-                  onSaved: (value) {
-                    con.edit.item = value;
-                  },),
-            ),
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Center(
-                      child: Icon(IconData(int.tryParse(con.edit.icon),
-                          fontFamily: 'MaterialIcons'))),
-                  DateTimeItem(
-                    dateTime: con.edit.dateTime,
-                    onChanged: (DateTime value) {
-                      setState(() {
-                        con.edit.dateTime = value;
-                      });
-                      con.edit.saveNeeded = true;
-                    },
-                  )
-                ]),
-            Container(
-                height: 600.0,
-                child: IconItems(
-                    icon: con.edit.icon,
-                    onTap: (icon) {
-                      setState(() {
-                        con.edit.icon = icon;
-                      });
-                    })),
-          ],
+          children: _listWidgets(),
         ),
       ),
     );
   }
 
   Future<bool> _onWillPop() async {
-    if (!con.edit.hasChanged) return true;
+    if (!con.data.hasChanged) return true;
 
     final TextStyle dialogTextStyle = theme.textTheme.subtitle1
         .copyWith(color: theme.textTheme.caption.color);
@@ -146,6 +106,72 @@ class TodoAndroid extends StateMVC<TodoPage> {
           },
         ) ??
         false;
+  }
+
+  List<Widget> _listWidgets() {
+    var widgets = <Widget>[
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        alignment: Alignment.bottomLeft,
+        child: TextFormField(
+          controller: con.data.changer,
+          decoration: const InputDecoration(
+            filled: true,
+          ),
+          validator: (v) {
+            if (v.isEmpty) return 'Cannot be empty.';
+            return null;
+          },
+          onSaved: (value) {
+            con.data.item = value;
+          },
+        ),
+      ),
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+        Center(
+            child: Icon(IconData(int.tryParse(con.data.icon),
+                fontFamily: 'MaterialIcons'))),
+        DateTimeItem(
+          dateTime: con.data.dateTime,
+          onChanged: (DateTime value) {
+            setState(() {
+              con.data.dateTime = value;
+            });
+            con.data.saveNeeded = true;
+          },
+        )
+      ]),
+    ];
+
+    if (con.favIcons.length > 0) {
+      widgets.add(Container(
+          height: 100.0,
+          decoration: BoxDecoration(
+            border: Border.all(width: 4, color: Colors.black),
+            borderRadius: const BorderRadius.all(const Radius.circular(8)),
+          ),
+          child: IconItems(
+              icons: Map.fromIterable(con.favIcons,
+                  key: (e) => e.values.first, value: (e) => e.values.first),
+              icon: con.data.icon,
+              onTap: (icon) {
+                setState(() {
+                  con.data.icon = icon;
+                });
+              })));
+    }
+
+    widgets.add(Container(
+        height: 600.0,
+        child: IconItems(
+            icons: con.icons,
+            icon: con.data.icon,
+            onTap: (icon) async {
+              await con.saveIcon(icon);
+              setState(() {});
+            })));
+
+    return widgets;
   }
 }
 

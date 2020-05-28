@@ -43,85 +43,90 @@ class SignInState extends StateMVC<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    return row;
-  }
-
-  Widget get row {
-    List<Widget> children;
-
-    children = [
-      Padding(
-        padding: EdgeInsets.only(top: 10.0, right: 40.0),
-        child: GestureDetector(
-          onTap: () => app.signInWithFacebook(),
-          child: Container(
-            padding: const EdgeInsets.all(15.0),
-            decoration: new BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-            ),
-            child: new Icon(
-              FontAwesomeIcons.facebook,
-              //                 color: Color(0xFF0084ff),
-            ),
-          ),
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.only(top: 10.0, right: 40.0),
-        child: GestureDetector(
-          onTap: () => app.signInWithTwitter(),
-          child: Container(
-            padding: const EdgeInsets.all(15.0),
-            decoration: new BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-            ),
-            child: new Icon(
-              FontAwesomeIcons.twitter,
-              //                 color: Color(0xFF0084ff),
-            ),
-          ),
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.only(top: 10.0, right: 40.0),
-        child: GestureDetector(
-          onTap: () => app.signInEmailPassword(context),
-          child: Container(
-            padding: const EdgeInsets.all(15.0),
-            decoration: new BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-            ),
-            child: new Icon(
-              FontAwesomeIcons.envelope,
-//                  color: Color(0xFF0084ff),
-            ),
-          ),
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.only(top: 10.0),
-        child: GestureDetector(
-          onTap: () => app.signInWithGoogle(),
-          child: Container(
-            padding: const EdgeInsets.all(15.0),
-            decoration: new BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-            ),
-            child: new Icon(
-              FontAwesomeIcons.google,
-              //                 color: Color(0xFF0084ff),
-            ),
-          ),
-        ),
-      ),
-    ];
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: children,
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.only(top: 10.0, right: 40.0),
+          child: GestureDetector(
+            onTap: () async {
+              bool signIn = await app.signInWithFacebook();
+              if (signIn) Navigator.pop(context);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(15.0),
+              decoration: new BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              child: new Icon(
+                FontAwesomeIcons.facebook,
+                //                 color: Color(0xFF0084ff),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 10.0, right: 40.0),
+          child: GestureDetector(
+            onTap: () async {
+              bool signIn = await app.signInWithTwitter();
+              if (signIn) Navigator.pop(context);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(15.0),
+              decoration: new BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              child: new Icon(
+                FontAwesomeIcons.twitter,
+                //                 color: Color(0xFF0084ff),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 10.0, right: 40.0),
+          child: GestureDetector(
+            onTap: () async {
+              bool signIn = await app.signInEmailPassword(context);
+              if (signIn) Navigator.pop(context);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(15.0),
+              decoration: new BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              child: new Icon(
+                FontAwesomeIcons.envelope,
+//                  color: Color(0xFF0084ff),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 10.0),
+          child: GestureDetector(
+            onTap: () async {
+              bool signIn = await app.signInWithGoogle();
+              if (signIn) Navigator.pop(context);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(15.0),
+              decoration: new BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              child: new Icon(
+                FontAwesomeIcons.google,
+                //                 color: Color(0xFF0084ff),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
