@@ -1,15 +1,11 @@
 ///
 /// Copyright (C) 2018 Andrious Solutions
 ///
-/// This program is free software; you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License
-/// as published by the Free Software Foundation; either version 3
-/// of the License, or any later version.
-///
+/// Licensed under the Apache License, Version 2.0 (the "License");
+/// you may not use this file except in compliance with the License.
 /// You may obtain a copy of the License at
 ///
-///  http://www.apache.org/licenses/LICENSE-2.0
-///
+/// http://www.apache.org/licenses/LICENSE-2.0
 ///
 /// Unless required by applicable law or agreed to in writing, software
 /// distributed under the License is distributed on an "AS IS" BASIS,
@@ -50,6 +46,8 @@ class Model {
   }
 
   Future<List<Map<String, dynamic>>> list() => _tToDo.notDeleted();
+
+  Future<List<Map<String, dynamic>>> listAll() => _tToDo.list();
 
   Future<Map<String, dynamic>> recordByKey(String key) async {
     List<Map<String, dynamic>> recs = await list();
@@ -99,6 +97,7 @@ class Model {
 //    if(dTime != null){
 //      data["DateTime"] = dTime.toUtc();
 //    }
+
     Map<String, dynamic> rec = await _tToDo.saveRec(ToDo.TABLE_NAME, data);
     return rec.isNotEmpty;
   }
@@ -204,13 +203,21 @@ class Model {
   void reSync() => _cloud.reSync();
 
   Future<bool> recordDump() async {
-    List<Map<String, dynamic>> records = await list();
-    // There's records already. Don't bother.
-    if (records.isNotEmpty) return false;
+    List<Map<String, dynamic>> records = await listAll();
+//    // There's records already. Don't bother.
+//    if (records.isNotEmpty) return false;
+
+    List<Map<String, dynamic>> newFBRecs = List();
+
     Set<String> keys = Set();
     records.forEach((Map<String, dynamic> rec) {
-      keys.add(rec[fbKeyField]);
+      if(rec[fbKeyField] != null) {
+        keys.add(rec[fbKeyField]);
+      }else{
+        newFBRecs.add(rec);
+      }
     });
+
     Map<dynamic, dynamic> fireDB = await _fbDB.records();
 
     bool dump = fireDB.isNotEmpty;
@@ -230,6 +237,10 @@ class Model {
         break;
       }
     }
+    // Add local records to Firebase
+    records.forEach((Map<String, dynamic> rec) async {
+      await save(rec);
+    });
     return dump;
   }
 }
@@ -333,7 +344,7 @@ class ToDo extends SQLiteDB {
       super.newRec(ToDo.TABLE_NAME, data);
 
   Future<List<Map<String, dynamic>>> icons() => _iconDB.query();
-  
+
   Future<bool> saveIcon(String icon) => _iconDB.saveRec(icon);
 }
 
@@ -353,11 +364,11 @@ class _IconFavourites {
 
   Future<List<Map<String, dynamic>>> query([String icon]) {
 //    String keyFld = await db.keyField(_IconFavourites.TABLE_NAME);
-   if(icon == null){
-     icon = '';
-   }else{
-     icon = ' icon = "$icon" AND ';
-   }
+    if (icon == null) {
+      icon = '';
+    } else {
+      icon = ' icon = "$icon" AND ';
+    }
     String select =
         "SELECT icon FROM ${_IconFavourites.TABLE_NAME} WHERE $icon deleted = 0";
     return db.rawQuery(select);
@@ -365,7 +376,7 @@ class _IconFavourites {
 
   Future<bool> saveRec(String icon) async {
     var icons = await query(icon);
-    if(icons.length > 0) return true;
+    if (icons.length > 0) return true;
     var rec = await db.saveRec(TABLE_NAME, {'icon': icon});
     return rec.isNotEmpty;
   }

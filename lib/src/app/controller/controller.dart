@@ -1,15 +1,11 @@
 ///
 /// Copyright (C) 2018 Andrious Solutions
 ///
-/// This program is free software; you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License
-/// as published by the Free Software Foundation; either version 3
-/// of the License, or any later version.
-///
+/// Licensed under the Apache License, Version 2.0 (the "License");
+/// you may not use this file except in compliance with the License.
 /// You may obtain a copy of the License at
 ///
-///  http://www.apache.org/licenses/LICENSE-2.0
-///
+/// http://www.apache.org/licenses/LICENSE-2.0
 ///
 /// Unless required by applicable law or agreed to in writing, software
 /// distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,9 +45,13 @@ runApp(
   ReportErrorHandler reportError,
 }) {
   // Supply Firebase Crashlytics
-  handler ??= Crashlytics.instance.recordFlutterError;
+  Crashlytics crash = Crashlytics.instance;
 
-  reportError ??= Crashlytics.instance.recordError;
+  handler ??= crash.recordFlutterError;
+
+  reportError ??= crash.recordError;
+
+  crash.enableInDevMode = true;
 
   a.runApp(app, handler: handler, builder: builder, reportError: reportError);
 }
@@ -65,8 +65,12 @@ class WorkingMemoryApp extends AppController {
   WorkingMemoryApp._() {
     _auth = Auth(listener: _logInUser);
     _con = Controller();
-    _auth.listener = _con.recordDump;
     _remoteConfig = RemoteConfig();
+  }
+
+  @override
+  void onError(FlutterErrorDetails details) {
+    super.onError(details);
   }
 
   /// Provide the sign in and the loading database info.
@@ -99,9 +103,6 @@ class WorkingMemoryApp extends AppController {
     super.dispose();
   }
 
-  @override
-  void onError(FlutterErrorDetails details) => super.onError(details);
-
   bool get loggedIn => _loggedIn;
 
   // logout and refresh
@@ -129,6 +130,9 @@ class WorkingMemoryApp extends AppController {
   Future<bool> signIn() async {
     _loggedIn = await signInSilently();
     if (!_loggedIn) _loggedIn = await signInAnonymously();
+    if(_auth.isAnonymous){
+      _auth.listener = _con.recordDump;
+    }
     return _loggedIn;
   }
 
@@ -189,20 +193,20 @@ class WorkingMemoryApp extends AppController {
 
   Future<bool> signInWithGoogle() async {
     bool signIn = await _auth.signInWithGoogle();
-
     if (!signIn) {
       Exception ex = _auth.getError();
       showBox(text: ex.toString(), context: context);
     }
+    await rebuild();
     return signIn;
   }
 
   // Stamp the user information to the firebase database.
   void userStamp() => FireBaseDB().userStamp();
 
-  void rebuild() async {
+  Future<void> rebuild() async {
     _loggedIn = await _auth.isLoggedIn();
-//    _con.refresh();
+    _con.refresh();
     // Pops only if on the stack and not on the first screen.
     if (_con.context != null) Navigator.of(_con.context).maybePop();
   }

@@ -1,3 +1,6 @@
+## 0.9.0
+- SignIn(); in Menu; crash.enableInDevMode = true; Future<bool> recordDump();
+
 ## 0.8.0
 - _auth.listener = _con.recordDump;
 - Save favourite icons data table

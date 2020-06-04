@@ -1,15 +1,11 @@
 ///
 /// Copyright (C) 2018 Andrious Solutions
 ///
-/// This program is free software; you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License
-/// as published by the Free Software Foundation; either version 3
-/// of the License, or any later version.
-///
+/// Licensed under the Apache License, Version 2.0 (the "License");
+/// you may not use this file except in compliance with the License.
 /// You may obtain a copy of the License at
 ///
-///  http://www.apache.org/licenses/LICENSE-2.0
-///
+/// http://www.apache.org/licenses/LICENSE-2.0
 ///
 /// Unless required by applicable law or agreed to in writing, software
 /// distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +18,7 @@
 ///                   https://github.com/Andrious/workingmemory
 
 
-import 'package:workingmemory/src/view.dart' show View;
+import 'package:workingmemory/src/view.dart' show FlutterErrorDetails, View;
 
 import 'package:workingmemory/src/controller.dart' show App, runApp;
 
@@ -31,4 +27,9 @@ void main() => runApp(WorkingMemory());
 class WorkingMemory extends App {
   @override
   createView() => View();
+
+  @override
+  void onError(FlutterErrorDetails details) {
+    super.onError(details);
+  }
 }
