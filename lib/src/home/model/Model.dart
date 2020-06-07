@@ -19,7 +19,7 @@
 import 'dart:async' show Future;
 
 import 'package:workingmemory/src/model.dart'
-    show CloudDB, FireBaseDB, SQLiteDB, Database;
+    show CloudDB, Database, FireBaseDB, Settings, SQLiteDB;
 
 import 'package:workingmemory/src/view.dart' show FieldWidgets;
 
@@ -45,7 +45,8 @@ class Model {
     return init;
   }
 
-  Future<List<Map<String, dynamic>>> list() => _tToDo.notDeleted();
+  Future<List<Map<String, dynamic>>> list() =>
+      _tToDo.notDeleted(ordered: itemsOrdered());
 
   Future<List<Map<String, dynamic>>> listAll() => _tToDo.list();
 
@@ -84,11 +85,8 @@ class Model {
     //  Save to SQLite
     if (save) save = await saveRec(newRec);
     // Save to Firebase
-    if (save) save = await _fbDB.save(newRec);
-    // Sync changes
-    if (save) _cloud.insert(newRec[_fbDB.key], "UPDATE");
+    if (save) save = await saveFirebase(newRec);
 
-    //   });
     return save;
   }
 
@@ -100,6 +98,15 @@ class Model {
 
     Map<String, dynamic> rec = await _tToDo.saveRec(ToDo.TABLE_NAME, data);
     return rec.isNotEmpty;
+  }
+
+  Future<bool> saveFirebase(Map<String, dynamic> newRec) async {
+    // Save to Firebase
+    bool save = await _fbDB.save(newRec);
+    // Sync changes
+    if (save) _cloud.insert(newRec[_fbDB.key], "UPDATE");
+
+    return save;
   }
 
   Map<String, dynamic> validRec(Map<String, dynamic> data) {
@@ -211,9 +218,9 @@ class Model {
 
     Set<String> keys = Set();
     records.forEach((Map<String, dynamic> rec) {
-      if(rec[fbKeyField] != null) {
+      if (rec[fbKeyField] != null) {
         keys.add(rec[fbKeyField]);
-      }else{
+      } else {
         newFBRecs.add(rec);
       }
     });
@@ -239,9 +246,18 @@ class Model {
     }
     // Add local records to Firebase
     records.forEach((Map<String, dynamic> rec) async {
-      await save(rec);
+      await saveFirebase(rec);
     });
     return dump;
+  }
+
+  bool itemsOrdered([bool ordered]) {
+    if (ordered == null) {
+      ordered = Settings.getOrder();
+    } else {
+      Settings.setOrder(ordered);
+    }
+    return ordered;
   }
 }
 
@@ -293,18 +309,29 @@ class ToDo extends SQLiteDB {
 
   get version => 1;
 
+  String _keyFld;
+
   @override
   Future<bool> init() async {
+    //
     bool init = await super.init();
-    String keyFld = await keyField(TABLE_NAME);
+
+    _keyFld = await keyField(TABLE_NAME);
+
+    _selectNotDeleted =
+        "SELECT $_keyFld, * FROM $TABLE_NAME" + " WHERE deleted = 0";
+
     _selectDeleted =
-        "SELECT $keyFld, * FROM $TABLE_NAME" + " WHERE deleted = 1";
-    _selectAll = "SELECT $keyFld, * FROM $TABLE_NAME";
+        "SELECT $_keyFld, * FROM $TABLE_NAME" + " WHERE deleted = 1";
+
+    _selectAll = "SELECT $_keyFld, * FROM $TABLE_NAME";
+
     return init;
   }
 
   @override
   Future<void> onCreate(Database db, int version) async {
+    //
     await db.execute("""
        CREATE TABLE IF NOT EXISTS $TABLE_NAME(
        Icon VARCHAR DEFAULT 0xe15b,
@@ -319,12 +346,15 @@ class ToDo extends SQLiteDB {
        Fired integer default 0, 
        deleted integer default 0)
     """);
+
     await db.execute(_IconFavourites.CREATE_TABLE);
   }
 
   @override
   Future onConfigure(Database db) async {
+    //
     int version = await db.getVersion();
+
     if (version == 0) {
       _cloud.timeStampDevice();
     }
@@ -333,11 +363,16 @@ class ToDo extends SQLiteDB {
 
   Future<List<Map<String, dynamic>>> list() => this.getTable(ToDo.TABLE_NAME);
 
-  Future<List<Map<String, dynamic>>> notDeleted() async {
-    String keyFld = await keyField(TABLE_NAME);
-    _selectNotDeleted =
-        "SELECT $keyFld, * FROM $TABLE_NAME" + " WHERE deleted = 0";
-    return rawQuery(_selectNotDeleted);
+  Future<List<Map<String, dynamic>>> notDeleted({bool ordered = false}) {
+    var select = _selectNotDeleted;
+    if (ordered) select = "$select order by datetime(DateTime)";
+    return rawQuery(select);
+  }
+
+  Future<List<Map<String, dynamic>>> isDeleted({bool ordered = false}) {
+    var select = _selectDeleted;
+    if (ordered) select += " order by datetime(DateTime)";
+    return rawQuery(select);
   }
 
   Map<String, dynamic> newRecord([Map<String, dynamic> data]) =>
@@ -375,6 +410,7 @@ class _IconFavourites {
   }
 
   Future<bool> saveRec(String icon) async {
+    //
     var icons = await query(icon);
     if (icons.length > 0) return true;
     var rec = await db.saveRec(TABLE_NAME, {'icon': icon});

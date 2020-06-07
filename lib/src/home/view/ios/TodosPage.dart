@@ -40,10 +40,12 @@ import 'package:flutter/material.dart'
         Text,
         Widget;
 
+import 'package:workingmemory/src/model.dart' show Settings;
+
 import 'package:workingmemory/src/view.dart'
     show App, SettingsScreen, SignIn, StateMVC, TodoPage, TodosPage, WorkMenu;
 
-import 'package:workingmemory/src/controller.dart' show Controller, Settings;
+import 'package:workingmemory/src/controller.dart' show Controller;
 
 class TodosiOS extends StateMVC<TodosPage> {
   TodosiOS() : super(Controller()) {

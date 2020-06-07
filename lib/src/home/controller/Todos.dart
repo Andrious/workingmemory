@@ -80,6 +80,12 @@ class Controller extends ControllerMVC {
 
   void rebuild() => _this.refresh();
 
+  Future<List<Map<String, dynamic>>> requery() async{
+    var recs = await data.query();
+    refresh();
+    return recs;
+  }
+
   Future<bool> initAsync() async {
     bool init = await _model.initAsync();
 //    list.retrieve().then((list) {
@@ -169,14 +175,15 @@ class Controller extends ControllerMVC {
     if (user == null) return;
     bool dump = await _model.recordDump();
     if (dump) {
-      await data.query();
-      refresh();
+      requery();
     }
   }
 
   get defaultIcon => _model.defaultIcon;
 
   void reSync() => _model.reSync();
+
+  bool itemsOrdered([bool ordered]) => _model.itemsOrdered(ordered);
 
   void setAlarms(List<Map<String, dynamic>> list) async {
     recs = list;

@@ -19,7 +19,7 @@
 
 import 'package:flutter/cupertino.dart';
 
-import 'package:workingmemory/src/controller.dart';
+import 'package:workingmemory/src/model.dart' show Settings;
 
 import 'package:workingmemory/src/home/view/ios/styles.dart';
 

@@ -1,3 +1,5 @@
+## 0.11.0
+- saveFirebase(newRec); bool itemsOrdered([bool ordered]); "$select order by datetime(DateTime)"; requery(); settitngs_drawer.dart
 
 ## 0.10.0
 - Modify .gitignore file to allow committing android and ios files & folders

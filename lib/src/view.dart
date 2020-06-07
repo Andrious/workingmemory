@@ -23,7 +23,7 @@ export 'package:mvc_application/view.dart';
 
 export 'package:workingmemory/src/app/view/view.dart';
 
-export 'package:workingmemory/src/app/view/settings_drawer.dart';
+export 'package:workingmemory/src/app/view/drawer/settings_drawer.dart';
 
 export 'package:workingmemory/src/app/view/sign_in.dart';
 

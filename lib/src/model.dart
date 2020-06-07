@@ -37,3 +37,5 @@ export 'package:workingmemory/src/home/model/SyncDB.dart' show SyncDB;
 
 export 'package:workingmemory/src/home/model/Semaphore.dart' show Semaphore;
 
+export 'package:workingmemory/src/home/model/settings.dart';
+

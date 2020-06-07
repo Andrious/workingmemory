@@ -56,9 +56,9 @@ import 'package:workingmemory/src/controller.dart' show App, Controller;
 
 class TodosAndroid extends StateMVC<TodosPage> {
   TodosAndroid() : super(Controller()) {
-    con = controller;
+    _con = controller;
   }
-  Controller con;
+  Controller _con;
   WorkMenu _menu;
 
   @override
@@ -67,7 +67,7 @@ class TodosAndroid extends StateMVC<TodosPage> {
     _menu = WorkMenu();
 //    if (con.data.items.length == 0 && !con.app.loggedIn) return SignIn();
     return Scaffold(
-      key: con.data.scaffoldKey,
+      key: _con.data.scaffoldKey,
       drawer: SettingsDrawer(),
       appBar: AppBar(
         title: const Text("My ToDos"),
@@ -83,23 +83,23 @@ class TodosAndroid extends StateMVC<TodosPage> {
         ),
       ),
       body: SafeArea(
-        child: con.data.items.length == 0
+        child: _con.data.items.length == 0
             ? Container()
             : ListView.builder(
                 scrollDirection: Axis.vertical,
                 padding: EdgeInsets.all(6.0),
-                itemCount: con.data.items.length,
+                itemCount: _con.data.items.length,
                 itemBuilder: (BuildContext context, int index) {
                   return Dismissible(
-                    key: ObjectKey(con.data.items[index]['rowid']),
+                    key: ObjectKey(_con.data.items[index]['rowid']),
                     onDismissed: (DismissDirection direction) {
-                      con.data.delete(con.data.items[index]);
-                      con.data.scaffoldKey.currentState?.showSnackBar(SnackBar(
+                      _con.data.delete(_con.data.items[index]);
+                      _con.data.scaffoldKey.currentState?.showSnackBar(SnackBar(
                           content: Text('You deleted an item.'),
                           action: SnackBarAction(
                               label: 'UNDO',
                               onPressed: () {
-                                con.data.undo(con.data.items[index]);
+                                _con.data.undo(_con.data.items[index]);
                               })));
                     },
                     background: Container(
@@ -117,13 +117,13 @@ class TodosAndroid extends StateMVC<TodosPage> {
                                   BorderSide(color: App.theme.dividerColor))),
                       child: ListTile(
                         leading: Icon(IconData(
-                            int.tryParse(con.data.items[index]['Icon']),
+                            int.tryParse(_con.data.items[index]['Icon']),
                             fontFamily: 'MaterialIcons')),
-                        title: Text(con.data.items[index]['Item']),
-                        subtitle: Text(con.data.dateFormat.format(
+                        title: Text(_con.data.items[index]['Item']),
+                        subtitle: Text(_con.data.dateFormat.format(
                             DateTime.tryParse(
-                                con.data.items[index]['DateTime']))),
-                        onTap: () => editToDo(con.data.items[index]),
+                                _con.data.items[index]['DateTime']))),
+                        onTap: () => editToDo(_con.data.items[index]),
                       ),
                     ),
                   );
