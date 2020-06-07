@@ -1,3 +1,7 @@
+
+## 0.10.0
+- Modify .gitignore file to allow committing android and ios files & folders
+
 ## 0.9.0
 - SignIn(); in Menu; crash.enableInDevMode = true; Future<bool> recordDump();
 
