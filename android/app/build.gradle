@@ -24,7 +24,7 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     lintOptions {
         disable 'InvalidPackage'
@@ -32,8 +32,8 @@ android {
 
     defaultConfig {
         applicationId "com.andrioussolutions.workingmemory"
-        minSdkVersion 28
-        targetSdkVersion 28
+        minSdkVersion 19
+        targetSdkVersion 29
         versionCode 1
         versionName flutterVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -72,10 +72,19 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    // Add the Firebase Crashlytics SDK.
+    implementation 'com.google.firebase:firebase-crashlytics:17.0.1'
+
+    // Recommended: Add the Google Analytics SDK.
+    implementation 'com.google.firebase:firebase-analytics:17.4.3'
 }
 
 // ADD THIS AT THE BOTTOM
+
 // Firebase Crashlytics
-apply plugin: 'io.fabric'
+//apply plugin: 'io.fabric'
+apply plugin: 'com.google.firebase.crashlytics'
+
 // Otherwise, Default FirebaseApp is not initialized in this process
 apply plugin: 'com.google.gms.google-services'

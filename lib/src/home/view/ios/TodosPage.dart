@@ -181,10 +181,10 @@ class MemoryList extends StatelessWidget {
                                           color: Colors.white, size: 36.0)))),
                           child: Container(
                             decoration: BoxDecoration(
-                                color: App.theme.canvasColor,
+                                color: App.themeData.canvasColor,
                                 border: Border(
                                     bottom: BorderSide(
-                                        color: App.theme.dividerColor))),
+                                        color: App.themeData.dividerColor))),
                             child: Material(
                                 type: MaterialType.transparency,
                                 child: ListTile(

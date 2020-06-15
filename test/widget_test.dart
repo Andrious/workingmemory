@@ -7,7 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:workingmemory/src/view.dart' show View;
+import 'package:workingmemory/src/view.dart' show WorkingView;
 import 'package:workingmemory/src/controller.dart' show App;
 
 void main() {
@@ -30,5 +30,5 @@ void main() {
 }
 
 class MyApp extends App{
-  createView() => View();
+  createView() => WorkingView();
 }

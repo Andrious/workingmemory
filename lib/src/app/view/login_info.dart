@@ -18,13 +18,13 @@ import 'dart:async' show Future;
 
 import 'package:flutter/material.dart' show AppBar, AsyncSnapshot, Color, Column, CrossAxisAlignment, FutureBuilder, Navigator, RaisedButton, Scaffold, Text, TextStyle, Widget;
 
-import 'package:workingmemory/src/controller.dart' show AppDrawer, WorkingMemoryApp;
+import 'package:workingmemory/src/controller.dart' show AppDrawer, WorkingController;
 
 import 'package:mvc_application/view.dart' show AppView;
 
 class LoginInfo {
 
-  final WorkingMemoryApp con = WorkingMemoryApp();
+  final WorkingController con = WorkingController();
 
   Widget scaffold(AppView _vw) {
     return Scaffold(

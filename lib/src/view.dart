@@ -15,13 +15,13 @@
 ///
 ///          Created  10 Apr 2019
 ///
-///           import 'package:workingmemory/view.dart';
+///           import 'package:workingmemory/working_memory_view.dart';
 
 export 'dart:io' show Platform;
 
 export 'package:mvc_application/view.dart';
 
-export 'package:workingmemory/src/app/view/view.dart';
+export 'package:workingmemory/src/app/view/working_memory_view.dart';
 
 export 'package:workingmemory/src/app/view/drawer/settings_drawer.dart';
 

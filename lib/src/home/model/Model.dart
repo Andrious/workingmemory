@@ -18,6 +18,8 @@
 
 import 'dart:async' show Future;
 
+import 'package:workingmemory/src/controller.dart' show App, WorkingController;
+
 import 'package:workingmemory/src/model.dart'
     show CloudDB, Database, FireBaseDB, Settings, SQLiteDB;
 
@@ -359,6 +361,12 @@ class ToDo extends SQLiteDB {
       _cloud.timeStampDevice();
     }
     return version;
+  }
+
+  @override
+  /// Upgrade to a higher version.
+  Future<void> onUpgrade(Database db, int oldVersion, int newVersion) {
+    return Future.value();
   }
 
   Future<List<Map<String, dynamic>>> list() => this.getTable(ToDo.TABLE_NAME);

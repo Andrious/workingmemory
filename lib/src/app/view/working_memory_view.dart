@@ -15,8 +15,7 @@
 ///
 ///          Created  23 Jun 2018
 ///
-
-import 'package:flutter/material.dart';
+//import 'package:workingmemory/src/view/LoginInfo.dart' show LoginInfo;
 
 import 'package:flutter_localizations/flutter_localizations.dart'
     show
@@ -24,41 +23,28 @@ import 'package:flutter_localizations/flutter_localizations.dart'
         GlobalMaterialLocalizations,
         GlobalWidgetsLocalizations;
 
-import 'package:mvc_application/view.dart' show AppView;
+import 'package:workingmemory/src/view.dart';
 
-import 'package:workingmemory/src/controller.dart' show App, WorkingMemoryApp;
+import 'package:workingmemory/src/controller.dart'
+    show WorkingController;
 
-import 'package:workingmemory/src/view.dart' show App, AppView, TodosPage;
-
-//import 'package:workingmemory/src/view/LoginInfo.dart' show LoginInfo;
-
-class View extends AppView {
-  factory View() => _this ??= View._();
-  View._()
+class WorkingView extends AppView {
+  factory WorkingView() => _this ??= WorkingView._();
+  WorkingView._()
       : super(
-            con: _app,
-            title: 'Working Memory',
-            home: TodosPage(),
-            debugShowCheckedModeBanner: false,
-            ) {
+          con: _app,
+          title: 'Working Memory',
+          home: TodosPage(),
+          debugShowCheckedModeBanner: false,
+        ) {
     idKey = _app.keyId;
   }
-  static View _this;
-
-  @override
-  void onError(FlutterErrorDetails details) {
-    super.onError(details);
-  }
-
-  /// Allow for easy access to 'the View' throughout the application.
-  static View get view => _this;
-
-  /// Instantiate here so to get the 'keyId.'
-  static final WorkingMemoryApp _app = WorkingMemoryApp();
+  static WorkingView _this;
   String idKey;
 
-  @override
-  ThemeData onTheme() => ThemeData(
-        primarySwatch: App.colorTheme,
-      );
+  /// Allow for easy access to 'the View' throughout the application.
+  static WorkingView get view => _this;
+
+  /// Instantiate here so to get the 'keyId.'
+  static final WorkingController _app = WorkingController();
 }

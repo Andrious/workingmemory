@@ -33,9 +33,9 @@ class SignIn extends StatefulWidget {
 
 class SignInState extends StateMVC<SignIn> {
   SignInState() : super() {
-    app = WorkingMemoryApp();
+    app = WorkingController();
   }
-  WorkingMemoryApp app;
+  WorkingController app;
 
   @override
   Widget build(BuildContext context) {

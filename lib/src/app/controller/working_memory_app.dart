@@ -56,21 +56,16 @@ runApp(
   a.runApp(app, handler: handler, builder: builder, reportError: reportError);
 }
 
-class WorkingMemoryApp extends AppController {
-  factory WorkingMemoryApp() => _this ??= WorkingMemoryApp._();
-  static WorkingMemoryApp _this;
+class WorkingController extends AppController {
+  factory WorkingController() => _this ??= WorkingController._();
+  static WorkingController _this;
 //
 //  /// Allow for easy access to 'the Controller' throughout the application.
 //  static WorkingMemoryApp get con => _this;
-  WorkingMemoryApp._() {
+  WorkingController._() {
     _auth = Auth(listener: _logInUser);
     _con = Controller();
     _remoteConfig = RemoteConfig();
-  }
-
-  @override
-  void onError(FlutterErrorDetails details) {
-    super.onError(details);
   }
 
   /// Provide the sign in and the loading database info.

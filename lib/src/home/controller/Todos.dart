@@ -40,7 +40,7 @@ import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart';
 
-final ThemeData theme = App.theme;
+final ThemeData theme = App.themeData;
 
 class Controller extends ControllerMVC {
   factory Controller() => _this ??= Controller._();
@@ -49,8 +49,6 @@ class Controller extends ControllerMVC {
   Controller._() : super() {
     _model = m.Model();
     _dataFields = ToDoEdit(this);
-    //   _editToDo = ToDoEdit();
-    //   _listToDo = _editToDo;
   }
 
   // External access to the Model component.
@@ -60,23 +58,8 @@ class Controller extends ControllerMVC {
   /// Allow for easy access to 'the Controller' throughout the application.
   static Controller get con => _this ?? Controller();
 
-  ToDoEdit get data => _dataFields;
-  ToDoEdit _dataFields;
-
-//  ToDoEdit get edit => _editToDo;
-//  ToDoEdit _editToDo;
-
-  String get editKey => _editKey;
-  String _editKey;
-
-//  _ToDoList get list => _listToDo;
-//  _ToDoList _listToDo;
-
-  String get listKey => _listKey;
-  String _listKey;
-
-  WorkingMemoryApp get app => _app ??= WorkingMemoryApp();
-  WorkingMemoryApp _app;
+  WorkingController get app => _app ??= WorkingController();
+  WorkingController _app;
 
   void rebuild() => _this.refresh();
 
@@ -88,24 +71,20 @@ class Controller extends ControllerMVC {
 
   Future<bool> initAsync() async {
     bool init = await _model.initAsync();
-//    list.retrieve().then((list) {
-//      // Display the list.
-//      refresh();
-//      setAlarms(list);
-//    });
-//    List<Map<String, dynamic>> recs = await list.retrieve();
     List<Map<String, dynamic>> records = await data.query();
-    // Display the list.
-//    refresh();
     setAlarms(records);
-//    _editKey = edit.addState(this.stateMVC);
-//    _listKey = list.addState(this.stateMVC);
-
-    // Return the list of favourite icons.
     _favIcons = await _model.listIcons();
-
     return init;
   }
+
+  ToDoEdit get data => _dataFields;
+  ToDoEdit _dataFields;
+
+  String get editKey => _editKey;
+  String _editKey;
+
+  String get listKey => _listKey;
+  String _listKey;
 
   List<Map<String, dynamic>> get favIcons => _favIcons;
   List<Map<String, dynamic>> _favIcons;
