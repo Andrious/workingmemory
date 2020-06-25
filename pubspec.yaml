@@ -1,7 +1,7 @@
 name: workingmemory
 description: A ToDo List for a not so working memory
 
-version: 0.11.0
+version: 0.12.0
 
 environment:
   sdk: '>=2.7.0 <3.0.0'
@@ -10,11 +10,13 @@ dependencies:
   flutter:
     sdk: flutter
 
-  mvc_application: ^5.0.0
+  # https://pub.dev/packages/mvc_application
+  mvc_application: #^5.0.0
 #     path: ../../../packages/mvc_application
 #    git:
 #      url: git://github.com/AndriousSolutions/mvc_application.git
 
+  # https://pub.dev/packages/remote_config
   remote_config: ^1.0.0
 #    path: ../../../packages/remote_config
 
@@ -23,13 +25,16 @@ dependencies:
 #    path: ../../../packages/dbutils
 
   # Facebook entry in AndroidManifest.xml
+  # https://pub.dev/packages/auth
   auth: ^6.0.0
 #    path: ../../Libs/auth
 
+  # https://pub.dev/packages/sqflite
   sqflite: ^1.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+  # https://pub.dev/packages/cupertino_icons
   cupertino_icons: any #^0.1.0
 
   # https://pub.dartlang.org/packages/path_provider#-changelog-tab-

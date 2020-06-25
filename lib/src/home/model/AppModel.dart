@@ -17,7 +17,7 @@
 
 import 'package:auth/auth.dart';
 
-import 'package:workingmemory/src/app/controller/Controller.dart';
+import 'package:workingmemory/src/app/controller/working_memory_app.dart';
 
 import 'package:workingmemory/src/model.dart' show OnLoginListener;
 

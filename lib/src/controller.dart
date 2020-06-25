@@ -15,7 +15,7 @@
 ///
 ///          Created  10 Apr 2019
 ///
-///           import 'package:workingmemory/controller.dart';
+///           import 'package:workingmemory/working_memory_app.dart';
 
 
 export 'package:mvc_application/controller.dart'
@@ -23,6 +23,8 @@ export 'package:mvc_application/controller.dart'
 
 export 'package:mvc_application/settings.dart' show AppSettings, Prefs;
 
-export 'package:workingmemory/src/app/controller/controller.dart';
+export 'package:workingmemory/src/app/controller/working_memory_app.dart';
+
+export 'package:workingmemory/src/app/controller/theme_controller.dart';
 
 export 'package:workingmemory/src/home/controller/Todos.dart';

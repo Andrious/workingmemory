@@ -26,7 +26,7 @@ import 'package:workingmemory/src/model.dart'
     show AppModel, FireBaseDB, Model, Semaphore, SyncDB;
 
 import 'package:workingmemory/src/controller.dart'
-    show App, Controller, WorkingMemoryApp;
+    show App, Controller, WorkingController;
 
 import 'package:firebase_database/firebase_database.dart'
     show DataSnapshot, DatabaseReference;
@@ -195,7 +195,7 @@ abstract class OnLoginListener {
 
 class DataSync {
   final String installNum = App.installNum;
-  static final WorkingMemoryApp _con = WorkingMemoryApp();
+  static final WorkingController _con = WorkingController();
   final FireBaseDB _fireDB = FireBaseDB();
   void init() {}
 

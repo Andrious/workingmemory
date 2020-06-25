@@ -23,7 +23,7 @@ import 'package:workingmemory/src/model.dart' show Semaphore;
 
 import 'package:dbutils/firebase_db.dart' as f;
 
-import 'package:workingmemory/src/controller.dart' show App, WorkingMemoryApp;
+import 'package:workingmemory/src/controller.dart' show App, WorkingController;
 
 import 'package:firebase_database/firebase_database.dart'
     show DataSnapshot, DatabaseReference, Event, Query;
@@ -152,7 +152,7 @@ class FireBaseDB {
   DatabaseReference get userRef {
 
     // infinite loop if instantiated in constructor.
-    String id = WorkingMemoryApp().uid;
+    String id = WorkingController().uid;
 
     if (id == null || id.trim().isEmpty) {
       id = null;
@@ -175,7 +175,7 @@ class FireBaseDB {
   DatabaseReference get yourDevicesRef {
 
     // infinite loop if instantiated in constructor.
-    String id = WorkingMemoryApp().uid;
+    String id = WorkingController().uid;
 
     if (id == null || id.trim().isEmpty) {
       id = null;
@@ -200,7 +200,7 @@ class FireBaseDB {
     DatabaseReference ref;
 
     // infinite loop if instantiated in constructor.
-    String id = WorkingMemoryApp().uid;
+    String id = WorkingController().uid;
 
     if (id.isEmpty) {
       ref = _db?.reference()?.child("tasks")?.child("dummy");
@@ -377,7 +377,7 @@ class FireBaseDB {
 
   bool userStamp(){
     bool stamp = true;
-    WorkingMemoryApp con = WorkingMemoryApp();
+    WorkingController con = WorkingController();
     try {
       DatabaseReference dbRef = userRef.child("profile");
       dbRef.child("name").set(con.name);

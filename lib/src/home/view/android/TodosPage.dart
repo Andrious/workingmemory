@@ -50,7 +50,7 @@ import 'package:flutter/material.dart'
         Widget;
 
 import 'package:workingmemory/src/view.dart'
-    show SettingsDrawer, SignIn, StateMVC, TodoPage, TodosPage, WorkMenu;
+    show SettingsDrawer, StateMVC, TodoPage, TodosPage, WorkMenu;
 
 import 'package:workingmemory/src/controller.dart' show App, Controller;
 
@@ -65,7 +65,6 @@ class TodosAndroid extends StateMVC<TodosPage> {
   Widget build(BuildContext context) {
     // Rebuilt the menu if state changes.
     _menu = WorkMenu();
-//    if (con.data.items.length == 0 && !con.app.loggedIn) return SignIn();
     return Scaffold(
       key: _con.data.scaffoldKey,
       drawer: SettingsDrawer(),
@@ -142,10 +141,5 @@ class TodosAndroid extends StateMVC<TodosPage> {
 
     await Navigator.of(context).push(route);
     refresh();
-  }
-
-  @override
-  void onError(FlutterErrorDetails details) {
-    print(details.exception.toString());
   }
 }

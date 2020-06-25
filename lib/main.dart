@@ -18,7 +18,7 @@
 ///                   https://github.com/Andrious/workingmemory
 
 
-import 'package:workingmemory/src/view.dart' show FlutterErrorDetails, View;
+import 'package:workingmemory/src/view.dart' show WorkingView;
 
 import 'package:workingmemory/src/controller.dart' show App, runApp;
 
@@ -26,10 +26,5 @@ void main() => runApp(WorkingMemory());
 
 class WorkingMemory extends App {
   @override
-  createView() => View();
-
-  @override
-  void onError(FlutterErrorDetails details) {
-    super.onError(details);
-  }
+  createView() => WorkingView();
 }
