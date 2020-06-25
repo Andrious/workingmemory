@@ -59,6 +59,6 @@ class View extends AppView {
 
   @override
   ThemeData onTheme() => ThemeData(
-        primarySwatch: App.colorTheme,
+        primarySwatch: App.color,
       );
 }

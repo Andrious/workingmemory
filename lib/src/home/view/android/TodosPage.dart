@@ -111,10 +111,10 @@ class TodosAndroid extends StateMVC<TodosPage> {
                                 color: Colors.white, size: 36.0))),
                     child: Container(
                       decoration: BoxDecoration(
-                          color: App.theme.canvasColor,
+                          color: App.themeData.canvasColor,
                           border: Border(
                               bottom:
-                                  BorderSide(color: App.theme.dividerColor))),
+                                  BorderSide(color: App.themeData.dividerColor))),
                       child: ListTile(
                         leading: Icon(IconData(
                             int.tryParse(_con.data.items[index]['Icon']),

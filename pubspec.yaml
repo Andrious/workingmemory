@@ -24,7 +24,7 @@ dependencies:
 
   # Facebook entry in AndroidManifest.xml
   auth: ^6.0.0
-#    path: ../../../packages/auth
+#    path: ../../Libs/auth
 
   sqflite: ^1.0.0
 

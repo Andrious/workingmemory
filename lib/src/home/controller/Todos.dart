@@ -40,7 +40,7 @@ import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart';
 
-final ThemeData theme = App.theme;
+final ThemeData theme = App.themeData;
 
 class Controller extends ControllerMVC {
   factory Controller() => _this ??= Controller._();

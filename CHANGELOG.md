@@ -1,3 +1,6 @@
+## 0.12.0
+- exclude much of ios/ in .gitignore
+
 ## 0.11.0
 - saveFirebase(newRec); bool itemsOrdered([bool ordered]); "$select order by datetime(DateTime)"; requery(); settitngs_drawer.dart
 

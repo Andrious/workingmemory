@@ -3,19 +3,17 @@
 /.atom/
 /.idea/
 
-/.packages
 /.pub/
 /out/
 /.gradle/
 
-/.flutter-plugins
 /.dart_tool/
 
 # Android Studio
 /*.iml
 
 # Ignore except for application packages
-#pubspec.lock
+pubspec.lock
 
 # Ignore App signing files
 /*.jks
@@ -74,9 +72,9 @@
 # Ignore API documentation directory created by dartdoc:
 /doc/api/
 .dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
+# .flutter-plugins
+# .flutter-plugins-dependencies
+# .packages
 .pub-cache/
 .pub/
 
@@ -96,7 +94,7 @@ google-services.json
 **/android/captures/
 **/android/gradlew
 **/android/gradlew.bat
-**/android/local.properties
+# **/android/local.properties
 **/android/key.properties
 **/android/**/GeneratedPluginRegistrant.java
 
@@ -115,7 +113,7 @@ google-services.json
 **/ios/**/Pods/
 **/ios/**/.symlinks/
 **/ios/**/profile
-**/ios/**/xcuserdata
+# **/ios/**/xcuserdata
 **/ios/.generated/
 **/ios/Flutter/App.framework
 **/ios/Flutter/Flutter.framework
@@ -125,8 +123,8 @@ google-services.json
 **/ios/Flutter/flutter_assets/
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
-**/ios/Runner/GoogleService-Info.plist
-**/ios/Runner/Info.plist
+# **/ios/Runner/GoogleService-Info.plist
+# **/ios/Runner/Info.plist
 
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3
