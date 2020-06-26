@@ -233,6 +233,7 @@ class Model {
 
     Iterator<dynamic> it = fireDB.entries.iterator;
 
+    // Insert Firebase records.
     while (it.moveNext()) {
       if (!keys.remove(it.current.key)) {
         if (it.current.value is! Map) continue;
@@ -248,6 +249,7 @@ class Model {
     }
     // Add local records to Firebase
     records.forEach((Map<String, dynamic> rec) async {
+      if(rec[fbKeyField] == null || rec[fbKeyField] == "")
       await saveFirebase(rec);
     });
     return dump;

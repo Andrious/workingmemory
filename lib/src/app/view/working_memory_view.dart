@@ -26,15 +26,15 @@ import 'package:flutter_localizations/flutter_localizations.dart'
 
 import 'package:mvc_application/view.dart' show AppView;
 
-import 'package:workingmemory/src/controller.dart' show App, WorkingMemoryApp;
+import 'package:workingmemory/src/controller.dart' show App, WorkingController;
 
 import 'package:workingmemory/src/view.dart' show App, AppView, TodosPage;
 
 //import 'package:workingmemory/src/view/LoginInfo.dart' show LoginInfo;
 
-class View extends AppView {
-  factory View() => _this ??= View._();
-  View._()
+class WorkingView extends AppView {
+  factory WorkingView() => _this ??= WorkingView._();
+  WorkingView._()
       : super(
             con: _app,
             title: 'Working Memory',
@@ -43,7 +43,7 @@ class View extends AppView {
             ) {
     idKey = _app.keyId;
   }
-  static View _this;
+  static WorkingView _this;
 
   @override
   void onError(FlutterErrorDetails details) {
@@ -51,10 +51,10 @@ class View extends AppView {
   }
 
   /// Allow for easy access to 'the View' throughout the application.
-  static View get view => _this;
+  static WorkingView get view => _this;
 
   /// Instantiate here so to get the 'keyId.'
-  static final WorkingMemoryApp _app = WorkingMemoryApp();
+  static final WorkingController _app = WorkingController();
   String idKey;
 
   @override

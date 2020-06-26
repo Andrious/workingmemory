@@ -1,26 +1,5 @@
-# workingmemory
+# Working Memory
+### A ToDo sample app written in Flutter
+Central to the 'Work in Progess' learning series:
+[![WorkInProgress2](https://user-images.githubusercontent.com/32497443/85770186-441e7e00-b6e0-11ea-8868-64bd7503823a.jpg)](https://medium.com/series/86c1d7ddd567)
 
-A ToDo List for a not so working memory
-
-## Getting Started
-
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
-
-```yaml
-dependencies:
-
-  flutter:
-    sdk: flutter
-
-  mvc_application:
-    git:
-      url: git://github.com/AndriousSolutions/mvc_application.git
-
-  firebase:
-    git:
-      url: git://github.com/AndriousSolutions/firebase.git
-  auth:
-    git:
-      url: git://github.com/AndriousSolutions/auth.git
-```

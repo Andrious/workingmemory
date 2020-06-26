@@ -1,4 +1,8 @@
+## 0.13.0
+- Updated README.md
+
 ## 0.12.0
+-  0.12.0  App.themeData; WorkingMemoryApp to WorkingController; View to WorkingView
 - exclude much of ios/ in .gitignore
 
 ## 0.11.0

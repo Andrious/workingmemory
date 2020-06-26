@@ -19,19 +19,6 @@ import "dart:async" show Future;
 
 import 'package:auth/auth.dart';
 
-import 'package:flutter/material.dart'
-    show
-        AppLifecycleState,
-        FormState,
-        GlobalKey,
-        MaterialPageRoute,
-        Navigator,
-        ScaffoldState,
-        Text,
-        TextEditingController,
-        ThemeData,
-        Widget;
-
 import 'package:intl/intl.dart' show DateFormat;
 
 import 'package:workingmemory/src/model.dart' as m;
