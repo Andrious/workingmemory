@@ -21,11 +21,8 @@ import 'package:workingmemory/src/app/controller/working_memory_app.dart';
 
 import 'package:workingmemory/src/model.dart' show OnLoginListener;
 
-class AppModel implements OnLoginListener{
-
-  void onLogin(){
-
-  }
+class AppModel implements OnLoginListener {
+  void onLogin() {}
 //
 //
 //  appView mAppView;

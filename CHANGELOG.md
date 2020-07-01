@@ -1,8 +1,13 @@
+## 0.14.0
+ July 01, 2020
+- primaryColor: App.color,
+- 49 files committed.
+
 ## 0.13.0
 - Updated README.md
 
 ## 0.12.0
--  0.12.0  App.themeData; WorkingMemoryApp to WorkingController; View to WorkingView
+- App.themeData; WorkingMemoryApp to WorkingController; View to WorkingView
 - exclude much of ios/ in .gitignore
 
 ## 0.11.0

@@ -36,11 +36,11 @@ class WorkingView extends AppView {
   factory WorkingView() => _this ??= WorkingView._();
   WorkingView._()
       : super(
-            con: _app,
-            title: 'Working Memory',
-            home: TodosPage(),
-            debugShowCheckedModeBanner: false,
-            ) {
+          con: _app,
+          title: 'Working Memory',
+          home: TodosPage(),
+          debugShowCheckedModeBanner: false,
+        ) {
     idKey = _app.keyId;
   }
   static WorkingView _this;
@@ -59,6 +59,6 @@ class WorkingView extends AppView {
 
   @override
   ThemeData onTheme() => ThemeData(
-        primarySwatch: App.color,
+        primaryColor: App.color,
       );
 }

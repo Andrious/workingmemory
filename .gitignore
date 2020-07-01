@@ -9,6 +9,12 @@
 
 /.dart_tool/
 
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
 # Android Studio
 /*.iml
 
@@ -44,9 +50,10 @@ pubspec.lock
 /.settings/
 /.loadpath
 
-                                        
+
 # Miscellaneous
 #*.lock
+*.txt
 *.class
 *.log
 *.pyc
@@ -69,6 +76,7 @@ pubspec.lock
 # Flutter/Dart/Pub related
 /build/
 
+# Flutter/Dart/Pub related
 # Ignore API documentation directory created by dartdoc:
 /doc/api/
 .dart_tool/

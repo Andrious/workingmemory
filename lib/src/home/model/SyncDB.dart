@@ -61,15 +61,15 @@ class SyncDB extends SQLiteDB {
   }
 
   Future<int> update(Map<String, dynamic> recValues) async {
-    int  result = 0;
+    int result = 0;
 
     int id = recValues["id"];
 
-    if(id == null || id <= 0) return result;
+    if (id == null || id <= 0) return result;
 
     String key = recValues["key"];
 
-    if(key == null || key.trim().isEmpty) return result;
+    if (key == null || key.trim().isEmpty) return result;
 
     Map<String, dynamic> recs = await updateRec(_table, recValues);
 

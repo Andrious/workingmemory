@@ -150,7 +150,6 @@ class FireBaseDB {
   }
 
   DatabaseReference get userRef {
-
     // infinite loop if instantiated in constructor.
     String id = WorkingController().uid;
 
@@ -173,7 +172,6 @@ class FireBaseDB {
   DatabaseReference get yourDeviceRef => yourDevicesRef.child(App.installNum);
 
   DatabaseReference get yourDevicesRef {
-
     // infinite loop if instantiated in constructor.
     String id = WorkingController().uid;
 
@@ -189,9 +187,7 @@ class FireBaseDB {
       // Important to provide a reference that is not likely there in case called by deletion routine.
       ref = reference().child("devices").child("dummy");
     } else {
-      ref = reference()
-          .child("devices")
-          .child(id);
+      ref = reference().child("devices").child(id);
     }
     return ref;
   }
@@ -254,19 +250,19 @@ class FireBaseDB {
     if (data?.value == null || data?.value is! Map) {
       mDataArrayList = Map();
     } else {
-      mDataArrayList = Map<String,dynamic>.from(data.value);
+      mDataArrayList = Map<String, dynamic>.from(data.value);
     }
     return mDataArrayList;
   }
 
-  Future<Map<String,dynamic>> record(String key) async{
+  Future<Map<String, dynamic>> record(String key) async {
     Map<String, dynamic> fbRecs = await records();
     Map<String, dynamic> rec;
-    if(fbRecs[key] == null){
+    if (fbRecs[key] == null) {
       rec = Map();
-    }else{
-       rec = Map<String, dynamic>.from(fbRecs[key]);
-       rec["KeyFld"] = key;
+    } else {
+      rec = Map<String, dynamic>.from(fbRecs[key]);
+      rec["KeyFld"] = key;
     }
     return rec;
   }
@@ -375,7 +371,7 @@ class FireBaseDB {
 
   static Future<void> goOffline() => _db.goOffline();
 
-  bool userStamp(){
+  bool userStamp() {
     bool stamp = true;
     WorkingController con = WorkingController();
     try {
@@ -385,7 +381,7 @@ class FireBaseDB {
       dbRef.child("provider").set(con.provider);
       dbRef.child("new user").set(con.isNewUser);
       dbRef.child("photo").set(con.photo);
-    }catch(ex){
+    } catch (ex) {
       stamp = false;
       con.getError(ex);
     }

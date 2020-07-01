@@ -80,6 +80,7 @@ class TodosAndroid extends StateMVC<TodosPage> {
           Icons.add,
           semanticLabel: 'Add',
         ),
+
       ),
       body: SafeArea(
         child: _con.data.items.length == 0
@@ -112,8 +113,8 @@ class TodosAndroid extends StateMVC<TodosPage> {
                       decoration: BoxDecoration(
                           color: App.themeData.canvasColor,
                           border: Border(
-                              bottom:
-                                  BorderSide(color: App.themeData.dividerColor))),
+                              bottom: BorderSide(
+                                  color: App.themeData.dividerColor))),
                       child: ListTile(
                         leading: Icon(IconData(
                             int.tryParse(_con.data.items[index]['Icon']),

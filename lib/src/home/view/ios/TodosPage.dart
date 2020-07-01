@@ -165,9 +165,7 @@ class MemoryList extends StatelessWidget {
                                     action: SnackBarAction(
                                         label: 'UNDO',
                                         onPressed: () {
-                                          Controller()
-                                              .data
-                                              .undo(_items[index]);
+                                          Controller().data.undo(_items[index]);
                                         })));
                           },
                           background: Container(

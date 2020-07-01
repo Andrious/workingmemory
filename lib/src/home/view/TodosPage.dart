@@ -18,8 +18,7 @@
 /// place: "/todos"
 import 'package:flutter/material.dart' show Key, State, StatefulWidget;
 
-import 'package:workingmemory/src/view.dart'
-    show App, TodosAndroid, TodosiOS;
+import 'package:workingmemory/src/view.dart' show App, TodosAndroid, TodosiOS;
 
 class TodosPage extends StatefulWidget {
   TodosPage({Key key}) : super(key: key);

@@ -69,13 +69,13 @@ class TodoiOS extends StateMVC<TodoPage> {
                 alignment: Alignment.bottomLeft,
                 child: FormField<String>(
                   initialValue: con.data.changer.text,
-                    validator: (v) {
-                      if (v.trim().isEmpty) return 'Cannot be empty.';
-                      return null;
-                    },
-                    onSaved: (value) {
-                      con.data.item = value;
-                    },
+                  validator: (v) {
+                    if (v.trim().isEmpty) return 'Cannot be empty.';
+                    return null;
+                  },
+                  onSaved: (value) {
+                    con.data.item = value;
+                  },
                   builder: (FormFieldState<String> field) {
                     return CupertinoTextField(
                       controller: con.data.changer,
@@ -129,60 +129,63 @@ class TodoiOS extends StateMVC<TodoPage> {
 
     bool willPop;
 
-    if(App.useCupertino) {
+    if (App.useCupertino) {
       //
       willPop = await showGeneralDialog<bool>(
-        context: context,
-          barrierDismissible: true,
-          barrierLabel: "label",
-          barrierColor: const Color(0x80000000),
-          transitionDuration: const Duration(milliseconds: 200),
-          pageBuilder: (BuildContext buildContext, Animation<double> animation, Animation<double> secondaryAnimation) {
-          return SafeArea(
-            child: CupertinoAlertDialog(
-              content: Text('Discard new event?', style: dialogTextStyle),
-              actions: <Widget>[
-                CupertinoButton(
-                    child: const Text('CANCEL'),
-                    onPressed: () {
-                      Navigator.of(context).pop(
-                          false); // Pops the confirmation dialog but not the page.
-                    }),
-                CupertinoButton(
-                    child: const Text('DISCARD'),
-                    onPressed: () {
-                      Navigator.of(context).pop(
-                          true); // Returning true to _onWillPop will pop again.
-                    })
-              ],
-            ),
-          );
-        },
-      ) ?? false;
-    }else {
+            context: context,
+            barrierDismissible: true,
+            barrierLabel: "label",
+            barrierColor: const Color(0x80000000),
+            transitionDuration: const Duration(milliseconds: 200),
+            pageBuilder: (BuildContext buildContext,
+                Animation<double> animation,
+                Animation<double> secondaryAnimation) {
+              return SafeArea(
+                child: CupertinoAlertDialog(
+                  content: Text('Discard new event?', style: dialogTextStyle),
+                  actions: <Widget>[
+                    CupertinoButton(
+                        child: const Text('CANCEL'),
+                        onPressed: () {
+                          Navigator.of(context).pop(
+                              false); // Pops the confirmation dialog but not the page.
+                        }),
+                    CupertinoButton(
+                        child: const Text('DISCARD'),
+                        onPressed: () {
+                          Navigator.of(context).pop(
+                              true); // Returning true to _onWillPop will pop again.
+                        })
+                  ],
+                ),
+              );
+            },
+          ) ??
+          false;
+    } else {
       //
       willPop = await showDialog<bool>(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: Text('Discard new event?', style: dialogTextStyle),
-            actions: <Widget>[
-              FlatButton(
-                  child: const Text('CANCEL'),
-                  onPressed: () {
-                    Navigator.of(context).pop(
-                        false); // Pops the confirmation dialog but not the page.
-                  }),
-              FlatButton(
-                  child: const Text('DISCARD'),
-                  onPressed: () {
-                    Navigator.of(context).pop(
-                        true); // Returning true to _onWillPop will pop again.
-                  })
-            ],
-          );
-        },
-      ) ??
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                content: Text('Discard new event?', style: dialogTextStyle),
+                actions: <Widget>[
+                  FlatButton(
+                      child: const Text('CANCEL'),
+                      onPressed: () {
+                        Navigator.of(context).pop(
+                            false); // Pops the confirmation dialog but not the page.
+                      }),
+                  FlatButton(
+                      child: const Text('DISCARD'),
+                      onPressed: () {
+                        Navigator.of(context).pop(
+                            true); // Returning true to _onWillPop will pop again.
+                      })
+                ],
+              );
+            },
+          ) ??
           false;
     }
     return willPop;

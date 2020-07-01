@@ -20,11 +20,11 @@ import 'dart:async' show Future, runZonedGuarded;
 import 'dart:isolate' show Isolate, RawReceivePort;
 
 import 'package:flutter/foundation.dart' show FlutterError, FlutterErrorDetails;
-import 'package:flutter/material.dart' show FlutterError, FlutterErrorDetails, Widget, runApp;
+import 'package:flutter/material.dart'
+    show FlutterError, FlutterErrorDetails, Widget, runApp;
 
 /// Must acknowledge https://github.com/yjbanov/crashy
 dynamic exeApp(Widget app) async {
-
   /// The default is to dump the error to the console.
   /// Instead, a custom function is called.
   FlutterError.onError = (FlutterErrorDetails details) async {
@@ -52,8 +52,9 @@ Future<Null> _reportError(dynamic error, dynamic stackTrace) async {
   // details.exception, details.stack
 
   FlutterError.dumpErrorToConsole(FlutterErrorDetails(
-  exception: error,
-  stack: stackTrace,));
+    exception: error,
+    stack: stackTrace,
+  ));
 }
 
 /// Reports [error] along with its [stackTrace]

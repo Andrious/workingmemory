@@ -6,7 +6,6 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
-
     <!-- android_alarm_manager -->
     <!-- Start an Alarm When the Device Boots if past due -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>

@@ -29,6 +29,6 @@ void main() {
   });
 }
 
-class MyApp extends App{
+class MyApp extends App {
   createView() => WorkingView();
 }

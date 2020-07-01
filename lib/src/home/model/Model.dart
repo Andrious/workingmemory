@@ -249,8 +249,8 @@ class Model {
     }
     // Add local records to Firebase
     records.forEach((Map<String, dynamic> rec) async {
-      if(rec[fbKeyField] == null || rec[fbKeyField] == "")
-      await saveFirebase(rec);
+      if (rec[fbKeyField] == null || rec[fbKeyField] == "")
+        await saveFirebase(rec);
     });
     return dump;
   }
@@ -366,6 +366,7 @@ class ToDo extends SQLiteDB {
   }
 
   @override
+
   /// Upgrade to a higher version.
   Future<void> onUpgrade(Database db, int oldVersion, int newVersion) {
     return Future.value();

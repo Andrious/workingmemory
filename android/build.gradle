@@ -3,28 +3,32 @@ buildscript {
         // Add Google's Maven repository (if it's not there already).
         google()
         jcenter()
-// DEPRECATED       // To use Firebase Crashlytics
-//        maven {
-//            url 'https://maven.fabric.io/public'
-//        }
     }
 
     dependencies {
-//        classpath 'com.android.tools.build:gradle:3.0.1'
-		  // Otherwise, Default FirebaseApp is not initialized in this process 
+		  // Otherwise, Default FirebaseApp is not initialized in this process
           classpath 'com.android.tools.build:gradle:4.0.0'
          // Google Services Gradle plugin
           classpath 'com.google.gms:google-services:4.3.3'
           // Firebase Crashlytics
-//          classpath 'io.fabric.tools:gradle:1.26.1'
-          classpath 'com.google.firebase:firebase-crashlytics-gradle:2.1.1'
+          classpath 'com.google.firebase:firebase-crashlytics-gradle:2.2.0'
     }
+
+//    configurations.all {
+//       resolutionStrategy {
+//          force 'com.android.support:support-v4:27.1.0'
+//       }
+//    }
 }
 
 allprojects {
     repositories {
         google()
         jcenter()
+    }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:deprecation,unchecked"
     }
 }
 

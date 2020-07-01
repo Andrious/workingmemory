@@ -11,7 +11,7 @@ dependencies:
     sdk: flutter
 
   # https://pub.dev/packages/mvc_application
-  mvc_application: #^5.0.0
+  mvc_application: ^5.0.0
 #     path: ../../../packages/mvc_application
 #    git:
 #      url: git://github.com/AndriousSolutions/mvc_application.git

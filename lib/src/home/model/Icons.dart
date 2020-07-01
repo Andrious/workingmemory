@@ -20,7 +20,6 @@
 ///
 
 class Icons {
-
   static Map<String, String> code = {
     '0xe84d': '3d_rotation',
     '0xeb3b': 'ac_unit',
@@ -55,8 +54,8 @@ class Icons {
     '0xe636': 'airline_seat_recline_extra',
     '0xe637': 'airline_seat_recline_normal',
     '0xe539': 'flight',
- //   '0xe1ca': 'airplanemode_inactive',
- //   '0xe1cb': 'airplay',
+    //   '0xe1ca': 'airplanemode_inactive',
+    //   '0xe1cb': 'airplay',
     '0xeb3c': 'airport_shuttle',
     '0xe857': 'alarm_off',
     '0xe858': 'alarm_on',
@@ -180,8 +179,8 @@ class Icons {
     '0xeb42': 'child_friendly',
     '0xe86d': 'chrome_reader_mode',
     '0xe5cd': 'close3',
- //   '0xe1eb': 'clear_all',
- //   '0xe1ec': 'closed_caption',
+    //   '0xe1eb': 'clear_all',
+    //   '0xe1ec': 'closed_caption',
     '0xe42d': 'wb_cloudy',
     '0xe2be': 'cloud_circle',
     '0xe2bf': 'cloud_done',
@@ -401,7 +400,7 @@ class Icons {
     '0xe310': 'headset',
     '0xe311': 'headset_mic',
     '0xe3f3': 'healing',
- //   '0xe217': 'hearing',
+    //   '0xe217': 'hearing',
     '0xe887': 'help',
     '0xe8fd': 'help_outline',
 //    '0xe218': 'high_quality',
@@ -639,7 +638,7 @@ class Icons {
     '0xe91f': 'record_voice_over',
 //    '0xe276': 'redo3',
     '0xe5d5': 'refresh2',
- //   '0xe277': 'remove4',
+    //   '0xe277': 'remove4',
 //    '0xe278': 'remove_circle_outline',
 //    '0xe279': 'remove_from_queue',
     '0xe8f4': 'visibility',
@@ -1995,5 +1994,3 @@ class Icons {
 //    '0xe1c2': 'opera',
   };
 }
-
-

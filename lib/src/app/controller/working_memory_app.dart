@@ -51,7 +51,7 @@ runApp(
 
   reportError ??= crash.recordError;
 
-  crash.enableInDevMode = true;
+//  crash.enableInDevMode = true;
 
   a.runApp(app, handler: handler, builder: builder, reportError: reportError);
 }
@@ -125,7 +125,7 @@ class WorkingController extends AppController {
   Future<bool> signIn() async {
     _loggedIn = await signInSilently();
     if (!_loggedIn) _loggedIn = await signInAnonymously();
-    if(_auth.isAnonymous){
+    if (_auth.isAnonymous) {
       _auth.listener = _con.recordDump;
     }
     return _loggedIn;

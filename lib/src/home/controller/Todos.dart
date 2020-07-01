@@ -50,7 +50,7 @@ class Controller extends ControllerMVC {
 
   void rebuild() => _this.refresh();
 
-  Future<List<Map<String, dynamic>>> requery() async{
+  Future<List<Map<String, dynamic>>> requery() async {
     var recs = await data.query();
     refresh();
     return recs;

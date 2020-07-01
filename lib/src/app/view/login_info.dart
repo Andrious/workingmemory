@@ -16,14 +16,27 @@
 ///          Created  22 Aug 2018
 import 'dart:async' show Future;
 
-import 'package:flutter/material.dart' show AppBar, AsyncSnapshot, Color, Column, CrossAxisAlignment, FutureBuilder, Navigator, RaisedButton, Scaffold, Text, TextStyle, Widget;
+import 'package:flutter/material.dart'
+    show
+        AppBar,
+        AsyncSnapshot,
+        Color,
+        Column,
+        CrossAxisAlignment,
+        FutureBuilder,
+        Navigator,
+        RaisedButton,
+        Scaffold,
+        Text,
+        TextStyle,
+        Widget;
 
-import 'package:workingmemory/src/controller.dart' show AppDrawer, WorkingController;
+import 'package:workingmemory/src/controller.dart'
+    show AppDrawer, WorkingController;
 
 import 'package:mvc_application/view.dart' show AppView;
 
 class LoginInfo {
-
   final WorkingController con = WorkingController();
 
   Widget scaffold(AppView _vw) {
@@ -49,7 +62,7 @@ class LoginInfo {
             child: const Text('Test signInSilently'),
             onPressed: () {
               _vw.setState(() {
-                _uid = con.signInSilently().then((log){
+                _uid = con.signInSilently().then((log) {
                   return con.uid;
                 });
               });
@@ -58,17 +71,17 @@ class LoginInfo {
             child: const Text('Test signInWithGoogle'),
             onPressed: () {
               _vw.setState(() {
-                _uid = con.signInWithGoogle().then((log){
+                _uid = con.signInWithGoogle().then((log) {
                   return con.uid;
                 });
               });
             }),
-    Text('User id: ${con.uid}'),
-    Text('User Name: ${con.name}'),
-    Text('Anonymous: ${con.isAnonymous}'),
-    Text('Email:     ${con.email}'),
-    Text('Provider:  ${con.provider}'),
-    Text('Photo:     ${con.photo}'),
+        Text('User id: ${con.uid}'),
+        Text('User Name: ${con.name}'),
+        Text('Anonymous: ${con.isAnonymous}'),
+        Text('Email:     ${con.email}'),
+        Text('Provider:  ${con.provider}'),
+        Text('Photo:     ${con.photo}'),
 //          Text('Token Id:  ${Controller.tokenId}'),
 //          Text('AcessToken:${Controller.token}'),
         FutureBuilder<String>(

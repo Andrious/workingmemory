@@ -87,8 +87,7 @@ class DTiOS extends StatelessWidget {
                 ]),
                 onTap: () {
                   showCupertinoDatePicker(context,
-                      mode: CupertinoDatePickerMode.time,
-                      initialDateTime: time,
+                      mode: CupertinoDatePickerMode.time, initialDateTime: time,
                       onDateTimeChanged: (DateTime time) {
                     DateTime result;
                     if (time.hour > 0 || time.minute > 0) {

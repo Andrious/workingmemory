@@ -50,10 +50,8 @@ class ThemeController extends ControllerMVC {
   setTheme([ThemeData theme]) {
     //
     if (theme != null) {
-
       App.themeData = theme;
     } else {
-
       if (_darkmode) {
         App.themeData = ThemeData.dark();
       } else {

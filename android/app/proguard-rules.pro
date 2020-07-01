@@ -27,7 +27,7 @@
 
 #Proguard can rename the `BuildConfig` Java class in the minification process
 # and prevent React Native Config from referencing it. To avoid this:
--keep class com.gtfp.workingmemory.BuildConfig { *; }     # <--- change to your app.
+-keep class com.andrioussolutions.workingmemory.BuildConfig { *; }     # <--- change to your app.
 
 ## Try a little more passes for kicks.
 -optimizationpasses 5
@@ -44,9 +44,6 @@
 
 # It's being sought but doesn't need to be.
 -dontwarn org.joda.convert.**
-
-# It's included as a jar file so don't worry, right?
-#-dontwarn com.example.exceptionhandler.**
 
 # Necessary since adding compile files('../../../libs/opencsv/opencsv-3.3.jar')
 -dontwarn org.apache.commons.collections.BeanMap

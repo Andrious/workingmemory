@@ -18,8 +18,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:workingmemory/src/view.dart'
-    show App, DTAndroid, DTiOS;
+import 'package:workingmemory/src/view.dart' show App, DTAndroid, DTiOS;
 
 class DateTimeItem extends StatelessWidget {
   DateTimeItem({this.key, this.dateTime, @required this.onChanged});

@@ -86,7 +86,6 @@ class DTAndroid extends StatelessWidget {
                   });
                 },
               ))
-        ])
-    );
+        ]));
   }
 }

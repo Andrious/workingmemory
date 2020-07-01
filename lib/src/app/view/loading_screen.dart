@@ -20,15 +20,12 @@ class _LoadingScreenState extends State<LoadingScreen>
   void initState() {
     super.initState();
     _controller = new AnimationController(
-        duration: const Duration(milliseconds: 1500),
-        vsync: this
-    )
+        duration: const Duration(milliseconds: 1500), vsync: this)
       ..forward();
     _animation = new CurvedAnimation(
         parent: _controller,
         curve: new Interval(0.0, 0.9, curve: Curves.fastOutSlowIn),
-        reverseCurve: Curves.fastOutSlowIn
-    )
+        reverseCurve: Curves.fastOutSlowIn)
       ..addStatusListener((AnimationStatus status) {
         if (status == AnimationStatus.dismissed) {
           _controller.forward();
@@ -47,18 +44,13 @@ class _LoadingScreenState extends State<LoadingScreen>
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      home: Scaffold(
-        appBar: new AppBar(
-            title: new Text('Loading...')
-        ),
-        body: new Container(
-            child: new AnimatedBuilder(
-                animation: _animation,
-                builder: (BuildContext context, Widget child) {
-                  return new Center(child: new CircularProgressIndicator());
-                }
-            )
-        )
-    ));
+        home: Scaffold(
+            appBar: new AppBar(title: new Text('Loading...')),
+            body: new Container(
+                child: new AnimatedBuilder(
+                    animation: _animation,
+                    builder: (BuildContext context, Widget child) {
+                      return new Center(child: new CircularProgressIndicator());
+                    }))));
   }
 }

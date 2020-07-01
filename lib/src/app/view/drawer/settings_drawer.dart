@@ -22,14 +22,12 @@ import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart';
 
-
 class SettingsDrawer extends StatefulWidget {
   @override
   _SettingsDrawerState createState() => _SettingsDrawerState();
 }
 
 class _SettingsDrawerState extends State<SettingsDrawer> {
-
   @override
   void initState() {
     super.initState();
@@ -37,38 +35,86 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
     _leftHanded = Settings.getLeftHanded();
     _con = Controller();
   }
+
   bool _descending;
   bool _leftHanded;
   Controller _con;
   bool _refresh;
 
-  void dispose(){
+  void dispose() {
     super.dispose();
-    if(_refresh == true)
-      _con.requery();
+    if (_refresh == true) _con.requery();
   }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     return Drawer(
-          child: ListView(
+      child: ListView(
 //      mainAxisAlignment: MainAxisAlignment.start,
 //      mainAxisSize: MainAxisSize.min,
 //      crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Card(
+          children: <Widget>[
+            Card(
+              child: Column(children: <Widget>[
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      const Text("INTERFACE PREFERENCES"),
+                    ]),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      const Text(
+                        "Sorted Order of Items",
+                      ),
+                    ]),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      const Expanded(
+                        child: const Text(
+                          "Check so the items are in descending order with the most recent items listed first.",
+                        ),
+                      ),
+                      Checkbox(
+                        key: null,
+                        value: _descending,
+                        onChanged: orderItems,
+                      ),
+                    ]),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(
+                        child: const Text(
+                          "Switch around dialog buttons",
+                        ),
+                      ),
+                      Checkbox(
+                        key: null,
+                        value: _leftHanded,
+                        onChanged: switchButton,
+                      ),
+                    ]),
+              ]),
+            ),
+            Card(
+              child: InkWell(
+                  onTap: () {},
                   child: Column(children: <Widget>[
                     Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          const Text("INTERFACE PREFERENCES"),
+                          const Text(
+                            "NOTIFICATION PREFERENCES",
+                          ),
                         ]),
                     Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
                           const Text(
-                            "Sorted Order of Items",
+                            "Notification Settings",
                           ),
                         ]),
                     Row(
@@ -76,105 +122,57 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                         children: <Widget>[
                           const Expanded(
                             child: const Text(
-                              "Check so the items are in descending order with the most recent items listed first.",
+                              "Notification behaviour, popup settings and LED Colour",
+                              softWrap: true,
                             ),
                           ),
-                          Checkbox(
-                            key: null,
-                            value: _descending,
-                            onChanged: orderItems,
+                        ]),
+                  ])),
+            ),
+            Card(
+              child: InkWell(
+                  onTap: () {},
+                  child: Column(children: <Widget>[
+                    Row(mainAxisAlignment: MainAxisAlignment.start,
+//            mainAxisSize: MainAxisSize.min,
+//            crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          const Text(
+                            "RECORD PREFERENCES",
                           ),
                         ]),
                     Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          Expanded(
-                            child: const Text(
-                              "Switch around dialog buttons",
-                            ),
-                          ),
-                          Checkbox(
-                            key: null,
-                            value: _leftHanded,
-                            onChanged: switchButton,
+                          const Text(
+                            "Item Record Preferences",
                           ),
                         ]),
-                  ]),
-                ),
-                Card(
-                  child: InkWell(
-                      onTap: () {},
-                      child: Column(children: <Widget>[
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              const Text(
-                                "NOTIFICATION PREFERENCES",
-                              ),
-                            ]),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              const Text(
-                                "Notification Settings",
-                              ),
-                            ]),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              const Expanded(
-                                child: const Text(
-                                  "Notification behaviour, popup settings and LED Colour",
-                                  softWrap: true,
-                                ),
-                              ),
-                            ]),
-                      ])),
-                ),
-                Card(
-                  child: InkWell(
-                      onTap: () {},
-                      child: Column(children: <Widget>[
-                        Row(mainAxisAlignment: MainAxisAlignment.start,
-//            mainAxisSize: MainAxisSize.min,
-//            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              const Text(
-                                "RECORD PREFERENCES",
-                              ),
-                            ]),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              const Text(
-                                "Item Record Preferences",
-                              ),
-                            ]),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              const Expanded(
-                                child: const Text(
-                                  "How certain records are further handled (eg. deleted, past due, etc.)",
-                                ),
-                              ),
-                            ])
-                      ])),
-                ),
-                Card(
-                    child: Settings.tapText(
-                  'About ToDo List',
-                  () {
-                    Settings.showAboutDialog(context);
-                  },
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          const Expanded(
+                            child: const Text(
+                              "How certain records are further handled (eg. deleted, past due, etc.)",
+                            ),
+                          ),
+                        ])
+                  ])),
+            ),
+            Card(
+                child: Settings.tapText(
+              'About ToDo List',
+              () {
+                Settings.showAboutDialog(context);
+              },
 //                  style: const TextStyle(
 //                      fontSize: 12.0,
 //                      color: const Color(0xFF000000),
 //                      fontWeight: FontWeight.w300,
 //                      fontFamily: "Roboto"),
-                )),
-              ]),
-        );
+            )),
+          ]),
+    );
   }
 
   void orderItems(bool value) {

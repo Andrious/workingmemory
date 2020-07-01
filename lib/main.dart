@@ -17,7 +17,6 @@
 ///
 ///                   https://github.com/Andrious/workingmemory
 
-
 import 'package:workingmemory/src/view.dart' show WorkingView;
 
 import 'package:workingmemory/src/controller.dart' show App, runApp;

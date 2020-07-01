@@ -17,9 +17,9 @@
 ///
 ///           import 'package:workingmemory/working_memory_app.dart';
 
-
 export 'package:mvc_application/controller.dart'
-    show App, AppController, AppDrawer, ControllerMVC hide runApp;
+    show App, AppController, AppDrawer, ControllerMVC
+    hide runApp;
 
 export 'package:mvc_application/settings.dart' show AppSettings, Prefs;
 
