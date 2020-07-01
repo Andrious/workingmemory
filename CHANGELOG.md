@@ -1,3 +1,7 @@
+## 0.15.0
+ July 01, 2020
+- Updated AppIcon & LaunchImage
+
 ## 0.14.0
  July 01, 2020
 - primaryColor: App.color,

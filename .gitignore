@@ -75,14 +75,12 @@ pubspec.lock
 
 # Flutter/Dart/Pub related
 /build/
-
-# Flutter/Dart/Pub related
 # Ignore API documentation directory created by dartdoc:
-/doc/api/
+doc/api/
 .dart_tool/
-# .flutter-plugins
-# .flutter-plugins-dependencies
-# .packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
 .pub-cache/
 .pub/
 
@@ -129,6 +127,8 @@ google-services.json
 **/ios/Flutter/app.flx
 **/ios/Flutter/app.zip
 **/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_environment.sh
+
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 # **/ios/Runner/GoogleService-Info.plist
