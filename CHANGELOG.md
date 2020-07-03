@@ -1,3 +1,9 @@
+## 0.16.0
+ July 03, 2020
+ - Podfile platform :ios, '10'
+ - channel dev
+ - GoogleService-Info.plist
+
 ## 0.15.0
  July 01, 2020
 - Updated AppIcon & LaunchImage

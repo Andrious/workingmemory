@@ -6,6 +6,11 @@
 /.idea/workspace.xml
 /.idea/libraries
 .DS_Store
+
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+
 /build
 /captures
 GeneratedPluginRegistrant.java

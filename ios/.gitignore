@@ -3,6 +3,11 @@
 .sconsign.dblite
 .svn/
 
+/.flutter-plugins
+/.flutter-plugins-dependencies
+/.packages
+
+
 .DS_Store
 *.swp
 profile
