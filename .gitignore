@@ -1,23 +1,24 @@
 # Good to keep this file with the code.
 #.gitignore
 
-# Flutter files
+# Ignore except for application packages
+#pubspec.lock
+
+# Flutter IDE files
 .packages
+.flutter-plugins
+.flutter-plugins-dependencies
+flutter_export_environment.sh
 .pub/
 out/
 .gradle/
-.flutter-plugins
 .dart_tool/
+.pub-cache/
 # Ignore API documentation directory created by dartdoc:
 doc/api/
-.flutter-plugins-dependencies
-.pub-cache/
 
 # Android Studio
 /*.iml
-
-# Ignore except for application packages
-#pubspec.lock
 
 # Ignore App signing files
 *.jks
@@ -30,6 +31,11 @@ doc/api/
 *.js_
 *.js.deps
 *.js.map
+
+# Explicitly include the example app
+!example/**
+example/.*
+example/ios/Flutter/flutter_export_environment.sh
 
 ### Eclipse ###
 *.pydevproject
@@ -115,6 +121,7 @@ obfuscate/
 **/ios/**/profile
 **/ios/**/xcuserdata
 **/ios/.generated/
+
 App.framework
 Flutter.framework
 Generated.xcconfig

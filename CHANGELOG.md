@@ -1,3 +1,7 @@
+## 0.17.1
+ July 04, 2020
+- .gitignore 
+
 ## 0.17.0
  July 04, 2020
 - if (map != null) icon = map['Icon'];
