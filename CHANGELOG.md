@@ -1,3 +1,9 @@
+## 0.17.0
+ July 04, 2020
+- if (map != null) icon = map['Icon'];
+- add google-services.json 
+- git rm --cached -r .packages
+
 ## 0.16.0
  July 03, 2020
  - Podfile platform :ios, '10'

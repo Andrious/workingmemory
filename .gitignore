@@ -77,10 +77,14 @@ build/
 lib/generated_plugin_registrant.dart
 
 # Symbolication related
-app.*.symbols
+app.*.symbolscd
 
 # Obfuscation related
 app.*.map.json
+mapping.txt
+seeds.txt
+unused.txt
+obfuscate/
 
 # Android related
 #google-services.json

@@ -72,7 +72,12 @@ class Model {
 
   Item _item;
 
-  get defaultIcon => _tToDo.newrec[ToDo.TABLE_NAME]['Icon'];
+  String get defaultIcon {
+    var icon;
+    var map = _tToDo.newrec[ToDo.TABLE_NAME];
+    if (map != null) icon = map['Icon'];
+    return icon ?? "0xe15b";
+  }
 
   Future<List<Map<String, dynamic>>> listIcons() => _tToDo.icons();
 
