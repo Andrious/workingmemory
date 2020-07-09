@@ -18,10 +18,7 @@
 
 import 'dart:async' show Future;
 
-import 'package:flutter/material.dart';
-
-import 'package:workingmemory/src/view.dart'
-    show DateTimeItem, IconItems, StateMVC, TodoPage;
+import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart' show Controller, theme;
 
@@ -52,23 +49,18 @@ class TodoAndroid extends StateMVC<TodoPage> {
               if (save) {
                 Navigator.pop(context);
               } else {
-                Controller()
-                    .data
-                    .scaffoldKey
-                    .currentState
-                    ?.showSnackBar(SnackBar(
-                      content: Text('There is an error.'),
-                    ));
+                Scaffold.of(context).showSnackBar(SnackBar(
+                  content: Text('There is an error.'),
+                ));
               }
-            })
+            }),
       ]),
       body: Form(
-        key: _con.data.formKey,
         onWillPop: _onWillPop,
-        child: ListView(
+        child: _con.data.linkForm(ListView(
           padding: const EdgeInsets.all(16.0),
           children: _listWidgets(),
-        ),
+        )),
       ),
     );
   }
@@ -110,7 +102,7 @@ class TodoAndroid extends StateMVC<TodoPage> {
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         alignment: Alignment.bottomLeft,
         child: TextFormField(
-          controller: _con.data.changer,
+          controller: _con.data.controller,
           decoration: const InputDecoration(
             filled: true,
           ),

@@ -40,6 +40,7 @@ class WorkingView extends AppView {
           title: 'Working Memory',
           home: TodosPage(),
           debugShowCheckedModeBanner: false,
+          switchUI: true,
         ) {
     idKey = _app.keyId;
   }

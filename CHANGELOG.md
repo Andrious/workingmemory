@@ -1,3 +1,9 @@
+## 1.0.0
+ July 06, 2020
+- Change semantic versioning to major first release.
+- Scaffold.of(context)
+- con.data.linkForm(
+
 ## 0.17.1
  July 04, 2020
 - .gitignore 

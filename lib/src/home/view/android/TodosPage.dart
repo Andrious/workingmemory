@@ -32,6 +32,7 @@ import 'package:flutter/material.dart'
         EdgeInsets,
         FloatingActionButton,
         FlutterErrorDetails,
+        GlobalKey,
         Icon,
         IconData,
         Icons,
@@ -66,7 +67,6 @@ class TodosAndroid extends StateMVC<TodosPage> {
     // Rebuilt the menu if state changes.
     _menu = WorkMenu();
     return Scaffold(
-      key: _con.data.scaffoldKey,
       drawer: SettingsDrawer(),
       appBar: AppBar(
         title: const Text("My ToDos"),
@@ -80,7 +80,6 @@ class TodosAndroid extends StateMVC<TodosPage> {
           Icons.add,
           semanticLabel: 'Add',
         ),
-
       ),
       body: SafeArea(
         child: _con.data.items.length == 0
@@ -94,7 +93,7 @@ class TodosAndroid extends StateMVC<TodosPage> {
                     key: ObjectKey(_con.data.items[index]['rowid']),
                     onDismissed: (DismissDirection direction) {
                       _con.data.delete(_con.data.items[index]);
-                      _con.data.scaffoldKey.currentState?.showSnackBar(SnackBar(
+                      Scaffold.of(context).showSnackBar(SnackBar(
                           content: Text('You deleted an item.'),
                           action: SnackBarAction(
                               label: 'UNDO',

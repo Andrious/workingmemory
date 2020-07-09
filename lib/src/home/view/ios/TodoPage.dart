@@ -19,12 +19,7 @@
 
 import 'dart:async' show Future;
 
-import 'package:flutter/cupertino.dart';
-
-import 'package:flutter/material.dart';
-
-import 'package:workingmemory/src/view.dart'
-    show App, DTiOS, IconItems, StateMVC, TodoPage;
+import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart' show Controller, theme;
 
@@ -40,11 +35,8 @@ class TodoiOS extends StateMVC<TodoPage> {
 //    con.edit.addState(this);
     con.data.init(widget.todo);
   }
-
-  @override
-  Widget build(BuildContext context) {
+      Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      key: con.data.scaffoldKey,
       navigationBar: CupertinoNavigationBar(
           middle: con.data.title,
           trailing: CupertinoButton(
@@ -54,70 +46,27 @@ class TodoiOS extends StateMVC<TodoPage> {
               padding: EdgeInsets.all(
                   10), // https://github.com/flutter/flutter/issues/32701
               onPressed: () async {
-                await con.data.onPressed();
-                Navigator.pop(context);
+                bool saved = await con.data.onPressed();
+                if (!saved) {
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                    content: Text(con.data.errorText),
+                  ));
+                } else {
+                  if (widget.onPressed == null) {
+                    Navigator.pop(context);
+                  } else {
+                    widget.onPressed();
+                  }
+                }
               })),
       child: Form(
-        key: con.data.formKey,
-        onWillPop: _onWillPop,
-        child: ListView(shrinkWrap: true,
-//            padding: const EdgeInsets.all(16.0),
-            children: <Widget>[
-              Container(
-                margin: const EdgeInsets.all(25.0),
-                padding: const EdgeInsets.only(bottom: 25.0),
-                alignment: Alignment.bottomLeft,
-                child: FormField<String>(
-                  initialValue: con.data.changer.text,
-                  validator: (v) {
-                    if (v.trim().isEmpty) return 'Cannot be empty.';
-                    return null;
-                  },
-                  onSaved: (value) {
-                    con.data.item = value;
-                  },
-                  builder: (FormFieldState<String> field) {
-                    return CupertinoTextField(
-                      controller: con.data.changer,
-                      autofocus: true,
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                        width: 2.0,
-                        color: CupertinoColors.inactiveGray,
-                      )),
-                    );
-                  },
-                ),
-              ),
-              Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Center(
-                        child: Icon(IconData(int.tryParse(con.data.icon),
-                            fontFamily: 'MaterialIcons'))),
-//                    Text('From', style: theme.textTheme.caption),
-                    DTiOS(
-                      dateTime: con.data.dateTime,
-                      onChanged: (DateTime value) {
-                        setState(() {
-                          con.data.dateTime = value;
-                        });
-                        con.data.saveNeeded = true;
-                      },
-                    )
-                  ]),
-              Container(
-                  height: 600.0,
-                  child: IconItems(
-                      icon: con.data.icon,
-                      onTap: (icon) {
-                        setState(() {
-                          con.data.icon = icon;
-                        });
-                      })),
-            ]),
-      ),
+          onWillPop: _onWillPop,
+          child: con.data.linkForm(
+            ListView(
+//          shrinkWrap: true,
+                padding: const EdgeInsets.all(16.0),
+                children: _listWidgets),
+          )),
     );
   }
 
@@ -189,5 +138,83 @@ class TodoiOS extends StateMVC<TodoPage> {
           false;
     }
     return willPop;
+  }
+
+  List<Widget> get _listWidgets {
+    var widgets = <Widget>[
+      Container(
+        margin: const EdgeInsets.all(25.0),
+        padding: const EdgeInsets.only(top: 25.0),
+        alignment: Alignment.bottomLeft,
+        child: FormField<String>(
+            initialValue: con.data.item,
+            validator: (v) {
+              if (v.trim().isEmpty) return 'Cannot be empty.';
+              return null;
+            },
+            builder: (FormFieldState<String> field) {
+              // Retain a copy of the FormFieldState object.
+              con.data.addField(field);
+              return CupertinoTextField(
+                textInputAction: TextInputAction.done,
+                controller: con.data.controller,
+                onChanged:(value) {
+                  field.didChange(value);
+                },
+                onSubmitted:(value) {
+                  field.didChange(value);
+                },
+                autofocus: true,
+              );
+            }),
+      ),
+      Column(crossAxisAlignment: CrossAxisAlignment.start,
+//                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Center(
+                child: Icon(IconData(int.tryParse(con.data.icon),
+                    fontFamily: 'MaterialIcons'))),
+//                    Text('From', style: theme.textTheme.caption),
+            DTiOS(
+              dateTime: con.data.dateTime,
+              onChanged: (DateTime value) {
+                setState(() {
+                  con.data.dateTime = value;
+                });
+                con.data.saveNeeded = true;
+              },
+            )
+          ]),
+    ];
+
+    if (con.favIcons.length > 0) {
+      widgets.add(Container(
+          height: 100.0,
+          decoration: BoxDecoration(
+            border: Border.all(width: 4, color: Colors.black),
+            borderRadius: const BorderRadius.all(const Radius.circular(8)),
+          ),
+          child: IconItems(
+              icons: Map.fromIterable(con.favIcons,
+                  key: (e) => e.values.first, value: (e) => e.values.first),
+              icon: con.data.icon,
+              onTap: (icon) {
+                con.setState(() {
+                  con.data.icon = icon;
+                });
+              })));
+    }
+
+    widgets.add(Container(
+        height: 600.0,
+        child: IconItems(
+            icons: con.icons,
+            icon: con.data.icon,
+            onTap: (icon) async {
+              await con.saveIcon(icon);
+              con.setState(() {});
+            })));
+
+    return widgets;
   }
 }

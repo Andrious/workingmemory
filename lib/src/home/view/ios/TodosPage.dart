@@ -35,6 +35,7 @@ import 'package:flutter/material.dart'
         Route,
         RouteSettings,
         SafeArea,
+        Scaffold,
         SnackBar,
         SnackBarAction,
         Text,
@@ -54,20 +55,27 @@ class TodosiOS extends StateMVC<TodosPage> {
   }
   Controller con;
   WorkMenu _menu;
+  CupertinoTabController _controlTab;
+
+  void initState() {
+    super.initState();
+    _controlTab = CupertinoTabController();
+  }
+
+  void dispose() {
+    _controlTab.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     if (!con.app.loggedIn) return SignIn();
     return CupertinoTabScaffold(
-      key: con.data.scaffoldKey,
+      controller: _controlTab,
       tabBar: CupertinoTabBar(items: [
         BottomNavigationBarItem(
           icon: Icon(CupertinoIcons.home),
           title: const Text('Home'),
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.create_solid),
-          title: const Text('Create'),
         ),
         BottomNavigationBarItem(
           icon: Icon(CupertinoIcons.settings),
@@ -75,35 +83,24 @@ class TodosiOS extends StateMVC<TodosPage> {
         ),
       ]),
       tabBuilder: (context, index) {
-        CupertinoTabView returnValue;
-        switch (index) {
-          case 0:
-            returnValue = CupertinoTabView(builder: (context) {
-              return CupertinoPageScaffold(
-                child: MemoryList(parent: this),
-              );
-            });
-            break;
-          case 1:
-            returnValue = CupertinoTabView(builder: (context) {
-              return CupertinoPageScaffold(
-                child: TodoPage(),
-              );
-            });
-            break;
-          case 2:
-            returnValue = CupertinoTabView(builder: (context) {
-              return SettingsScreen();
-            });
-            break;
-        }
-        return returnValue;
+        Widget widget;
+        return CupertinoTabView(builder: (BuildContext context) {
+          switch (index) {
+            case 0:
+              widget = MemoryList(parent: this);
+              break;
+            default:
+              widget = SettingsScreen();
+              break;
+          }
+          return widget;
+        });
       },
     );
   }
 
   void editToDo([Map todo]) async {
-    Route route = MaterialPageRoute<Map<String, dynamic>>(
+    Route route = CupertinoPageRoute<Map<String, dynamic>>(
       settings: RouteSettings(name: "/todos/todo"),
       builder: (BuildContext context) => TodoPage(todo: todo),
       fullscreenDialog: true,
@@ -156,17 +153,13 @@ class MemoryList extends StatelessWidget {
                                 (direction == DismissDirection.endToStart)
                                     ? 'deleted'
                                     : 'archived';
-                            Controller()
-                                .data
-                                .scaffoldKey
-                                .currentState
-                                ?.showSnackBar(SnackBar(
-                                    content: Text('You $action an item.'),
-                                    action: SnackBarAction(
-                                        label: 'UNDO',
-                                        onPressed: () {
-                                          Controller().data.undo(_items[index]);
-                                        })));
+                            Scaffold.of(context).showSnackBar(SnackBar(
+                                content: Text('You $action an item.'),
+                                action: SnackBarAction(
+                                    label: 'UNDO',
+                                    onPressed: () {
+                                      Controller().data.undo(_items[index]);
+                                    })));
                           },
                           background: Container(
                               color: Colors.red,

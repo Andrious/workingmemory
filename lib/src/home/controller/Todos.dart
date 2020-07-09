@@ -64,6 +64,8 @@ class Controller extends ControllerMVC {
     return init;
   }
 
+  FormState formState;
+
   ToDoEdit get data => _dataFields;
   ToDoEdit _dataFields;
 
@@ -300,22 +302,25 @@ class ToDoEdit extends DataFields {
   m.Model _model;
 
   bool hasName;
-  TextEditingController changer;
+  TextEditingController controller;
   bool hasChanged = false;
 
+  String get item => _item;
+  set item(String text) {
+    _item = text;
+    controller?.text = text;
+  }
+
+  String _item;
+
   Map todo;
-  String item;
   String icon;
   DateTime dateTime;
   bool saveNeeded;
 
   final DateFormat dateFormat = DateFormat('EEEE, MMM dd  h:mm a');
 
-  final scaffoldKey = GlobalKey<ScaffoldState>();
-
-  final formKey = GlobalKey<FormState>();
-
-  Widget get title => Text(hasName ? item : 'New');
+  Widget get title => Text(hasName ? _item : 'New');
 
   void init([Map todo]) {
     this.todo = todo;
@@ -323,17 +328,23 @@ class ToDoEdit extends DataFields {
     hasName = this.todo?.isNotEmpty ?? false;
 
     if (hasName) {
-      item = todo['Item'];
+      _item = todo['Item'];
       dateTime = DateTime.tryParse(todo['DateTime']);
       icon = todo['Icon'];
     } else {
-      item = ' ';
+      _item = ' ';
       icon = con.defaultIcon;
     }
 
-    changer = TextEditingController(text: item);
-    changer.addListener(() {
-      hasChanged = changer.value.text != item;
+    if (controller == null) {
+      controller = TextEditingController(text: _item);
+    } else {
+      // Re-instantiating every time is not efficient.
+      controller.text = _item;
+    }
+
+    controller.addListener(() {
+      hasChanged = controller.value.text != _item;
     });
 
     dateTime = dateTime ?? DateTime.now();
@@ -344,11 +355,10 @@ class ToDoEdit extends DataFields {
   Future<List<Map<String, dynamic>>> retrieve() => _model.list();
 
   Future<bool> onPressed() async {
-    bool save = formKey.currentState.validate();
+    bool save = con.data.saveForm();
     if (save) {
-      formKey.currentState.save();
       save = await this.saveRec(
-          {'Item': changer.text.trim(), 'DateTime': dateTime, 'Icon': icon},
+          {'Item': controller.text.trim(), 'DateTime': dateTime, 'Icon': icon},
           this.todo);
       await query();
     }

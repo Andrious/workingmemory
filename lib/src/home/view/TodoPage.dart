@@ -19,13 +19,17 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:workingmemory/src/view.dart' show App, TodoAndroid, TodoiOS;
+import 'package:workingmemory/src/view.dart';
+
+import 'package:workingmemory/src/controller.dart';
 
 class TodoPage extends StatefulWidget {
-  TodoPage({Key key, this.todo}) : super(key: key);
+  TodoPage({Key key, this.todo, this.onPressed}) : super(key: key);
 
   final Map todo;
+  final VoidCallback onPressed;
 
   @override
   State createState() => App.useMaterial ? TodoAndroid() : TodoiOS();
 }
+
