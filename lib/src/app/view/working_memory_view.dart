@@ -18,12 +18,6 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter_localizations/flutter_localizations.dart'
-    show
-        GlobalCupertinoLocalizations,
-        GlobalMaterialLocalizations,
-        GlobalWidgetsLocalizations;
-
 import 'package:mvc_application/view.dart' show AppView;
 
 import 'package:workingmemory/src/controller.dart' show App, WorkingController;
@@ -45,6 +39,10 @@ class WorkingView extends AppView {
     idKey = _app.keyId;
   }
   static WorkingView _this;
+
+  /// Conceivably, you could define your own WidgetsApp.
+  @override
+  Widget buildApp(BuildContext context) => super.buildApp(context);
 
   @override
   void onError(FlutterErrorDetails details) {

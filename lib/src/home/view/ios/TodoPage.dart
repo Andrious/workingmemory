@@ -24,6 +24,7 @@ import 'package:workingmemory/src/view.dart';
 import 'package:workingmemory/src/controller.dart' show Controller, theme;
 
 class TodoiOS extends StateMVC<TodoPage> {
+  //
   TodoiOS() : super(Controller()) {
     con = controller;
   }
@@ -35,7 +36,8 @@ class TodoiOS extends StateMVC<TodoPage> {
 //    con.edit.addState(this);
     con.data.init(widget.todo);
   }
-      Widget build(BuildContext context) {
+
+  Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
           middle: con.data.title,
@@ -158,10 +160,10 @@ class TodoiOS extends StateMVC<TodoPage> {
               return CupertinoTextField(
                 textInputAction: TextInputAction.done,
                 controller: con.data.controller,
-                onChanged:(value) {
+                onChanged: (value) {
                   field.didChange(value);
                 },
-                onSubmitted:(value) {
+                onSubmitted: (value) {
                   field.didChange(value);
                 },
                 autofocus: true,

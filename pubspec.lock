@@ -363,14 +363,14 @@ packages:
       name: mvc_application
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.6.0"
+    version: "5.8.0"
   mvc_pattern:
     dependency: transitive
     description:
       name: mvc_pattern
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.0.0"
+    version: "6.1.0"
   package_info:
     dependency: transitive
     description:

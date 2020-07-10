@@ -1,3 +1,8 @@
+## 1.1.0
+ July 10, 2020
+- CupertinoTabScaffold to CupertinoPageScaffold
+- Use of showCupertinoModalPopup
+
 ## 1.0.0
  July 06, 2020
 - Change semantic versioning to major first release.

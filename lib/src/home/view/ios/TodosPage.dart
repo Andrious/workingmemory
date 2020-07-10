@@ -29,11 +29,7 @@ import 'package:flutter/material.dart'
         Icons,
         ListTile,
         Material,
-        MaterialPageRoute,
         MaterialType,
-        Navigator,
-        Route,
-        RouteSettings,
         SafeArea,
         Scaffold,
         SnackBar,
@@ -44,18 +40,20 @@ import 'package:flutter/material.dart'
 import 'package:workingmemory/src/model.dart' show Settings;
 
 import 'package:workingmemory/src/view.dart'
-    show App, SettingsScreen, SignIn, StateMVC, TodoPage, TodosPage, WorkMenu;
+    show App, SignIn, StateMVC, TodoPage, TodosPage;
 
 import 'package:workingmemory/src/controller.dart' show Controller;
 
 class TodosiOS extends StateMVC<TodosPage> {
+  //
   TodosiOS() : super(Controller()) {
     con = controller;
-    _menu = WorkMenu();
   }
   Controller con;
-  WorkMenu _menu;
   CupertinoTabController _controlTab;
+
+  int prevIndex = -1;
+  Widget prevWidget;
 
   void initState() {
     super.initState();
@@ -64,51 +62,29 @@ class TodosiOS extends StateMVC<TodosPage> {
 
   void dispose() {
     _controlTab.dispose();
+    prevWidget = null;
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     if (!con.app.loggedIn) return SignIn();
-    return CupertinoTabScaffold(
-      controller: _controlTab,
-      tabBar: CupertinoTabBar(items: [
-        BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.home),
-          title: const Text('Home'),
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.settings),
-          title: const Text('Settings'),
-        ),
-      ]),
-      tabBuilder: (context, index) {
-        Widget widget;
-        return CupertinoTabView(builder: (BuildContext context) {
-          switch (index) {
-            case 0:
-              widget = MemoryList(parent: this);
-              break;
-            default:
-              widget = SettingsScreen();
-              break;
-          }
-          return widget;
-        });
-      },
-    );
+    return CupertinoPageScaffold(
+        navigationBar: CupertinoNavigationBar(
+            trailing: CupertinoButton(
+                child: Text('New'),
+                padding: EdgeInsets.all(10),
+                onPressed: () {
+                  editToDo(con.context);
+                })),
+        child: MemoryList(parent: this));
   }
 
-  void editToDo([Map todo]) async {
-    Route route = CupertinoPageRoute<Map<String, dynamic>>(
-      settings: RouteSettings(name: "/todos/todo"),
+  void editToDo(BuildContext context, [Map todo]) async {
+    await showCupertinoModalPopup(
+      context: context,
       builder: (BuildContext context) => TodoPage(todo: todo),
-      fullscreenDialog: true,
     );
-
-    await Navigator.of(context).push(route);
-    await con.data.retrieve();
-    refresh();
   }
 
   @override
@@ -118,6 +94,7 @@ class TodosiOS extends StateMVC<TodosPage> {
 }
 
 class MemoryList extends StatelessWidget {
+  //
   MemoryList({this.parent, Key key}) : super(key: key);
   final TodosiOS parent;
   @override
@@ -186,7 +163,8 @@ class MemoryList extends StatelessWidget {
                                   subtitle: Text(parent.con.data.dateFormat
                                       .format(DateTime.tryParse(
                                           _items[index]['DateTime']))),
-                                  onTap: () => parent.editToDo(_items[index]),
+                                  onTap: () =>
+                                      parent.editToDo(context, _items[index]),
                                 )),
                           ),
                         );
