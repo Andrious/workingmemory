@@ -338,14 +338,14 @@ class ToDoEdit extends DataFields {
 
     if (controller == null) {
       controller = TextEditingController(text: _item);
+
+      controller.addListener(() {
+        hasChanged = controller.value.text != _item;
+      });
     } else {
       // Re-instantiating every time is not efficient.
       controller.text = _item;
     }
-
-    controller.addListener(() {
-      hasChanged = controller.value.text != _item;
-    });
 
     dateTime = dateTime ?? DateTime.now();
   }

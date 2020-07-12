@@ -65,7 +65,6 @@ class TodoiOS extends StateMVC<TodoPage> {
           onWillPop: _onWillPop,
           child: con.data.linkForm(
             ListView(
-//          shrinkWrap: true,
                 padding: const EdgeInsets.all(16.0),
                 children: _listWidgets),
           )),

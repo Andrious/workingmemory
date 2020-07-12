@@ -1,3 +1,7 @@
+## 1.1.0+2
+ July 12, 2020
+- WorkMenu in iOS interface
+
 ## 1.1.0
  July 10, 2020
 - CupertinoTabScaffold to CupertinoPageScaffold
@@ -42,7 +46,10 @@
 - exclude much of ios/ in .gitignore
 
 ## 0.11.0
-- saveFirebase(newRec); bool itemsOrdered([bool ordered]); "$select order by datetime(DateTime)"; requery(); settitngs_drawer.dart
+- saveFirebase(newRec); bool itemsOrdered([bool ordered]); 
+- "$select order by datetime(DateTime)"; 
+- requery(); 
+- settitngs_drawer.dart
 
 ## 0.10.0
 - Modify .gitignore file to allow committing android and ios files & folders

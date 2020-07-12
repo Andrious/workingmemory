@@ -40,7 +40,7 @@ import 'package:flutter/material.dart'
 import 'package:workingmemory/src/model.dart' show Settings;
 
 import 'package:workingmemory/src/view.dart'
-    show App, SignIn, StateMVC, TodoPage, TodosPage;
+    show App, SignIn, StateMVC, TodoPage, TodosPage, WorkMenu;
 
 import 'package:workingmemory/src/controller.dart' show Controller;
 
@@ -51,6 +51,8 @@ class TodosiOS extends StateMVC<TodosPage> {
   }
   Controller con;
   CupertinoTabController _controlTab;
+
+  WorkMenu _menu;
 
   int prevIndex = -1;
   Widget prevWidget;
@@ -69,6 +71,8 @@ class TodosiOS extends StateMVC<TodosPage> {
   @override
   Widget build(BuildContext context) {
     if (!con.app.loggedIn) return SignIn();
+    // Rebuilt the menu if state changes.
+    _menu = WorkMenu();
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
             trailing: CupertinoButton(
@@ -76,7 +80,8 @@ class TodosiOS extends StateMVC<TodosPage> {
                 padding: EdgeInsets.all(10),
                 onPressed: () {
                   editToDo(con.context);
-                })),
+                }),
+        ),
         child: MemoryList(parent: this));
   }
 
