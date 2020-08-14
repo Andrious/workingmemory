@@ -37,42 +37,44 @@ class TodoiOS extends StateMVC<TodoPage> {
     con.data.init(widget.todo);
   }
 
+  @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
           middle: con.data.title,
           trailing: CupertinoButton(
-              child: Text(
-                'Save',
-              ),
-              padding: EdgeInsets.all(
-                  10), // https://github.com/flutter/flutter/issues/32701
-              onPressed: () async {
-                bool saved = await con.data.onPressed();
-                if (!saved) {
-                  Scaffold.of(context).showSnackBar(SnackBar(
-                    content: Text(con.data.errorText),
-                  ));
+            padding: const EdgeInsets.all(
+                10), // https://github.com/flutter/flutter/issues/32701
+            onPressed: () async {
+              final bool saved = await con.data.onPressed();
+              if (!saved) {
+                Scaffold.of(context).showSnackBar(SnackBar(
+                  content: Text(con.data.errorText),
+                ));
+              } else {
+                if (widget.onPressed == null) {
+                  Navigator.pop(context);
                 } else {
-                  if (widget.onPressed == null) {
-                    Navigator.pop(context);
-                  } else {
-                    widget.onPressed();
-                  }
+                  widget.onPressed();
                 }
-              })),
+              }
+            },
+            child: const Text(
+              'Save',
+            ),
+          )),
       child: Form(
           onWillPop: _onWillPop,
           child: con.data.linkForm(
-            ListView(
-                padding: const EdgeInsets.all(16.0),
-                children: _listWidgets),
+            ListView(padding: const EdgeInsets.all(16), children: _listWidgets),
           )),
     );
   }
 
   Future<bool> _onWillPop() async {
-    if (!con.data.hasChanged) return true;
+    if (!con.data.hasChanged) {
+      return true;
+    }
 
     final TextStyle dialogTextStyle = theme.textTheme.subtitle1
         .copyWith(color: theme.textTheme.caption.color);
@@ -84,7 +86,7 @@ class TodoiOS extends StateMVC<TodoPage> {
       willPop = await showGeneralDialog<bool>(
             context: context,
             barrierDismissible: true,
-            barrierLabel: "label",
+            barrierLabel: 'label',
             barrierColor: const Color(0x80000000),
             transitionDuration: const Duration(milliseconds: 200),
             pageBuilder: (BuildContext buildContext,
@@ -95,17 +97,19 @@ class TodoiOS extends StateMVC<TodoPage> {
                   content: Text('Discard new event?', style: dialogTextStyle),
                   actions: <Widget>[
                     CupertinoButton(
-                        child: const Text('CANCEL'),
-                        onPressed: () {
-                          Navigator.of(context).pop(
-                              false); // Pops the confirmation dialog but not the page.
-                        }),
+                      onPressed: () {
+                        Navigator.of(context).pop(
+                            false); // Pops the confirmation dialog but not the page.
+                      },
+                      child: const Text('CANCEL'),
+                    ),
                     CupertinoButton(
-                        child: const Text('DISCARD'),
-                        onPressed: () {
-                          Navigator.of(context).pop(
-                              true); // Returning true to _onWillPop will pop again.
-                        })
+                      onPressed: () {
+                        Navigator.of(context).pop(
+                            true); // Returning true to _onWillPop will pop again.
+                      },
+                      child: const Text('DISCARD'),
+                    )
                   ],
                 ),
               );
@@ -121,17 +125,19 @@ class TodoiOS extends StateMVC<TodoPage> {
                 content: Text('Discard new event?', style: dialogTextStyle),
                 actions: <Widget>[
                   FlatButton(
-                      child: const Text('CANCEL'),
-                      onPressed: () {
-                        Navigator.of(context).pop(
-                            false); // Pops the confirmation dialog but not the page.
-                      }),
+                    onPressed: () {
+                      Navigator.of(context).pop(
+                          false); // Pops the confirmation dialog but not the page.
+                    },
+                    child: const Text('CANCEL'),
+                  ),
                   FlatButton(
-                      child: const Text('DISCARD'),
-                      onPressed: () {
-                        Navigator.of(context).pop(
-                            true); // Returning true to _onWillPop will pop again.
-                      })
+                    onPressed: () {
+                      Navigator.of(context).pop(
+                          true); // Returning true to _onWillPop will pop again.
+                    },
+                    child: const Text('DISCARD'),
+                  )
                 ],
               );
             },
@@ -142,17 +148,22 @@ class TodoiOS extends StateMVC<TodoPage> {
   }
 
   List<Widget> get _listWidgets {
-    var widgets = <Widget>[
+    final widgets = <Widget>[
       Container(
-        margin: const EdgeInsets.all(25.0),
-        padding: const EdgeInsets.only(top: 25.0),
+        margin: const EdgeInsets.all(25),
+        padding: const EdgeInsets.only(top: 25),
         alignment: Alignment.bottomLeft,
         child: FormField<String>(
             initialValue: con.data.item,
             validator: (v) {
-              if (v.trim().isEmpty) return 'Cannot be empty.';
+              if (v.trim().isEmpty) {
+                return 'Cannot be empty.';
+              }
               return null;
             },
+//            onSaved: (value) {
+//              con.data.item = value;
+//            },
             builder: (FormFieldState<String> field) {
               // Retain a copy of the FormFieldState object.
               con.data.addField(field);
@@ -188,16 +199,15 @@ class TodoiOS extends StateMVC<TodoPage> {
           ]),
     ];
 
-    if (con.favIcons.length > 0) {
+    if (con.favIcons.isNotEmpty) {
       widgets.add(Container(
-          height: 100.0,
+          height: 100,
           decoration: BoxDecoration(
-            border: Border.all(width: 4, color: Colors.black),
-            borderRadius: const BorderRadius.all(const Radius.circular(8)),
+            border: Border.all(width: 4),
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
           ),
           child: IconItems(
-              icons: Map.fromIterable(con.favIcons,
-                  key: (e) => e.values.first, value: (e) => e.values.first),
+              icons: { for (var e in con.favIcons) e.values.first : e.values.first },
               icon: con.data.icon,
               onTap: (icon) {
                 con.setState(() {
@@ -207,7 +217,7 @@ class TodoiOS extends StateMVC<TodoPage> {
     }
 
     widgets.add(Container(
-        height: 600.0,
+        height: 600,
         child: IconItems(
             icons: con.icons,
             icon: con.data.icon,

@@ -20,7 +20,7 @@
 import 'package:workingmemory/src/view.dart';
 
 class IconItems extends StatelessWidget {
-  IconItems(
+  const IconItems(
       {Key key,
       @required this.icon,
       @required this.onTap,
@@ -32,7 +32,7 @@ class IconItems extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var icons = this.icons.keys;
+    final icons = this.icons.keys;
     final Orientation orientation = MediaQuery.of(context).orientation;
     return Column(
       children: <Widget>[
@@ -42,10 +42,10 @@ class IconItems extends StatelessWidget {
             bottom: false,
             child: GridView.count(
               crossAxisCount: (orientation == Orientation.portrait) ? 10 : 20,
-              mainAxisSpacing: 4.0,
-              crossAxisSpacing: 4.0,
-              physics: ClampingScrollPhysics(),
-              padding: const EdgeInsets.all(4.0),
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+              physics: const ClampingScrollPhysics(),
+              padding: const EdgeInsets.all(4),
               childAspectRatio:
                   (orientation == Orientation.portrait) ? 1.0 : 1.2,
               children: icons.where((dynamic icon) {
@@ -58,7 +58,7 @@ class IconItems extends StatelessWidget {
                     onTap(icon);
                   },
                   child: Padding(
-                    padding: const EdgeInsets.all(2.0),
+                    padding: const EdgeInsets.all(2),
                     child: Icon(IconData(int.tryParse(icon),
                         fontFamily: 'MaterialIcons')),
                   ),

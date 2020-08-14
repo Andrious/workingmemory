@@ -59,6 +59,7 @@ class Controller extends ControllerMVC {
   Future<bool> initAsync() async {
     bool init = await _model.initAsync();
     List<Map<String, dynamic>> records = await data.query();
+    _setupNotifications();
     setAlarms(records);
     _favIcons = await _model.listIcons();
     return init;
@@ -194,8 +195,50 @@ class Controller extends ControllerMVC {
       break;
     }
   }
-
   static List<Map<String, dynamic>> recs;
+
+  void _setupNotifications(){
+
+    notifications = ScheduleNotifications(
+      this.runtimeType.toString(),
+      'Working Memory Channel',
+      'The Working Memory app sets Notifications',
+    );
+
+    notifications.init(onSelectNotification: (String payload) async {
+      if (payload == null || payload.trim().isEmpty) return null;
+//      await Navigator.push(
+//        context,
+//        MaterialPageRoute(builder: (context) => SecondScreen(payload)),
+//      );
+      return;
+    });
+
+    notifications.getNotificationAppLaunchDetails().then((details){
+
+    });
+  }
+  ScheduleNotifications notifications;
+
+  /// Establish any notifications indicated in the record.
+  int _setNotification(Map<String, dynamic> rec){
+    int id = -1;
+    DateTime time = rec['DateTime'];
+    if(time != null) {
+      id = notifications.schedule(time,
+      title: rec['Item'],
+      body: 'WorkingMemory',);
+      if(id == null) id = -1;
+    }
+    return id;
+  }
+
+  bool _cancelNotification(int id){
+    bool cancel = id != null && id > -1;
+    if(cancel)
+      notifications.cancel(id);
+    return cancel;
+  }
 }
 
 //class ToDoEdit extends _ToDoList {
@@ -370,7 +413,15 @@ class ToDoEdit extends DataFields {
       save(con?.newRec(diffRec, oldRec));
 
   @override
-  Future<bool> save(Map<String, dynamic> rec) => _model.save(rec);
+  Future<bool> save(Map<String, dynamic> rec) async {
+    int id = con?._setNotification(rec);
+    if(id > -1) rec['alarmId'] = id;
+    bool save = await _model.save(rec);
+    if (!save) {
+      con?._cancelNotification(id);
+    }
+    return save;
+  }
 
   @override
   Future<bool> delete(Map<String, dynamic> rec) async {

@@ -26,29 +26,33 @@ import 'package:workingmemory/src/controller.dart' show App, AppSettings, Prefs;
 class Settings {
   //
   static bool get(String setting) {
-    if (setting == null || setting.trim().isEmpty) return false;
+    if (setting == null || setting.trim().isEmpty) {
+      return false;
+    }
     return Prefs.getBool(setting, false);
   }
 
   static Future<bool> set(String setting, bool value) {
-    if (setting == null || setting.trim().isEmpty) return Future.value(false);
+    if (setting == null || setting.trim().isEmpty) {
+      return Future.value(false);
+    }
     return Prefs.setBool(setting, value);
   }
 
   static bool getOrder() {
-    return Prefs.getBool("order_of_items", false);
+    return Prefs.getBool('order_of_items', false);
   }
 
   static Future<bool> setOrder(bool value) {
-    return Prefs.setBool("order_of_items", value);
+    return Prefs.setBool('order_of_items', value);
   }
 
   static bool getLeftHanded() {
-    return Prefs.getBool("left_handed", false);
+    return Prefs.getBool('left_handed', false);
   }
 
   static Future<bool> setLeftHanded(bool value) {
-    return Prefs.setBool("left_handed", value);
+    return Prefs.setBool('left_handed', value);
   }
 
   static StatelessWidget tapText(String text, VoidCallback onTap,
@@ -56,12 +60,12 @@ class Settings {
     return AppSettings.tapText(text, onTap, style: style);
   }
 
-  static aboutTile(BuildContext context) {
+  static Widget aboutTile(BuildContext context) {
     return SingleChildScrollView(
       child: SafeArea(
         child: AboutListTile(
-          icon: Icon(Icons.info),
-          applicationIcon: FlutterLogo(),
+          icon: const Icon(Icons.info),
+          applicationIcon: const FlutterLogo(),
           applicationName: 'Show About Example',
           applicationVersion: 'Ver. ${App.version}',
           applicationLegalese: 'Andrious Solutions Ltd.\n© 2020',
@@ -71,7 +75,7 @@ class Settings {
     );
   }
 
-  static showAboutDialog(BuildContext context) {
+  static void showAboutDialog(BuildContext context) {
     //
     final ThemeData themeData = Theme.of(context);
     final TextStyle aboutTextStyle = themeData.textTheme.bodyText1;
@@ -85,7 +89,7 @@ class Settings {
       applicationLegalese: 'Andrious Solutions Ltd.\n© 2020',
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(top: 24.0),
+          padding: const EdgeInsets.only(top: 24),
           child: RichText(
             text: TextSpan(
               children: <TextSpan>[
@@ -121,7 +125,7 @@ class Settings {
         themeData.textTheme.bodyText1.copyWith(color: themeData.accentColor);
     return [
       Padding(
-        padding: const EdgeInsets.only(top: 24.0),
+        padding: const EdgeInsets.only(top: 24),
         child: RichText(
           text: TextSpan(
             children: <TextSpan>[

@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/cupertino.dart';
-import 'styles.dart';
 
 import 'settings_item.dart';
+import 'styles.dart';
 
 // The widgets in this file present a group of Cupertino-style settings items to
 // the user. In the future, the Cupertino package in the Flutter SDK will
@@ -14,21 +14,21 @@ import 'settings_item.dart';
 // See https://github.com/flutter/flutter/projects/29 for more info.
 
 class SettingsGroupHeader extends StatelessWidget {
-  const SettingsGroupHeader(this.title);
+  const SettingsGroupHeader(this.title, {Key key}) : super(key: key);
 
   final String title;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(
+      padding: const EdgeInsets.only(
         left: 15,
         right: 15,
         bottom: 6,
       ),
       child: Text(
         title.toUpperCase(),
-        style: TextStyle(
+        style: const TextStyle(
           color: CupertinoColors.inactiveGray,
           fontSize: 13.5,
           letterSpacing: -0.5,
@@ -39,21 +39,21 @@ class SettingsGroupHeader extends StatelessWidget {
 }
 
 class SettingsGroupFooter extends StatelessWidget {
-  const SettingsGroupFooter(this.title);
+  const SettingsGroupFooter(this.title, {Key key}) : super(key: key);
 
   final String title;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(
+      padding: const EdgeInsets.only(
         left: 15,
         right: 15,
         top: 7.5,
       ),
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           color: Styles.settingsGroupSubtitle,
           fontSize: 13,
           letterSpacing: -0.08,
@@ -65,11 +65,13 @@ class SettingsGroupFooter extends StatelessWidget {
 
 class SettingsGroup extends StatelessWidget {
   SettingsGroup({
+    Key key,
     @required this.items,
     this.header,
     this.footer,
   })  : assert(items != null),
-        assert(items.isNotEmpty);
+        assert(items.isNotEmpty),
+        super(key: key);
 
   final List<SettingsItem> items;
   final Widget header;
@@ -96,14 +98,14 @@ class SettingsGroup extends StatelessWidget {
         children: [
           if (header != null) header,
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: CupertinoColors.white,
               border: Border(
-                top: const BorderSide(
+                top: BorderSide(
                   color: Styles.settingsLineation,
                   width: 0,
                 ),
-                bottom: const BorderSide(
+                bottom: BorderSide(
                   color: Styles.settingsLineation,
                   width: 0,
                 ),

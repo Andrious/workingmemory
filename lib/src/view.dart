@@ -27,28 +27,28 @@ export 'package:workingmemory/src/app/view/drawer/settings_drawer.dart';
 
 export 'package:workingmemory/src/app/view/sign_in.dart';
 
-export 'package:workingmemory/src/home/view/TodosPage.dart';
+export 'package:workingmemory/src/home/view/todos_page.dart';
 
-export 'package:workingmemory/src/home/view/android/TodosPage.dart';
+export 'package:workingmemory/src/home/view/android/todos_page.dart';
 
-export 'package:workingmemory/src/home/view/ios/TodosPage.dart';
+export 'package:workingmemory/src/home/view/ios/todos_page.dart';
 
-export 'package:workingmemory/src/home/view/TodoPage.dart';
+export 'package:workingmemory/src/home/view/todo_page.dart';
 
-export 'package:workingmemory/src/home/view/android/TodoPage.dart';
+export 'package:workingmemory/src/home/view/android/todo_page.dart';
 
-export 'package:workingmemory/src/home/view/ios/TodoPage.dart';
+export 'package:workingmemory/src/home/view/ios/todo_page.dart';
 
-export 'package:workingmemory/src/home/view/android/DateTimeItem.dart';
+export 'package:workingmemory/src/home/view/android/datetime_item.dart';
 
-export 'package:workingmemory/src/home/view/ios/DateTimeItem.dart';
+export 'package:workingmemory/src/home/view/ios/datetime_item.dart';
 
-export 'package:workingmemory/src/home/view/DateTimeItem.dart';
+export 'package:workingmemory/src/home/view/datetime_item.dart';
 
-export 'package:workingmemory/src/home/view/ios/Settings.dart';
+export 'package:workingmemory/src/home/view/ios/settings.dart';
 
 export 'package:workingmemory/src/home/view/ios/settings/notification_settings.dart';
 
-export 'package:workingmemory/src/home/view/IconItems.dart';
+export 'package:workingmemory/src/home/view/icon_items.dart';
 
 export 'package:workingmemory/src/home/view/menu/home.dart';

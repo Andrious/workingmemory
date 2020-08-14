@@ -1,3 +1,7 @@
+## 1.2.0
+ August 14, 2020
+- Introduced analysis_options.yaml with strict Dart style guide.
+
 ## 1.1.0+2
  July 12, 2020
 - WorkMenu in iOS interface

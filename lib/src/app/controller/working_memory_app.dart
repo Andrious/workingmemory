@@ -38,14 +38,14 @@ import 'package:auth/auth.dart' show Auth, FirebaseUser, GoogleSignInAccount;
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
-runApp(
+void runApp(
   Widget app, {
   FlutterExceptionHandler handler,
   ErrorWidgetBuilder builder,
   ReportErrorHandler reportError,
 }) {
   // Supply Firebase Crashlytics
-  Crashlytics crash = Crashlytics.instance;
+  final Crashlytics crash = Crashlytics.instance;
 
   handler ??= crash.recordFlutterError;
 
@@ -58,7 +58,6 @@ runApp(
 
 class WorkingController extends AppController {
   factory WorkingController() => _this ??= WorkingController._();
-  static WorkingController _this;
 //
 //  /// Allow for easy access to 'the Controller' throughout the application.
 //  static WorkingMemoryApp get con => _this;
@@ -67,11 +66,12 @@ class WorkingController extends AppController {
     _con = Controller();
     _remoteConfig = RemoteConfig();
   }
+  static WorkingController _this;
 
   /// Provide the sign in and the loading database info.
   @override
   Future<bool> initAsync() async {
-    super.initAsync();
+    await super.initAsync();
     await signIn();
     await _remoteConfig.initAsync();
     await _con.initAsync();
@@ -85,6 +85,7 @@ class WorkingController extends AppController {
   RemoteConfig get config => _remoteConfig;
   RemoteConfig _remoteConfig;
 
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     FireBaseDB.didChangeAppLifecycleState(state);
     CloudDB.didChangeAppLifecycleState(state);
@@ -101,8 +102,8 @@ class WorkingController extends AppController {
   bool get loggedIn => _loggedIn;
 
   // logout and refresh
-  void logOut() async {
-    await signOut();
+  void logOut() {
+    signOut();
     rebuild();
   }
 
@@ -124,7 +125,9 @@ class WorkingController extends AppController {
 
   Future<bool> signIn() async {
     _loggedIn = await signInSilently();
-    if (!_loggedIn) _loggedIn = await signInAnonymously();
+    if (!_loggedIn) {
+      _loggedIn = await signInAnonymously();
+    }
     if (_auth.isAnonymous) {
       _auth.listener = _con.recordDump;
     }
@@ -140,57 +143,55 @@ class WorkingController extends AppController {
 
   Future<bool> signInWithTwitter() async {
     //
-    PackageInfo info = await PackageInfo.fromPlatform();
+    final PackageInfo info = await PackageInfo.fromPlatform();
 
-    List<String> items = info.packageName.split(".");
+    final List<String> items = info.packageName.split('.');
 
-    String one = await _remoteConfig.getStringed(items[0]);
+    final String one = await _remoteConfig.getStringed(items[0]);
     if (one.isEmpty) {
       return false;
     }
-    String two = await _remoteConfig.getStringed(items[1]);
+    final String two = await _remoteConfig.getStringed(items[1]);
     if (two.isEmpty) {
       return false;
     }
-    bool signIn = await _auth
+    final bool signIn = await _auth
         .signInWithTwitter(
-      key: one,
-      secret: two,
-    )
-        .catchError((error) {
-      getError(error);
-    });
+          key: one,
+          secret: two,
+        )
+        .catchError(getError);
 
     if (!signIn) {
-      Exception ex = _auth.getError();
-      showBox(text: ex.toString(), context: context);
+      final Exception ex = _auth.getError();
+      await showBox(text: ex.toString(), context: context);
     }
     return signIn;
   }
 
   Future<bool> signInEmailPassword(BuildContext context) async {
     //
-    String email = "";
+    const String email = '';
 
-    String password = "";
+    const String password = '';
 
-    bool signIn = await _auth.signInWithEmailAndPassword(
+    final bool signIn = await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
 
     if (!signIn) {
-      Exception ex = _auth.getError();
-      showBox(text: ex.toString(), context: context);
+      final Exception ex = _auth.getError();
+      await showBox(text: ex.toString(), context: context);
     }
     return signIn;
   }
 
   Future<bool> signInWithGoogle() async {
-    bool signIn = await _auth.signInWithGoogle();
+    final bool signIn = await _auth.signInWithGoogle();
     if (!signIn) {
-      Exception ex = _auth.getError();
-      showBox(text: ex.toString(), context: context);
+      final Exception ex = _auth.getError();
+      await showBox(text: ex.toString(), context: context);
     }
     await rebuild();
     return signIn;
@@ -199,28 +200,31 @@ class WorkingController extends AppController {
   // Stamp the user information to the firebase database.
   void userStamp() => FireBaseDB().userStamp();
 
+  @override
   Future<void> rebuild() async {
     _loggedIn = await _auth.isLoggedIn();
     _con.refresh();
     // Pops only if on the stack and not on the first screen.
-    if (_con.context != null) Navigator.of(_con.context).maybePop();
+    if (_con.context != null) {
+      await Navigator.of(_con.context).maybePop();
+    }
   }
 
   String get uid => _auth.uid;
 
-  get email => _auth.email;
+  String get email => _auth.email;
 
-  get name => _auth.displayName;
+  String get name => _auth.displayName;
 
-  get provider => _auth.providerId;
+  String get provider => _auth.providerId;
 
-  get isNewUser => _auth.isNewUser;
+  bool get isNewUser => _auth.isNewUser;
 
-  get isAnonymous => _auth.isAnonymous;
+  bool get isAnonymous => _auth.isAnonymous;
 
-  get photo => _auth.photoUrl;
+  String get photo => _auth.photoUrl;
 
-  get token => _auth.accessToken;
+  String get token => _auth.accessToken;
 
-  get tokenId => _auth.idToken;
+  String get tokenId => _auth.idToken;
 }

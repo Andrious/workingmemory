@@ -13,15 +13,24 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 ///
-///          Created  16 Jun 2018
+///          Created  29 Aug 2018
+///
 
-/// place: "/todos"
-import 'package:flutter/material.dart' show Key, State, StatefulWidget;
+import 'package:flutter/material.dart';
 
-import 'package:workingmemory/src/view.dart' show App, TodosAndroid, TodosiOS;
+import 'package:workingmemory/src/view.dart' show App, DTAndroid, DTiOS;
 
-class TodosPage extends StatefulWidget {
-  TodosPage({Key key}) : super(key: key);
+class DateTimeItem extends StatelessWidget {
+  const DateTimeItem({this.key, this.dateTime, @required this.onChanged});
   @override
-  State createState() => App.useMaterial ? TodosAndroid() : TodosiOS();
+  final Key key;
+  final DateTime dateTime;
+  final ValueChanged<DateTime> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return App.useCupertino
+        ? DTiOS(key: key, dateTime: dateTime, onChanged: onChanged)
+        : DTAndroid(key: key, dateTime: dateTime, onChanged: onChanged);
+  }
 }

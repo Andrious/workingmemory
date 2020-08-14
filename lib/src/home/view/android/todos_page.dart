@@ -46,6 +46,7 @@ import 'package:flutter/material.dart'
         SnackBar,
         SnackBarAction,
         Text,
+        Theme,
         Widget;
 
 import 'package:workingmemory/src/view.dart'
@@ -67,24 +68,24 @@ class TodosAndroid extends StateMVC<TodosPage> {
     return Scaffold(
       drawer: SettingsDrawer(),
       appBar: AppBar(
-        title: const Text("My ToDos"),
+        title: const Text('My ToDos'),
         actions: <Widget>[
           _menu.show(this),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => editToDo(),
+        foregroundColor: Theme.of(context).primaryColor,
+        onPressed: editToDo,
         child: const Icon(
           Icons.add,
           semanticLabel: 'Add',
         ),
       ),
       body: SafeArea(
-        child: _con.data.items.length == 0
+        child: _con.data.items.isEmpty
             ? Container()
             : ListView.builder(
-                scrollDirection: Axis.vertical,
-                padding: EdgeInsets.all(6.0),
+                padding: const EdgeInsets.all(6),
                 itemCount: _con.data.items.length,
                 itemBuilder: (BuildContext context, int index) {
                   return Dismissible(
@@ -92,7 +93,7 @@ class TodosAndroid extends StateMVC<TodosPage> {
                     onDismissed: (DismissDirection direction) {
                       _con.data.delete(_con.data.items[index]);
                       Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text('You deleted an item.'),
+                          content: const Text('You deleted an item.'),
                           action: SnackBarAction(
                               label: 'UNDO',
                               onPressed: () {
@@ -102,10 +103,10 @@ class TodosAndroid extends StateMVC<TodosPage> {
                     background: Container(
                         color: Colors.red,
                         child: const ListTile(
-                            leading: const Icon(Icons.delete,
-                                color: Colors.white, size: 36.0),
-                            trailing: const Icon(Icons.delete,
-                                color: Colors.white, size: 36.0))),
+                            leading: Icon(Icons.delete,
+                                color: Colors.white, size: 36),
+                            trailing: Icon(Icons.delete,
+                                color: Colors.white, size: 36))),
                     child: Container(
                       decoration: BoxDecoration(
                           color: App.themeData.canvasColor,
@@ -130,13 +131,12 @@ class TodosAndroid extends StateMVC<TodosPage> {
     );
   }
 
-  void editToDo([Map todo]) async {
-    Route route = MaterialPageRoute<Map<String, dynamic>>(
-      settings: RouteSettings(name: "/todos/todo"),
+  Future<void> editToDo([Map todo]) async {
+    final Route<Map<String, dynamic>> route = MaterialPageRoute(
+      settings: const RouteSettings(name:'/todos/todo'),
       builder: (BuildContext context) => TodoPage(todo: todo),
       fullscreenDialog: true,
     );
-
     await Navigator.of(context).push(route);
     refresh();
   }

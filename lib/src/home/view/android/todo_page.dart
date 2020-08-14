@@ -40,25 +40,26 @@ class TodoAndroid extends StateMVC<TodoPage> {
     return Scaffold(
       appBar: AppBar(title: _con.data.title, actions: [
         FlatButton(
-            child: Text(
-              'SAVE',
-              style: theme.textTheme.bodyText2.copyWith(color: Colors.white),
-            ),
-            onPressed: () async {
-              bool save = await _con.data.onPressed();
-              if (save) {
-                Navigator.pop(context);
-              } else {
-                Scaffold.of(context).showSnackBar(SnackBar(
-                  content: Text('There is an error.'),
-                ));
-              }
-            }),
+          onPressed: () async {
+            final bool save = await _con.data.onPressed();
+            if (save) {
+              Navigator.pop(context);
+            } else {
+              Scaffold.of(context).showSnackBar(const SnackBar(
+                content: Text('There is an error.'),
+              ));
+            }
+          },
+          child: Text(
+            'SAVE',
+            style: theme.textTheme.bodyText2.copyWith(color: Colors.white),
+          ),
+        ),
       ]),
       body: Form(
         onWillPop: _onWillPop,
         child: _con.data.linkForm(ListView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           children: _listWidgets(),
         )),
       ),
@@ -66,7 +67,9 @@ class TodoAndroid extends StateMVC<TodoPage> {
   }
 
   Future<bool> _onWillPop() async {
-    if (!_con.data.hasChanged) return true;
+    if (!_con.data.hasChanged) {
+      return true;
+    }
 
     final TextStyle dialogTextStyle = theme.textTheme.subtitle1
         .copyWith(color: theme.textTheme.caption.color);
@@ -78,17 +81,19 @@ class TodoAndroid extends StateMVC<TodoPage> {
               content: Text('Discard new event?', style: dialogTextStyle),
               actions: <Widget>[
                 FlatButton(
-                    child: const Text('CANCEL'),
-                    onPressed: () {
-                      Navigator.of(context).pop(
-                          false); // Pops the confirmation dialog but not the page.
-                    }),
+                  onPressed: () {
+                    Navigator.of(context).pop(
+                        false); // Pops the confirmation dialog but not the page.
+                  },
+                  child: const Text('CANCEL'),
+                ),
                 FlatButton(
-                    child: const Text('DISCARD'),
-                    onPressed: () {
-                      Navigator.of(context).pop(
-                          true); // Returning true to _onWillPop will pop again.
-                    })
+                  onPressed: () {
+                    Navigator.of(context).pop(
+                        true); // Returning true to _onWillPop will pop again.
+                  },
+                  child: const Text('DISCARD'),
+                )
               ],
             );
           },
@@ -97,9 +102,9 @@ class TodoAndroid extends StateMVC<TodoPage> {
   }
 
   List<Widget> _listWidgets() {
-    var widgets = <Widget>[
+    final widgets = <Widget>[
       Container(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         alignment: Alignment.bottomLeft,
         child: TextFormField(
           controller: _con.data.controller,
@@ -107,7 +112,9 @@ class TodoAndroid extends StateMVC<TodoPage> {
             filled: true,
           ),
           validator: (v) {
-            if (v.isEmpty) return 'Cannot be empty.';
+            if (v.isEmpty) {
+              return 'Cannot be empty.';
+            }
             return null;
           },
           onSaved: (value) {
@@ -131,16 +138,17 @@ class TodoAndroid extends StateMVC<TodoPage> {
       ]),
     ];
 
-    if (_con.favIcons.length > 0) {
+    if (_con.favIcons.isNotEmpty) {
       widgets.add(Container(
-          height: 100.0,
+          height: 100,
           decoration: BoxDecoration(
-            border: Border.all(width: 4, color: Colors.black),
-            borderRadius: const BorderRadius.all(const Radius.circular(8)),
+            border: Border.all(width: 4),
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
           ),
           child: IconItems(
-              icons: Map.fromIterable(_con.favIcons,
-                  key: (e) => e.values.first, value: (e) => e.values.first),
+              icons: {
+                for (var e in _con.favIcons) e.values.first: e.values.first
+              },
               icon: _con.data.icon,
               onTap: (icon) {
                 setState(() {
@@ -150,7 +158,7 @@ class TodoAndroid extends StateMVC<TodoPage> {
     }
 
     widgets.add(Container(
-        height: 600.0,
+        height: 600,
         child: IconItems(
             icons: _con.icons,
             icon: _con.data.icon,

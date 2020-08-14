@@ -20,7 +20,7 @@ class SettingsNavigationIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Icon(
+    return const Icon(
       CupertinoIcons.forward,
       color: Styles.settingsMediumGray,
       size: 21,
@@ -97,7 +97,7 @@ class SettingsItemState extends State<SettingsItem> {
             });
             await widget.onPress();
             Future.delayed(
-              Duration(milliseconds: 150),
+              const Duration(milliseconds: 150),
               () {
                 setState(() {
                   pressed = false;
@@ -131,12 +131,12 @@ class SettingsItemState extends State<SettingsItem> {
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            SizedBox(height: 8.5),
+                            const SizedBox(height: 8.5),
                             Text(widget.label),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
                               widget.subtitle,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 12,
                                 letterSpacing: -0.2,
                               ),
@@ -144,7 +144,7 @@ class SettingsItemState extends State<SettingsItem> {
                           ],
                         )
                       : Padding(
-                          padding: EdgeInsets.only(top: 1.5),
+                          padding: const EdgeInsets.only(top: 1.5),
                           child: Text(widget.label),
                         ),
                 ),

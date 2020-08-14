@@ -33,7 +33,7 @@ dynamic exeApp(Widget app) async {
 
   /// All Dart code runs in an isolate.  Isolates is Dart's way to work with threads.
   /// Your app runs in its own isolate and can spawn new isolates.
-  Isolate.current.addErrorListener(new RawReceivePort((dynamic pair) async {
+  Isolate.current.addErrorListener(RawReceivePort((dynamic pair) async {
     await _reportError(
       (pair as List<String>).first,
       (pair as List<String>).last,
@@ -42,13 +42,13 @@ dynamic exeApp(Widget app) async {
 
   /// The initial `main` function runs in the default or 'root' zone.
   /// We can, instead, create a new zone using [runZoned] and catch any errors.
-  runZonedGuarded(() async {
+  await runZonedGuarded(() async {
     runApp(app);
   }, _reportError);
 }
 
 /// Reports [error] along with its [stackTrace]
-Future<Null> _reportError(dynamic error, dynamic stackTrace) async {
+Future<void> _reportError(dynamic error, dynamic stackTrace) async {
   // details.exception, details.stack
 
   FlutterError.dumpErrorToConsole(FlutterErrorDetails(
@@ -57,8 +57,8 @@ Future<Null> _reportError(dynamic error, dynamic stackTrace) async {
   ));
 }
 
-/// Reports [error] along with its [stackTrace]
-Future<Null> _reportErrorDetails(FlutterErrorDetails details) async {
+/// Reports error along with its stackTrace
+Future<void> _reportErrorDetails(FlutterErrorDetails details) async {
   // details.exception, details.stack
 
   FlutterError.dumpErrorToConsole(details);

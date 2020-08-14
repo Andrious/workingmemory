@@ -28,10 +28,11 @@ import 'package:workingmemory/src/home/view/ios/settings_group.dart';
 import 'package:workingmemory/src/home/view/ios/settings_item.dart';
 
 class NotificationSettings extends StatelessWidget {
+  const NotificationSettings({Key key}):super(key: key);
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
+      navigationBar: const CupertinoNavigationBar(
         middle: Text('Notification Settings'),
         previousPageTitle: 'Settings',
       ),

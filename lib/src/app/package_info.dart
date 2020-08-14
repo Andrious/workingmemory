@@ -3,13 +3,13 @@ import 'package:package_info/package_info.dart' as lib;
 class PackageInfo {
   static lib.PackageInfo info;
 
-  init() async {
+  void init() async {
     info = await lib.PackageInfo.fromPlatform();
   }
 
-  static get name => info?.packageName;
+  static String get name => info?.packageName;
 
-  static get version => info?.version;
+  static String get version => info?.version;
 
-  static get number => info?.buildNumber;
+  static String get number => info?.buildNumber;
 }

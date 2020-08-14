@@ -24,12 +24,13 @@ import 'package:workingmemory/src/view.dart';
 import 'package:workingmemory/src/controller.dart';
 
 class TodoPage extends StatefulWidget {
-  TodoPage({Key key, this.todo, this.onPressed}) : super(key: key);
+  const TodoPage({Key key, this.todo, this.onPressed}) : super(key: key);
 
   final Map todo;
   final VoidCallback onPressed;
 
   @override
+  // ignore: no_logic_in_create_state
   State createState() => App.useMaterial ? TodoAndroid() : TodoiOS();
 }
 

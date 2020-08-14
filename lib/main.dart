@@ -17,13 +17,14 @@
 ///
 ///                   https://github.com/Andrious/workingmemory
 
-import 'package:workingmemory/src/view.dart' show WorkingView;
+import 'package:workingmemory/src/view.dart' show Key, WorkingView;
 
 import 'package:workingmemory/src/controller.dart' show App, runApp;
 
 void main() => runApp(WorkingMemory());
 
 class WorkingMemory extends App {
+  WorkingMemory({Key key}):super(key: key);
   @override
-  createView() => WorkingView();
+  WorkingView createView() => WorkingView();
 }

@@ -20,9 +20,10 @@ import 'package:firebase_database/firebase_database.dart';
 
 import 'package:workingmemory/src/model.dart';
 
+// ignore: avoid_classes_with_only_static_members
 class Semaphore {
   //
-  static const String _SIGNAL = "semaphore";
+  static const String _SIGNAL = 'semaphore';
 
   static const int STAMP_RESET = -1;
 
@@ -54,7 +55,7 @@ class Semaphore {
     return write;
   }
 
-  static int get timeStamp => (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+  static int get timeStamp => DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
   static DateTime getDateTime(int seconds) =>
       DateTime.fromMillisecondsSinceEpoch(seconds * 1000);

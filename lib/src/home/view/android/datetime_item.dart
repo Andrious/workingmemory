@@ -40,18 +40,11 @@ class DTAndroid extends StatelessWidget {
         child: Row(children: <Widget>[
           Expanded(
               child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
                       border: Border(
                           bottom: BorderSide(color: theme.dividerColor))),
                   child: InkWell(
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(DateFormat('EEE, MMM d yyyy').format(date)),
-                          const Icon(Icons.arrow_drop_down,
-                              color: Colors.black54),
-                        ]),
                     onTap: () {
                       showDatePicker(
                               context: context,
@@ -59,32 +52,41 @@ class DTAndroid extends StatelessWidget {
                               firstDate:
                                   date.subtract(const Duration(days: 30)),
                               lastDate: date.add(const Duration(days: 2555)))
-                          .then<Null>((DateTime value) {
-                        if (value != null)
+                          .then<void>((DateTime value) {
+                        if (value != null) {
                           onChanged(DateTime(value.year, value.month, value.day,
                               time.hour, time.minute));
+                        }
                       });
                     },
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(DateFormat('EEE, MMM d yyyy').format(date)),
+                          const Icon(Icons.arrow_drop_down,
+                              color: Colors.black54),
+                        ]),
                   ))),
           Container(
-              margin: const EdgeInsets.only(left: 8.0),
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              margin: const EdgeInsets.only(left: 8),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
                   border:
                       Border(bottom: BorderSide(color: theme.dividerColor))),
               child: InkWell(
-                child: Row(children: <Widget>[
-                  Text('${time.format(context)}'),
-                  const Icon(Icons.arrow_drop_down, color: Colors.black54),
-                ]),
                 onTap: () {
                   showTimePicker(context: context, initialTime: time)
-                      .then<Null>((TimeOfDay value) {
-                    if (value != null)
+                      .then<void>((TimeOfDay value) {
+                    if (value != null) {
                       onChanged(DateTime(date.year, date.month, date.day,
                           value.hour, value.minute));
+                    }
                   });
                 },
+                child: Row(children: <Widget>[
+                  Text(time.format(context)),
+                  const Icon(Icons.arrow_drop_down, color: Colors.black54),
+                ]),
               ))
         ]));
   }

@@ -16,24 +16,21 @@
 ///          Created  23 Jun 2018
 ///
 
-// What is done, with every change, it's recorded in every other device
-// to be synced when those devices start up.
-import 'package:flutter/material.dart';
-
 import 'dart:collection' show LinkedHashMap;
-
-import 'package:workingmemory/src/model.dart'
-    show AppModel, FireBaseDB, Model, Semaphore, SyncDB;
-
-import 'package:workingmemory/src/controller.dart'
-    show App, Controller, WorkingController;
 
 import 'package:firebase_database/firebase_database.dart'
     show DataSnapshot, DatabaseReference;
 
+// What is done, with every change, it's recorded in every other device
+// to be synced when those devices start up.
+import 'package:flutter/material.dart';
+import 'package:workingmemory/src/controller.dart'
+    show App, Controller, WorkingController;
+import 'package:workingmemory/src/model.dart'
+    show AppModel, FireBaseDB, Model, Semaphore, SyncDB;
+
 class CloudDB {
   factory CloudDB() => _this ??= CloudDB._();
-  static CloudDB _this;
   CloudDB._() {
     _fbDB = FireBaseDB();
     _appModel = AppModel();
@@ -41,6 +38,8 @@ class CloudDB {
     _dbHelper = SyncDB();
     _dataSync = DataSync();
   }
+  static CloudDB _this;
+
   FireBaseDB _fbDB;
   AppModel _appModel;
   DatabaseReference _fireDBRef;
@@ -50,7 +49,7 @@ class CloudDB {
   /// Allow for easy access to 'this singular instance' throughout the application.
 //  static CloudDB get object => _this ?? CloudDB();
 
-  static final String _dbName = "sync";
+  static const String _dbName = 'sync';
 
   Future<bool> init() => _dbHelper.open();
 
@@ -83,24 +82,24 @@ class CloudDB {
       _dataSync.insert(key, action);
 
   Future<bool> delete(int recId, String key) async {
-    Map<String, dynamic> recValues = Map();
+    final Map<String, dynamic> recValues = {};
 
-    recValues["id"] = recId;
+    recValues['id'] = recId;
 
-    recValues["key"] = key;
+    recValues['key'] = key;
 
-    recValues["action"] = "DELETE";
+    recValues['action'] = 'DELETE';
 
     // time is seconds
-    recValues["timestamp"] = Semaphore.timeStamp;
+    recValues['timestamp'] = Semaphore.timeStamp;
 
-    int count = await _dbHelper.update(recValues);
+    final int count = await _dbHelper.update(recValues);
 
     return count > 0;
   }
 
   Future<List<Map<String, dynamic>>> getRecs() =>
-      _dbHelper.rawQuery("SELECT * FROM " + _dbName);
+      _dbHelper.rawQuery('SELECT * FROM ' + _dbName);
 
   Future<List<Map<String, dynamic>>> getRec(String key) async {
     List<Map<String, dynamic>> recs;
@@ -108,7 +107,7 @@ class CloudDB {
       recs = [{}];
     } else {
       recs = await _dbHelper
-          .rawQuery("SELECT * from $_dbName  WHERE key = \"${key.trim()}\"");
+          .rawQuery('SELECT * from $_dbName  WHERE key = "${key.trim()}"');
     }
     return recs;
   }
@@ -119,17 +118,17 @@ class CloudDB {
     save = _dbHelper.isOpen;
 
     if (save) {
-      Map<String, dynamic> recValues = {
-        "id": recId,
-        "key": key,
-        "action": "UPDATE",
-        "timestamp": DataSync.timeStamp
+      final Map<String, dynamic> recValues = {
+        'id': recId,
+        'key': key,
+        'action': 'UPDATE',
+        'timestamp': DataSync.timeStamp
       };
 
       // Record is no longer to be deleted but updated.
-      String action = await getAction(recId);
+      final String action = await getAction(recId);
 
-      if (action == "DELETE") {
+      if (action == 'DELETE') {
         save = await update(recValues, recId);
       } else {
         save = await insertNew(recValues, recId);
@@ -141,13 +140,13 @@ class CloudDB {
   Future<String> getAction(int recId) async {
     String action;
 
-    List<Map<String, dynamic>> recs = await _dbHelper
-        .rawQuery("SELECT action FROM $_dbName WHERE id = $recId");
+    final List<Map<String, dynamic>> recs = await _dbHelper
+        .rawQuery('SELECT action FROM $_dbName WHERE id = $recId');
 
     if (recs.isEmpty) {
-      action = "";
+      action = '';
     } else {
-      action = recs[0]["action"];
+      action = recs[0]['action'];
     }
     return action;
   }

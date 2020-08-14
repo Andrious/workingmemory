@@ -23,8 +23,8 @@ import 'package:workingmemory/src/controller.dart' show ControllerMVC, Prefs;
 
 class ThemeController extends ControllerMVC {
   factory ThemeController() => _this ??= ThemeController._();
-  static ThemeController _this;
   ThemeController._();
+  static ThemeController _this;
 
   ThemeData get themeData => App.themeData;
 
@@ -35,19 +35,21 @@ class ThemeController extends ControllerMVC {
 
   @override
   void initState() {
-    _darkmode = Prefs.getBool("darkmode");
+    _darkmode = Prefs.getBool('darkmode');
     setDarkMode(_darkmode);
   }
 
   bool setDarkMode(bool darkMode) {
-    if (darkMode == null) return false;
+    if (darkMode == null) {
+      return false;
+    }
     _darkmode = darkMode;
-    Prefs.setBool("darkmode", _darkmode);
+    Prefs.setBool('darkmode', _darkmode);
     setTheme();
     return true;
   }
 
-  setTheme([ThemeData theme]) {
+  void setTheme([ThemeData theme]) {
     //
     if (theme != null) {
       App.themeData = theme;

@@ -38,25 +38,18 @@ class DTiOS extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    DateTime initDate = date;
-    DateTime initTime = time;
+    final DateTime initDate = date;
+    final DateTime initTime = time;
     return DefaultTextStyle(
         style: theme.textTheme.subtitle1,
         child: Row(children: <Widget>[
           Expanded(
               child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
                       border: Border(
                           bottom: BorderSide(color: theme.dividerColor))),
                   child: GestureDetector(
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(DateFormat('EEE, MMM d yyyy').format(date)),
-                          const Icon(Icons.arrow_drop_down,
-                              color: Colors.black54),
-                        ]),
                     onTap: () {
                       showCupertinoDatePicker(context,
                           mode: CupertinoDatePickerMode.date,
@@ -73,18 +66,21 @@ class DTiOS extends StatelessWidget {
                         onChanged(result);
                       });
                     },
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(DateFormat('EEE, MMM d yyyy').format(date)),
+                          const Icon(Icons.arrow_drop_down,
+                              color: Colors.black54),
+                        ]),
                   ))),
           Container(
-              margin: const EdgeInsets.only(left: 8.0),
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              margin: const EdgeInsets.only(left: 8),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
                   border:
                       Border(bottom: BorderSide(color: theme.dividerColor))),
               child: GestureDetector(
-                child: Row(children: <Widget>[
-                  Text(DateFormat('h:mm a').format(time)),
-                  const Icon(Icons.arrow_drop_down, color: Colors.black54),
-                ]),
                 onTap: () {
                   showCupertinoDatePicker(context,
                       mode: CupertinoDatePickerMode.time, initialDateTime: time,
@@ -100,6 +96,10 @@ class DTiOS extends StatelessWidget {
                     onChanged(result);
                   });
                 },
+                child: Row(children: <Widget>[
+                  Text(DateFormat('h:mm a').format(time)),
+                  const Icon(Icons.arrow_drop_down, color: Colors.black54),
+                ]),
               ))
         ]));
   }

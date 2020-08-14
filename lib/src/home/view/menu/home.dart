@@ -30,16 +30,16 @@ class WorkMenu extends Menu {
     if (_con.app.loggedIn) {
       if (_con.app.isAnonymous) {
         tailItems = [
-          PopupMenuItem(value: "SignIn", child: Text("Sign in...")),
+          const PopupMenuItem(value: 'SignIn', child: Text('Sign in...')),
         ];
       } else {
         tailItems = [
-          PopupMenuItem(value: "Logout", child: Text("Logout")),
+          const PopupMenuItem(value: 'Logout', child: Text('Logout')),
         ];
       }
     } else {
       tailItems = [
-        PopupMenuItem(value: "SignIn", child: Text("Sign in...")),
+        const PopupMenuItem(value: 'SignIn', child: Text('Sign in...')),
       ];
     }
   }
@@ -47,7 +47,7 @@ class WorkMenu extends Menu {
 
   @override
   List<PopupMenuItem<dynamic>> menuItems() => [
-        PopupMenuItem(value: "Resync", child: Text("Resync")),
+        const PopupMenuItem(value: 'Resync', child: Text('Resync')),
       ];
 
   @override

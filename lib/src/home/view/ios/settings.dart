@@ -33,43 +33,42 @@ import 'settings_item.dart';
 
 class SettingsScreen extends StatelessWidget {
   //
+  SettingsScreen(Key key) : super(key: key);
+
   final Controller con = Controller();
 
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      child: Container(
-        //       color: Styles.scaffoldBackground,
-        child: CustomScrollView(
-          slivers: <Widget>[
-            CupertinoSliverNavigationBar(
-              largeTitle: Text('Settings'),
-            ),
-            SliverSafeArea(
-              top: false,
-              sliver: SliverList(
-                delegate: SliverChildListDelegate(
-                  <Widget>[
-                    SettingsGroup(items: _settingsGroupItems(context)),
-                  ],
-                ),
+      child: CustomScrollView(
+        slivers: <Widget>[
+          const CupertinoSliverNavigationBar(
+            largeTitle: Text('Settings'),
+          ),
+          SliverSafeArea(
+            top: false,
+            sliver: SliverList(
+              delegate: SliverChildListDelegate(
+                <Widget>[
+                  SettingsGroup(items: _settingsGroupItems(context)),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   List<SettingsItem> _settingsGroupItems(BuildContext context) {
     SettingsItem item;
-    List<SettingsItem> items = [
+    final List<SettingsItem> items = [
       SettingsItem(
         label: 'Sorted Order of Items',
         subtitle: 'Check for most recent listed first.',
         content: CupertinoSwitch(
           value: Settings.getOrder(),
-          onChanged: (bool value) => Settings.setOrder(value),
+          onChanged: Settings.setOrder,
         ),
       ),
       SettingsItem(
@@ -77,17 +76,17 @@ class SettingsScreen extends StatelessWidget {
         subtitle: 'Possibly preferred if left-handed.',
         content: CupertinoSwitch(
           value: Settings.getLeftHanded(),
-          onChanged: (bool value) => Settings.setLeftHanded(value),
+          onChanged: Settings.setLeftHanded,
         ),
       ),
       SettingsItem(
         label: 'Notification Settings',
         subtitle: 'Behaviour and Colour settings',
-        content: SettingsNavigationIndicator(),
+        content: const SettingsNavigationIndicator(),
         onPress: () {
           Navigator.of(context).push<void>(
             CupertinoPageRoute(
-              builder: (context) => NotificationSettings(),
+              builder: (context) => const NotificationSettings(),
               title: 'Preferred Categories',
             ),
           );
@@ -96,13 +95,13 @@ class SettingsScreen extends StatelessWidget {
     ];
 
     if (!con.app.isAnonymous) {
-      item = SettingsItem(label: 'Log Out', onPress: () => con.logOut());
+      item = SettingsItem(label: 'Log Out', onPress: con.logOut);
     } else {
       item = SettingsItem(
           label: 'Sign In',
           onPress: () {
             Navigator.of(con.context).push(
-              CupertinoPageRoute(
+              CupertinoPageRoute<void>(
                 builder: (context) => SignIn(),
                 title: 'Preferred Categories',
               ),

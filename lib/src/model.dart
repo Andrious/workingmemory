@@ -24,19 +24,19 @@ export 'package:sqflite/sqflite.dart' show Database;
 export 'package:remote_config/remote_config.dart'
     show RemoteConfig, RemoteConfigValue;
 
-export 'package:workingmemory/src/home/model/AppModel.dart' show AppModel;
+export 'package:workingmemory/src/home/model/appmodel.dart' show AppModel;
 
-export 'package:workingmemory/src/home/model/CloudDB.dart'
+export 'package:workingmemory/src/home/model/cloud_db.dart'
     show CloudDB, OnLoginListener;
 
-export 'package:workingmemory/src/home/model/Icons.dart' show Icons;
+export 'package:workingmemory/src/home/model/icons.dart' show Icons;
 
-export 'package:workingmemory/src/home/model/Model.dart';
+export 'package:workingmemory/src/home/model/model.dart';
 
-export 'package:workingmemory/src/home/model/FireBaseDB.dart' show FireBaseDB;
+export 'package:workingmemory/src/home/model/firebase_db.dart' show FireBaseDB;
 
-export 'package:workingmemory/src/home/model/SyncDB.dart' show SyncDB;
+export 'package:workingmemory/src/home/model/sync_db.dart' show SyncDB;
 
-export 'package:workingmemory/src/home/model/Semaphore.dart' show Semaphore;
+export 'package:workingmemory/src/home/model/semaphore.dart' show Semaphore;
 
 export 'package:workingmemory/src/home/model/settings.dart';
