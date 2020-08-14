@@ -360,10 +360,10 @@ packages:
   mvc_application:
     dependency: "direct main"
     description:
-      path: "../../../packages/mvc_application"
-      relative: true
-    source: path
-    version: "5.9.0"
+      name: mvc_application
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "5.8.0"
   mvc_pattern:
     dependency: transitive
     description:

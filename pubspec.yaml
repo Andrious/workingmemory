@@ -1,7 +1,7 @@
 name: workingmemory
 description: A ToDo List for a not so working memory
 
-version: 1.1.0+2
+version: 1.2.0
 
 environment:
   sdk: '>=2.7.0 <3.0.0'
@@ -11,8 +11,8 @@ dependencies:
     sdk: flutter
 
   # https://pub.dev/packages/mvc_application
-  mvc_application: #^5.0.0
-     path: ../../../packages/mvc_application
+  mvc_application: ^5.0.0
+  #   path: ../../../packages/mvc_application
 #    git:
 #      url: git://github.com/AndriousSolutions/mvc_application.git
 
