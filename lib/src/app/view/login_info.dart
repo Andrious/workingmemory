@@ -41,7 +41,7 @@ class LoginInfo {
 
   Widget scaffold(AppView _vw) {
     return Scaffold(
-        appBar: AppBar(title: Text("My Home Page")),
+        appBar: AppBar(title: const Text('My Home Page')),
         endDrawer: AppDrawer(),
         body: body(_vw));
   }
@@ -53,29 +53,31 @@ class LoginInfo {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         RaisedButton(
-          child: Text("My Todos"),
           onPressed: () {
-            Navigator.of(_vw.context).pushNamed("/todos");
+            Navigator.of(_vw.context).pushNamed('/todos');
           },
+          child: const Text('My Todos'),
         ),
         RaisedButton(
-            child: const Text('Test signInSilently'),
-            onPressed: () {
-              _vw.setState(() {
-                _uid = con.signInSilently().then((log) {
-                  return con.uid;
-                });
+          onPressed: () {
+            _vw.setState(() {
+              _uid = con.signInSilently().then((log) {
+                return con.uid;
               });
-            }),
+            });
+          },
+          child: const Text('Test signInSilently'),
+        ),
         RaisedButton(
-            child: const Text('Test signInWithGoogle'),
-            onPressed: () {
-              _vw.setState(() {
-                _uid = con.signInWithGoogle().then((log) {
-                  return con.uid;
-                });
+          onPressed: () {
+            _vw.setState(() {
+              _uid = con.signInWithGoogle().then((log) {
+                return con.uid;
               });
-            }),
+            });
+          },
+          child: const Text('Test signInWithGoogle'),
+        ),
         Text('User id: ${con.uid}'),
         Text('User Name: ${con.name}'),
         Text('Anonymous: ${con.isAnonymous}'),
@@ -88,8 +90,8 @@ class LoginInfo {
             future: _uid,
             builder: (_, AsyncSnapshot<String> snapshot) {
               return Text(snapshot.data ?? '',
-                  style: const TextStyle(
-                      color: const Color.fromARGB(255, 0, 155, 0)));
+                  style:
+                      const TextStyle(color: Color.fromARGB(255, 0, 155, 0)));
             }),
       ],
     );

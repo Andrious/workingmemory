@@ -23,6 +23,7 @@ import 'package:workingmemory/src/view.dart';
 import 'package:workingmemory/src/controller.dart';
 
 class SettingsDrawer extends StatefulWidget {
+  const SettingsDrawer({Key key}) : super(key: key);
   @override
   _SettingsDrawerState createState() => _SettingsDrawerState();
 }
@@ -41,9 +42,12 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
   Controller _con;
   bool _refresh;
 
+  @override
   void dispose() {
     super.dispose();
-    if (_refresh == true) _con.requery();
+    if (_refresh == true) {
+      _con.requery();
+    }
   }
 
   @override
@@ -58,41 +62,35 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
             Card(
               child: Column(children: <Widget>[
                 Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      const Text("INTERFACE PREFERENCES"),
+                    children: const <Widget>[
+                       Text('INTERFACE PREFERENCES'),
                     ]),
                 Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      const Text(
-                        "Sorted Order of Items",
+                    children:const <Widget>[
+                       Text(
+                        'Sorted Order of Items',
                       ),
                     ]),
                 Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       const Expanded(
-                        child: const Text(
-                          "Check so the items are in descending order with the most recent items listed first.",
+                        child: Text(
+                          'Check so the items are in descending order with the most recent items listed first.',
                         ),
                       ),
                       Checkbox(
-                        key: null,
                         value: _descending,
                         onChanged: orderItems,
                       ),
                     ]),
                 Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
-                      Expanded(
-                        child: const Text(
-                          "Switch around dialog buttons",
+                      const Expanded(
+                        child: Text(
+                          'Switch around dialog buttons',
                         ),
                       ),
                       Checkbox(
-                        key: null,
                         value: _leftHanded,
                         onChanged: switchButton,
                       ),
@@ -104,25 +102,22 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                   onTap: () {},
                   child: Column(children: <Widget>[
                     Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          const Text(
-                            "NOTIFICATION PREFERENCES",
+                        children: const <Widget>[
+                           Text(
+                            'NOTIFICATION PREFERENCES',
                           ),
                         ]),
                     Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          const Text(
-                            "Notification Settings",
+                        children: const <Widget>[
+                          Text(
+                            'Notification Settings',
                           ),
                         ]),
                     Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          const Expanded(
-                            child: const Text(
-                              "Notification behaviour, popup settings and LED Colour",
+                        children: const <Widget>[
+                           Expanded(
+                            child:  Text(
+                              'Notification behaviour, popup settings and LED Colour',
                               softWrap: true,
                             ),
                           ),
@@ -133,27 +128,22 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
               child: InkWell(
                   onTap: () {},
                   child: Column(children: <Widget>[
-                    Row(mainAxisAlignment: MainAxisAlignment.start,
-//            mainAxisSize: MainAxisSize.min,
-//            crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          const Text(
-                            "RECORD PREFERENCES",
+                    Row(children:const <Widget>[
+                           Text(
+                            'RECORD PREFERENCES',
                           ),
                         ]),
                     Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          const Text(
-                            "Item Record Preferences",
+                        children: const <Widget>[
+                          Text(
+                            'Item Record Preferences',
                           ),
                         ]),
                     Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          const Expanded(
-                            child: const Text(
-                              "How certain records are further handled (eg. deleted, past due, etc.)",
+                        children: const <Widget>[
+                           Expanded(
+                            child:  Text(
+                              'How certain records are further handled (eg. deleted, past due, etc.)',
                             ),
                           ),
                         ])
@@ -191,6 +181,6 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
   }
 
   static void onTap() {
-    var test = true;
+    final test = true;
   }
 }

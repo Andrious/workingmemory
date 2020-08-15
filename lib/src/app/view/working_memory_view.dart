@@ -32,7 +32,7 @@ class WorkingView extends AppView {
       : super(
           con: _app,
           title: 'Working Memory',
-          home: TodosPage(),
+          home: const TodosPage(),
           debugShowCheckedModeBanner: false,
         ) {
     idKey = _app.keyId;
@@ -42,11 +42,6 @@ class WorkingView extends AppView {
   /// Conceivably, you could define your own WidgetsApp.
   @override
   Widget buildApp(BuildContext context) => super.buildApp(context);
-
-  @override
-  void onError(FlutterErrorDetails details) {
-    super.onError(details);
-  }
 
   /// Allow for easy access to 'the View' throughout the application.
   static WorkingView get view => _this;

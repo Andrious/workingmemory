@@ -26,7 +26,7 @@ import 'package:workingmemory/src/view.dart';
 import 'package:workingmemory/src/controller.dart';
 
 class SignIn extends StatefulWidget {
-  SignIn({Key key}) : super(key: key);
+  const SignIn({Key key}) : super(key: key);
   @override
   State createState() => SignInState();
 }
@@ -43,19 +43,21 @@ class SignInState extends StateMVC<SignIn> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.only(top: 10.0, right: 40.0),
+          padding: const EdgeInsets.only(top: 10, right: 40),
           child: GestureDetector(
             onTap: () async {
-              bool signIn = await app.signInWithFacebook();
-              if (signIn) Navigator.pop(context);
+              final bool signIn = await app.signInWithFacebook();
+              if (signIn) {
+                Navigator.pop(context);
+              }
             },
             child: Container(
-              padding: const EdgeInsets.all(15.0),
-              decoration: new BoxDecoration(
+              padding: const EdgeInsets.all(15),
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white,
               ),
-              child: new Icon(
+              child: const Icon(
                 FontAwesomeIcons.facebook,
                 //                 color: Color(0xFF0084ff),
               ),
@@ -63,19 +65,21 @@ class SignInState extends StateMVC<SignIn> {
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: 10.0, right: 40.0),
+          padding: const EdgeInsets.only(top: 10, right: 40),
           child: GestureDetector(
             onTap: () async {
-              bool signIn = await app.signInWithTwitter();
-              if (signIn) Navigator.pop(context);
+              final bool signIn = await app.signInWithTwitter();
+              if (signIn) {
+                Navigator.pop(context);
+              }
             },
             child: Container(
-              padding: const EdgeInsets.all(15.0),
-              decoration: new BoxDecoration(
+              padding: const EdgeInsets.all(15),
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white,
               ),
-              child: new Icon(
+              child: const Icon(
                 FontAwesomeIcons.twitter,
                 //                 color: Color(0xFF0084ff),
               ),
@@ -83,19 +87,21 @@ class SignInState extends StateMVC<SignIn> {
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: 10.0, right: 40.0),
+          padding: const EdgeInsets.only(top: 10, right: 40),
           child: GestureDetector(
             onTap: () async {
-              bool signIn = await app.signInEmailPassword(context);
-              if (signIn) Navigator.pop(context);
+              final bool signIn = await app.signInEmailPassword(context);
+              if (signIn) {
+                Navigator.pop(context);
+              }
             },
             child: Container(
-              padding: const EdgeInsets.all(15.0),
-              decoration: new BoxDecoration(
+              padding: const EdgeInsets.all(15),
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white,
               ),
-              child: new Icon(
+              child: const Icon(
                 FontAwesomeIcons.envelope,
 //                  color: Color(0xFF0084ff),
               ),
@@ -103,19 +109,21 @@ class SignInState extends StateMVC<SignIn> {
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: 10.0),
+          padding: const EdgeInsets.only(top: 10),
           child: GestureDetector(
             onTap: () async {
-              bool signIn = await app.signInWithGoogle();
-              if (signIn) Navigator.pop(context);
+              final bool signIn = await app.signInWithGoogle();
+              if (signIn) {
+                Navigator.pop(context);
+              }
             },
             child: Container(
-              padding: const EdgeInsets.all(15.0),
-              decoration: new BoxDecoration(
+              padding: const EdgeInsets.all(15),
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white,
               ),
-              child: new Icon(
+              child: const Icon(
                 FontAwesomeIcons.google,
                 //                 color: Color(0xFF0084ff),
               ),

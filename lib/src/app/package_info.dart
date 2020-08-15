@@ -3,7 +3,7 @@ import 'package:package_info/package_info.dart' as lib;
 class PackageInfo {
   static lib.PackageInfo info;
 
-  void init() async {
+  Future<void> init() async {
     info = await lib.PackageInfo.fromPlatform();
   }
 
