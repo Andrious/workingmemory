@@ -26,7 +26,7 @@ import 'package:workingmemory/src/controller.dart';
 class TodoPage extends StatefulWidget {
   const TodoPage({Key key, this.todo, this.onPressed}) : super(key: key);
 
-  final Map todo;
+  final Map<String, dynamic> todo;
   final VoidCallback onPressed;
 
   @override

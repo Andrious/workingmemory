@@ -15,7 +15,7 @@
 ///
 ///          Created  04 Nov 2018
 
-import "dart:async" show Future;
+import 'dart:async' show Future;
 
 import 'package:auth/auth.dart';
 
@@ -43,22 +43,25 @@ class Controller extends ControllerMVC {
   m.Model _model;
 
   /// Allow for easy access to 'the Controller' throughout the application.
+  // ignore: prefer_constructors_over_static_methods
   static Controller get con => _this ?? Controller();
 
   WorkingController get app => _app ??= WorkingController();
   WorkingController _app;
 
+  @override
   void rebuild() => _this.refresh();
 
   Future<List<Map<String, dynamic>>> requery() async {
-    var recs = await data.query();
+    final recs = await data.query();
     refresh();
     return recs;
   }
 
+  @override
   Future<bool> initAsync() async {
-    bool init = await _model.initAsync();
-    List<Map<String, dynamic>> records = await data.query();
+    final bool init = await _model.initAsync();
+    final List<Map<String, dynamic>> records = await data.query();
     _setupNotifications();
     setAlarms(records);
     _favIcons = await _model.listIcons();
@@ -80,11 +83,11 @@ class Controller extends ControllerMVC {
   List<Map<String, dynamic>> _favIcons;
 
   Map<String, String> get icons => _icons;
-  Map<String, String> _icons = m.Icons.code;
+  final Map<String, String> _icons = m.Icons.code;
 
   Future<bool> saveIcon(String icon) async {
     data.icon = icon;
-    bool save = await _model.saveIcon(icon);
+    final bool save = await _model.saveIcon(icon);
     _favIcons = await _model.listIcons();
     return save;
   }
@@ -95,11 +98,11 @@ class Controller extends ControllerMVC {
     super.dispose();
   }
 
-  void signIn() async {
+  Future<void> signIn() async {
 //    app.signIn();
-    signOut();
+    await signOut();
     await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => SignIn()));
+        context, MaterialPageRoute<void>(builder: (context) => const SignIn()));
 //   refresh();
   }
 
@@ -128,44 +131,49 @@ class Controller extends ControllerMVC {
 
   Map<String, dynamic> newRec(
       Map<String, dynamic> diffRec, Map<String, dynamic> oldRec) {
-    Map<String, dynamic> newRec = Map();
+    final Map<String, dynamic> newRec = {};
 
     if (oldRec == null) {
       newRec.addAll(diffRec);
     } else {
       newRec.addAll(oldRec);
-
       newRec.addEntries(diffRec.entries);
     }
     return newRec;
   }
 
-  recordDump(FirebaseUser user) async {
-    if (user == null) return;
-    bool dump = await _model.recordDump();
+  Future<void> recordDump(FirebaseUser user) async {
+    if (user == null) {
+      return;
+    }
+    final bool dump = await _model.recordDump();
     if (dump) {
-      requery();
+      await requery();
     }
   }
 
-  get defaultIcon => _model.defaultIcon;
+  String get defaultIcon => _model.defaultIcon;
 
   void reSync() => _model.reSync();
 
   bool itemsOrdered([bool ordered]) => _model.itemsOrdered(ordered);
 
-  void setAlarms(List<Map<String, dynamic>> list) async {
+  Future<void> setAlarms(List<Map<String, dynamic>> list) async {
     recs = list;
-    Iterator it = list.iterator;
+    final Iterator<Map<String, dynamic>> it = list.iterator;
     String sDateTime;
     DateTime time;
-    DateTime threshold = DateTime.now();
+    final DateTime threshold = DateTime.now();
     bool oneShot;
     while (it.moveNext()) {
-      int id = it.current["rowid"];
-      if (id == null) continue;
-      sDateTime = it.current["DateTime"];
-      if (sDateTime == null) continue;
+      int id = it.current['rowid'];
+      if (id == null) {
+        continue;
+      }
+      sDateTime = it.current['DateTime'];
+      if (sDateTime == null) {
+        continue;
+      }
       time = DateTime.parse(sDateTime);
       if (time.isAfter(threshold)) {
 //        oneShot = await AlarmManager.oneShotAt(
@@ -195,18 +203,19 @@ class Controller extends ControllerMVC {
       break;
     }
   }
+
   static List<Map<String, dynamic>> recs;
 
-  void _setupNotifications(){
-
+  void _setupNotifications() {
     notifications = ScheduleNotifications(
-      this.runtimeType.toString(),
+      runtimeType.toString(),
       'Working Memory Channel',
       'The Working Memory app sets Notifications',
-    );
-
-    notifications.init(onSelectNotification: (String payload) async {
-      if (payload == null || payload.trim().isEmpty) return null;
+    )
+    ..init(onSelectNotification: (String payload) async {
+      if (payload == null || payload.trim().isEmpty) {
+        return null;
+      }
 //      await Navigator.push(
 //        context,
 //        MaterialPageRoute(builder: (context) => SecondScreen(payload)),
@@ -214,29 +223,31 @@ class Controller extends ControllerMVC {
       return;
     });
 
-    notifications.getNotificationAppLaunchDetails().then((details){
-
-    });
+    notifications.getNotificationAppLaunchDetails().then((details) {});
   }
+
   ScheduleNotifications notifications;
 
   /// Establish any notifications indicated in the record.
-  int _setNotification(Map<String, dynamic> rec){
+  int _setNotification(Map<String, dynamic> rec) {
     int id = -1;
-    DateTime time = rec['DateTime'];
-    if(time != null) {
-      id = notifications.schedule(time,
-      title: rec['Item'],
-      body: 'WorkingMemory',);
-      if(id == null) id = -1;
+    final DateTime time = rec['DateTime'];
+    if (time != null) {
+      id = notifications.schedule(
+        time,
+        title: rec['Item'],
+        body: 'WorkingMemory',
+      );
+      id ??= -1;
     }
     return id;
   }
 
-  bool _cancelNotification(int id){
-    bool cancel = id != null && id > -1;
-    if(cancel)
+  bool _cancelNotification(int id) {
+    final bool cancel = id != null && id > -1;
+    if (cancel) {
       notifications.cancel(id);
+    }
     return cancel;
   }
 }
@@ -327,7 +338,7 @@ class Controller extends ControllerMVC {
 //}
 
 class _ToDoFields {
-  Map todo;
+  Map<String, dynamic> todo;
   String item;
   String icon;
   DateTime dateTime;
@@ -356,7 +367,7 @@ class ToDoEdit extends DataFields {
 
   String _item;
 
-  Map todo;
+  Map<String, dynamic> todo;
   String icon;
   DateTime dateTime;
   bool saveNeeded;
@@ -365,7 +376,7 @@ class ToDoEdit extends DataFields {
 
   Widget get title => Text(hasName ? _item : 'New');
 
-  void init([Map todo]) {
+  void init([Map<String, dynamic> todo]) {
     this.todo = todo;
 
     hasName = this.todo?.isNotEmpty ?? false;
@@ -400,9 +411,9 @@ class ToDoEdit extends DataFields {
   Future<bool> onPressed() async {
     bool save = con.data.saveForm();
     if (save) {
-      save = await this.saveRec(
+      save = await saveRec(
           {'Item': controller.text.trim(), 'DateTime': dateTime, 'Icon': icon},
-          this.todo);
+          todo);
       await query();
     }
     return save;
@@ -414,9 +425,11 @@ class ToDoEdit extends DataFields {
 
   @override
   Future<bool> save(Map<String, dynamic> rec) async {
-    int id = con?._setNotification(rec);
-    if(id > -1) rec['alarmId'] = id;
-    bool save = await _model.save(rec);
+    final int id = con?._setNotification(rec);
+    if (id > -1) {
+      rec['alarmId'] = id;
+    }
+    final bool save = await _model.save(rec);
     if (!save) {
       con?._cancelNotification(id);
     }
@@ -425,14 +438,14 @@ class ToDoEdit extends DataFields {
 
   @override
   Future<bool> delete(Map<String, dynamic> rec) async {
-    bool delete = await _model.delete(rec);
+    final bool delete = await _model.delete(rec);
     await con?.data?.query();
     return delete;
   }
 
   @override
   Future<bool> undo(Map<String, dynamic> rec) async {
-    bool undo = await _model.unDelete(rec);
+    final bool undo = await _model.unDelete(rec);
     await con?.data?.query();
     return undo;
   }

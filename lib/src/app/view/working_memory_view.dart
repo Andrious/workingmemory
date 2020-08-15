@@ -50,8 +50,8 @@ class WorkingView extends AppView {
   static final WorkingController _app = WorkingController();
   String idKey;
 
-  @override
-  ThemeData onTheme() => ThemeData(
-        primaryColor: App.color,
-      );
+//  @override
+//  ThemeData onTheme() => ThemeData(
+//        primaryColor: App.color,
+//      );
 }

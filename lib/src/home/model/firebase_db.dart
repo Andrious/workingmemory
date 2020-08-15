@@ -32,12 +32,12 @@ import 'package:flutter/widgets.dart' show AppLifecycleState;
 
 class FireBaseDB {
   factory FireBaseDB({
-    void once(DataSnapshot data),
-    void onChildAdded(Event event),
-    void onChildRemoved(Event event),
-    void onChildChanged(Event event),
-    void onChildMoved(Event event),
-    void onValue(Event event),
+    void Function(DataSnapshot data) once,
+    void Function(Event event) onChildAdded,
+    void Function(Event event) onChildRemoved,
+    void Function(Event event) onChildChanged,
+    void Function(Event event) onChildMoved,
+    void Function(Event event) onValue,
   }) =>
       _this ??= FireBaseDB._(
         once,
@@ -73,7 +73,7 @@ class FireBaseDB {
 
   static bool mShowDeleted = false;
 
-  String _keyFld = "KeyFld";
+  final String _keyFld = 'KeyFld';
   String get key => _keyFld;
 
   DatabaseReference reference() => _reference;
@@ -82,25 +82,25 @@ class FireBaseDB {
     bool save;
 
     if (itemToDo.isEmpty) {
-      String key = await insertRec(itemToDo);
+      final String key = await insertRec(itemToDo);
 
       itemToDo['key'] = key;
 
       save = key.isNotEmpty;
     } else {
-      var key = await updateRec(itemToDo);
+      final key = await updateRec(itemToDo);
 
       save = key.isNotEmpty;
     }
 
     if (save) {
-      Semaphore.write();
+      await Semaphore.write();
     }
     return save;
   }
 
   Future<String> insertRec(Map<String, dynamic> itemToDo) async {
-    String key = "";
+    String key = '';
 
     DatabaseReference dbRef;
 
@@ -113,36 +113,38 @@ class FireBaseDB {
 
       await dbRef.update(itemToDo);
     } catch (ex) {
-      key = "";
+      key = '';
     }
     return key;
   }
 
-  Future<String> updateRec(Map rec) async {
-    String key = "";
+  Future<String> updateRec(Map<String, dynamic> rec) async {
+    String key = '';
 
-    if (!rec.containsKey(_keyFld)) return key;
+    if (!rec.containsKey(_keyFld)) {
+      return key;
+    }
 
-    var foxRec = Map.from(rec);
+    final foxRec = Map.from(rec);
 
     key = foxRec[_keyFld];
 
     foxRec.remove(_keyFld);
 
     try {
-      DatabaseReference dbRef = tasksRef;
+      final DatabaseReference dbRef = tasksRef;
 
       if (key == null || key.isEmpty) {
         key = dbRef.push().key;
         rec[_keyFld] = key;
       }
 
-      await dbRef.update({key: foxRec}).catchError((ex) {
-        key = "";
+      await dbRef.update({key: foxRec}).catchError((Exception ex) {
+        key = '';
         _db?.setError(ex);
       });
     } catch (ex) {
-      key = "";
+      key = '';
       _db?.setError(ex);
     }
 
@@ -159,10 +161,10 @@ class FireBaseDB {
       id = id.trim();
     }
 
-    DatabaseReference ref = reference().child("users");
+    DatabaseReference ref = reference().child('users');
 
     if (id == null) {
-      ref = ref.child("dummy");
+      ref = ref.child('dummy');
     } else {
       ref = ref.child(id);
     }
@@ -185,9 +187,9 @@ class FireBaseDB {
 
     if (id == null) {
       // Important to provide a reference that is not likely there in case called by deletion routine.
-      ref = reference().child("devices").child("dummy");
+      ref = reference().child('devices').child('dummy');
     } else {
-      ref = reference().child("devices").child(id);
+      ref = reference().child('devices').child(id);
     }
     return ref;
   }
@@ -196,12 +198,12 @@ class FireBaseDB {
     DatabaseReference ref;
 
     // infinite loop if instantiated in constructor.
-    String id = WorkingController().uid;
+    final String id = WorkingController().uid;
 
     if (id.isEmpty) {
-      ref = _db?.reference()?.child("tasks")?.child("dummy");
+      ref = _db?.reference()?.child('tasks')?.child('dummy');
     } else {
-      ref = _db?.reference()?.child("tasks")?.child(id);
+      ref = _db?.reference()?.child('tasks')?.child(id);
     }
     return ref;
   }
@@ -211,7 +213,7 @@ class FireBaseDB {
       return true;
     }
 
-    Query queryRef = tasksRef.orderByKey();
+    final Query queryRef = tasksRef.orderByKey();
 
     if (queryRef == null) {
       return false;
@@ -236,7 +238,9 @@ class FireBaseDB {
 
   Future<Map<String, dynamic>> records() async {
     // You have the recent data?
-    if (Semaphore.got()) return mDataArrayList;
+    if (Semaphore.got()) {
+      return mDataArrayList;
+    }
 
     DataSnapshot data;
 
@@ -248,7 +252,7 @@ class FireBaseDB {
     }
 
     if (data?.value == null || data?.value is! Map) {
-      mDataArrayList = Map();
+      mDataArrayList = {};
     } else {
       mDataArrayList = Map<String, dynamic>.from(data.value);
     }
@@ -256,13 +260,13 @@ class FireBaseDB {
   }
 
   Future<Map<String, dynamic>> record(String key) async {
-    Map<String, dynamic> fbRecs = await records();
+    final Map<String, dynamic> fbRecs = await records();
     Map<String, dynamic> rec;
     if (fbRecs[key] == null) {
-      rec = Map();
+      rec = {};
     } else {
       rec = Map<String, dynamic>.from(fbRecs[key]);
-      rec["KeyFld"] = key;
+      rec['KeyFld'] = key;
     }
     return rec;
   }
@@ -275,18 +279,18 @@ class FireBaseDB {
 
   static List<Map<String, String>> recArrayList(
       DataSnapshot data, bool showDeleted) {
-    List list = List<Map<String, String>>();
+    final List<Map<String, String>> list = [];
 
     if (data == null || data.value is! LinkedHashMap) {
       return list;
     }
 
-    LinkedHashMap recs = data.value;
+    final LinkedHashMap recs = data.value;
 
-    recs.map((rec, that) => new MapEntry(rec, that));
+    recs.map((rec, that) => MapEntry(rec, that));
 
     // This is awesome! No middle man!
-    Object fieldsObj = new Object();
+    final Object fieldsObj = Object();
 
     Map fldObj;
 
@@ -343,17 +347,21 @@ class FireBaseDB {
   }
 
   Future<bool> delete(final String key) async {
-    if (key == null || key.isEmpty) return false;
+    if (key == null || key.isEmpty) {
+      return false;
+    }
     final online = await _db.isOnline();
-    if (!online) return false;
+    if (!online) {
+      return false;
+    }
     bool delete;
     try {
-      DatabaseReference rec = tasksRef.child(key);
+      final DatabaseReference rec = tasksRef.child(key);
       // Delete that record
-      rec.set(null);
+      await rec.set(null);
       delete = true;
       // Retain the semaphore.
-      Semaphore.write();
+      await Semaphore.write();
     } catch (ex) {
       delete = false;
     }
@@ -373,14 +381,14 @@ class FireBaseDB {
 
   bool userStamp() {
     bool stamp = true;
-    WorkingController con = WorkingController();
+    final WorkingController con = WorkingController();
     try {
-      DatabaseReference dbRef = userRef.child("profile");
-      dbRef.child("name").set(con.name);
-      dbRef.child("isAnonymous").set(con.isAnonymous);
-      dbRef.child("provider").set(con.provider);
-      dbRef.child("new user").set(con.isNewUser);
-      dbRef.child("photo").set(con.photo);
+      final DatabaseReference dbRef = userRef.child('profile');
+      dbRef.child('name').set(con.name);
+      dbRef.child('isAnonymous').set(con.isAnonymous);
+      dbRef.child('provider').set(con.provider);
+      dbRef.child('new user').set(con.isNewUser);
+      dbRef.child('photo').set(con.photo);
     } catch (ex) {
       stamp = false;
       con.getError(ex);

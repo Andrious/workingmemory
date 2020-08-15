@@ -199,7 +199,7 @@ class DataSync {
   void init() {}
 
   //todo What to do about this mess.
-  static Model _model = Controller().model;
+  static final Model _model = Controller().model;
 
   Future<void> timeStampDevice() => devRef.set(timeStamp);
 
@@ -207,7 +207,7 @@ class DataSync {
   DatabaseReference _devRef;
 
   // Set the timeStamp this program was last run.
-  static int get timeStamp => (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+  static int get timeStamp => DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
   @override
   bool operator ==(Object other) =>
@@ -218,7 +218,7 @@ class DataSync {
   int get hashCode => 0;
 
   Future<DatabaseReference> getSyncRef() async {
-    DatabaseReference ref = await yourSyncRef();
+    final DatabaseReference ref = await yourSyncRef();
     return ref.child(App.installNum);
   }
 
@@ -241,9 +241,9 @@ class DataSync {
 
     if (id == null) {
       // Important to give a reference that's not  there in case called by deletion routine.
-      ref = _fireDB.reference().child("sync").child("dummy");
+      ref = _fireDB.reference().child('sync').child('dummy');
     } else {
-      ref = _fireDB.reference().child("sync").child(id);
+      ref = _fireDB.reference().child('sync').child(id);
     }
     return ref;
   }
@@ -255,50 +255,54 @@ class DataSync {
     //
     final online = await isOnline();
 
-    if (!online) return;
+    if (!online) {
+      return;
+    }
 
     final DatabaseReference syncRef = await getSyncRef();
 
-    final DataSnapshot syncINRef = await syncRef.child("IN").once();
+    final DataSnapshot syncINRef = await syncRef.child('IN').once();
 
-    if (syncINRef.value == null || syncINRef.value is! Map) return;
+    if (syncINRef.value == null || syncINRef.value is! Map) {
+      return;
+    }
 
     bool synced;
     syncINRef.value.forEach((k, v) async {
       synced = false;
 
-      var key = v["key"];
+      final key = v['key'];
 
-      var action = v["action"];
+      final action = v['action'];
 
-      var timestamp = v["timestamp"];
+      final timestamp = v['timestamp'];
 
-      List<Map<String, dynamic>> offlineRecs = await cloud.getRec(key);
+      final List<Map<String, dynamic>> offlineRecs = await cloud.getRec(key);
 
       // Maybe device was offline and made changes locally to the same record.
       if (offlineRecs.isNotEmpty) {
         //
-        Map<String, dynamic> rec = offlineRecs[0];
+        final Map<String, dynamic> rec = offlineRecs[0];
 
         // If the local is more up to date
-        if (timestamp < rec["timestamp"]) {
+        if (timestamp < rec['timestamp']) {
           synced = true;
 
           // The remote change is more recent.
         } else {
           // Delete the local sync entry. It's old.
-          _model.deleteRec(key);
+          await _model.deleteRec(key);
         }
 
         if (!synced) {
           //
-          List<Map<String, dynamic>> local = await _model.getRecord(key);
+          final List<Map<String, dynamic>> local = await _model.getRecord(key);
 
-          LinkedHashMap<String, dynamic> cloud = await _fireDB.records();
+          final LinkedHashMap<String, dynamic> cloud = await _fireDB.records();
 
           // Add to the local device.
-          if (local.length == 0) {
-            if (action == "DELETE") {
+          if (local.isEmpty) {
+            if (action == 'DELETE') {
               // It's been deleted and not to be added anyway.
               synced = true;
             } else {
@@ -306,8 +310,8 @@ class DataSync {
             }
             // Update the appropriate database with the most recent copy.
           } else {
-            if (action == "DELETE") {
-              if (cloud.length == 0) {
+            if (action == 'DELETE') {
+              if (cloud.isEmpty) {
                 //It has been deleted already
                 synced = true;
               } else {
@@ -324,14 +328,14 @@ class DataSync {
 
       if (!synced) {
         //  Get the online copy of the record.
-        Map<String, dynamic> cloudRec = await _fireDB.record(key);
+        final Map<String, dynamic> cloudRec = await _fireDB.record(key);
 
         // Get a local copy of the record.
-        Map<String, dynamic> localRec = await Model().recordByKey(key);
+        final Map<String, dynamic> localRec = await Model().recordByKey(key);
 
         // Add to the local device.
         if (localRec.isEmpty) {
-          if (action == "DELETE") {
+          if (action == 'DELETE') {
             // It's been deleted and not to be added anyway.
             synced = true;
           } else {
@@ -340,7 +344,7 @@ class DataSync {
 
           // Update the appropriate database with the most recent copy.
         } else {
-          if (action == "DELETE") {
+          if (action == 'DELETE') {
             if (cloudRec.isEmpty) {
               // It has been deleted already
               synced = true;
@@ -356,18 +360,18 @@ class DataSync {
       }
 
       if (synced) {
-        DatabaseReference dbRef = syncRef.child("IN").child(k);
+        final DatabaseReference dbRef = syncRef.child('IN').child(k);
 
         // Delete that record
-        dbRef.set(null);
+        await dbRef.set(null);
       }
     });
   }
 
-  void reSync() async {
-    Map<String, dynamic> recs = await _fireDB.records();
+  Future<void> reSync() async {
+    final Map<String, dynamic> recs = await _fireDB.records();
     recs.forEach((key, value) {
-      insert(key, "UPDATE");
+      insert(key, 'UPDATE');
     });
   }
 
@@ -380,9 +384,9 @@ class DataSync {
     }
     bool insert;
     try {
-      timeStampDevice();
+      await timeStampDevice();
       await replace(
-          key, {"key": key, "action": action, "timestamp": timeStamp});
+          key, {'key': key, 'action': action, 'timestamp': timeStamp});
       insert = true;
     } catch (ex) {
       insert = false;
@@ -412,32 +416,39 @@ class DataSync {
 
     DataSnapshot snapshot = await syncRef.once();
 
-    if (snapshot.value == null || snapshot.value is! Map) return false;
+    if (snapshot.value == null || snapshot.value is! Map) {
+      return false;
+    }
 
     // Retrieve all your devices.
-    DatabaseReference dRef = _fireDB.yourDevicesRef;
+    final DatabaseReference dRef = _fireDB.yourDevicesRef;
 
     snapshot = await dRef.once();
 
-    if (snapshot.value == null || snapshot.value is! Map) return false;
+    if (snapshot.value == null || snapshot.value is! Map) {
+      return false;
+    }
 
-    Map<String, dynamic> data = Map.from(snapshot.value);
-
+    final Map<String, dynamic> data = Map.from(snapshot.value)
     // Remove the device you're current on.
-    data.removeWhere((key, value) => key == App.installNum);
+    ..removeWhere((key, value) => key == App.installNum);
 
-    bool replace = data.isNotEmpty;
+    final bool replace = data.isNotEmpty;
     String key;
 
     // Iterate through your devices and log the change.
-    Iterator<dynamic> it = data.entries.iterator;
+    final Iterator<dynamic> it = data.entries.iterator;
 
     while (it.moveNext()) {
-      if (it.current.value == null || it.current.value is! int) continue;
-      if (it.current.key is! String) continue;
+      if (it.current.value == null || it.current.value is! int) {
+        continue;
+      }
+      if (it.current.key is! String) {
+        continue;
+      }
       // Remove devices that are more than a year old.
-      DateTime timeStamp = Semaphore.getDateTime(it.current.value);
-      int daysOld = DateTime.now().difference(timeStamp).inDays;
+      final DateTime timeStamp = Semaphore.getDateTime(it.current.value);
+      final int daysOld = DateTime.now().difference(timeStamp).inDays;
       if (daysOld > 365) {
         try {
           // Delete that record
@@ -450,15 +461,17 @@ class DataSync {
         continue;
       }
       // Go through the sync entries.
-      DatabaseReference ref = syncRef.child(it.current.key);
+      final DatabaseReference ref = syncRef.child(it.current.key);
       snapshot = await dRef.once();
-      if (snapshot.value == null || snapshot.value is! Map) continue;
-      // Is there already a sync record.
-      snapshot = await ref.child("IN").orderByChild("key").equalTo(key).once();
       if (snapshot.value == null || snapshot.value is! Map) {
-        key = await insertRef(ref.child("IN"), recValues);
+        continue;
+      }
+      // Is there already a sync record.
+      snapshot = await ref.child('IN').orderByChild('key').equalTo(key).once();
+      if (snapshot.value == null || snapshot.value is! Map) {
+        key = await insertRef(ref.child('IN'), recValues);
       } else {
-        Map<String, dynamic> data = snapshot.value;
+        final Map<String, dynamic> data = snapshot.value;
         data.forEach((k, v) {
           syncRef.child("IN").child(k).update({k: recValues});
         });
@@ -474,7 +487,7 @@ class DataSync {
       key = dbRef.push().key;
       await dbRef.update({key: recValues});
     } catch (ex) {
-      key = "";
+      key = '';
     }
     return key;
   }
