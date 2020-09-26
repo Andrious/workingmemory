@@ -18,44 +18,50 @@
 import 'package:workingmemory/src/model.dart';
 
 class SyncDB extends SQLiteDB {
+  factory SyncDB() => _this ??= SyncDB._();
+  SyncDB._(): super();
+  static SyncDB _this;
+
   final String _table = 'sync';
 
   final int _version = 1;
 
+  @override
   String get name => _table;
 
+  @override
   int get version => _version;
 
   bool get isOpen => _open;
   bool _open = false;
 
   @override
-  Future onCreate(Database db, int version) {
-    return db.execute("""
+  Future<void> onCreate(Database db, int version) {
+    return db.execute('''
        CREATE TABLE IF NOT EXISTS $_table(
        id Long, 
        key VARCHAR, 
        action VARCHAR, 
        timestamp INTEGER)
-    """);
+    ''');
   }
 
   @override
-  Future onOpen(Database db) {
+  Future<void> onOpen(Database db) {
     _open = true;
     return super.onOpen(db);
   }
 
   Future<int> getRowID(int recId) async {
-    List<Map<String, dynamic>> recs = await rawQuery(
-        "SELECT id FROM $_table WHERE id = $recId ORDER BY id DESC LIMIT 1");
+    final List<Map<String, dynamic>> recs = await rawQuery(
+        'SELECT id FROM $_table WHERE id = $recId ORDER BY id DESC LIMIT 1');
 
     int rowID;
 
     if (recs.isEmpty) {
       rowID = 0;
     } else {
-      rowID = recs[0]["id"];
+      rowID = recs[0]['id'];
     }
     return rowID;
   }
@@ -63,15 +69,19 @@ class SyncDB extends SQLiteDB {
   Future<int> update(Map<String, dynamic> recValues) async {
     int result = 0;
 
-    int id = recValues["id"];
+    final id = recValues['id'];
 
-    if (id == null || id <= 0) return result;
+    if (id == null || id <= 0) {
+      return result;
+    }
 
-    String key = recValues["key"];
+    final key = recValues['key'];
 
-    if (key == null || key.trim().isEmpty) return result;
+    if (key == null || key.trim().isEmpty) {
+      return result;
+    }
 
-    Map<String, dynamic> recs = await updateRec(_table, recValues);
+    final Map<String, dynamic> recs = await updateRec(_table, recValues);
 
     if (recs.isEmpty) {
       result = 0;
@@ -84,7 +94,7 @@ class SyncDB extends SQLiteDB {
   Future<int> insert(Map<String, dynamic> recValues) async {
     int result;
 
-    Map<String, dynamic> recs = await updateRec(_table, recValues);
+    final Map<String, dynamic> recs = await updateRec(_table, recValues);
 
     if (recs.isEmpty) {
       result = 0;

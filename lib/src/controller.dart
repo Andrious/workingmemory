@@ -18,7 +18,14 @@
 ///           import 'package:workingmemory/working_memory_app.dart';
 
 export 'package:mvc_application/controller.dart'
-    show App, AppController, AppDrawer, ControllerMVC, ScheduleNotifications
+    show
+        App,
+        AppController,
+        AppDrawer,
+        ControllerMVC,
+        ScheduleNotifications,
+        RawResourceAndroidNotificationSound,
+        DrawableResourceAndroidBitmap
     hide runApp;
 
 export 'package:mvc_application/settings.dart' show AppSettings, Prefs;

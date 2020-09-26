@@ -66,7 +66,7 @@ class TodosAndroid extends StateMVC<TodosPage> {
     // Rebuilt the menu if state changes.
     _menu = WorkMenu();
     return Scaffold(
-      drawer: SettingsDrawer(),
+      drawer: const SettingsDrawer(),
       appBar: AppBar(
         title: const Text('My ToDos'),
         actions: <Widget>[
@@ -74,7 +74,6 @@ class TodosAndroid extends StateMVC<TodosPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        foregroundColor: Theme.of(context).primaryColor,
         onPressed: editToDo,
         child: const Icon(
           Icons.add,

@@ -16,14 +16,12 @@
 ///          Created  23 Jun 2018
 ///
 
-import 'dart:async' show Future;
-
-import 'package:workingmemory/src/controller.dart' show App, WorkingController;
+import 'dart:async' show Future, FutureOr;
 
 import 'package:workingmemory/src/model.dart'
     show CloudDB, Database, FireBaseDB, Settings, SQLiteDB;
 
-import 'package:workingmemory/src/view.dart' show FieldWidgets;
+import 'package:workingmemory/src/view.dart' show FieldWidgets, unawaited;
 
 class Model {
   factory Model() => _this ??= Model._();
@@ -98,9 +96,8 @@ class Model {
     }
     // Save to Firebase
     if (save) {
-      save = await saveFirebase(newRec);
+      unawaited(saveFirebase(newRec));
     }
-
     return save;
   }
 
@@ -180,7 +177,7 @@ class Model {
       _tToDo.getRecord(ToDo.TABLE_NAME, int.parse(id));
 
   Future<bool> delete(Map<String, dynamic> data) async {
-    final Map newRec = _tToDo.newRecord(data);
+    final Map<String, dynamic> newRec = _tToDo.newRecord(data);
 
     newRec['deleted'] = 1;
 
@@ -250,13 +247,20 @@ class Model {
     final List<Map<String, dynamic>> newFBRecs = [];
 
     final Set<String> keys = {};
-    records.forEach((Map<String, dynamic> rec) {
+//    records.forEach((Map<String, dynamic> rec) {
+//      if (rec[fbKeyField] != null) {
+//        keys.add(rec[fbKeyField]);
+//      } else {
+//        newFBRecs.add(rec);
+//      }
+//    });
+    for (final Map<String, dynamic> rec in records) {
       if (rec[fbKeyField] != null) {
         keys.add(rec[fbKeyField]);
       } else {
         newFBRecs.add(rec);
       }
-    });
+    }
 
     final Map<dynamic, dynamic> fireDB = await _fbDB.records();
 
@@ -282,12 +286,17 @@ class Model {
         dump = true;
       }
     }
+//    records.forEach((Map<String, dynamic> rec) async {
+//      if (rec[fbKeyField] == null || rec[fbKeyField] == '') {
+//        await saveFirebase(rec);
+//      }
+//    });
     // Add local records to Firebase
-    records.forEach((Map<String, dynamic> rec) async {
+    for (final Map<String, dynamic> rec in records) {
       if (rec[fbKeyField] == null || rec[fbKeyField] == '') {
         await saveFirebase(rec);
       }
-    });
+    }
     return dump;
   }
 
@@ -305,7 +314,7 @@ class Item extends FieldWidgets {
   Item([Map rec]) : super(object: rec, label: 'Item', value: rec['Item']);
 
   @override
-  void onSaved(v) => object['Item'] = value = v;
+  void onSaved(dynamic v) => object['Item'] = value = v;
 
   @override
   String onValidator(String v) {
@@ -326,10 +335,11 @@ class Datetime extends FieldWidgets {
 }
 
 class Icon extends FieldWidgets {
-  Icon([Map rec]) : super(object: rec, label: 'Icon', value: rec['Icon']);
+  Icon([Map<String, dynamic> rec])
+      : super(object: rec, label: 'Icon', value: rec['Icon']);
 
   @override
-  void onSaved(v) => object['Icon'] = value = v;
+  void onSaved(dynamic v) => object['Icon'] = value = v;
 }
 
 class ToDo extends SQLiteDB {

@@ -27,16 +27,17 @@ import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart';
 
+import 'package:workingmemory/src/app/controller/notifications.dart';
+
 final ThemeData theme = App.themeData;
 
 class Controller extends ControllerMVC {
   factory Controller() => _this ??= Controller._();
-  static Controller _this;
-
   Controller._() : super() {
     _model = m.Model();
     _dataFields = ToDoEdit(this);
   }
+  static Controller _this;
 
   // External access to the Model component.
   m.Model get model => _model;
@@ -62,10 +63,15 @@ class Controller extends ControllerMVC {
   Future<bool> initAsync() async {
     final bool init = await _model.initAsync();
     final List<Map<String, dynamic>> records = await data.query();
-    _setupNotifications();
-    setAlarms(records);
+    unawaited(setAlarms(records));
     _favIcons = await _model.listIcons();
     return init;
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    _notifications = FlutterNotifications(state?.context);
   }
 
   FormState formState;
@@ -95,6 +101,7 @@ class Controller extends ControllerMVC {
   @override
   void dispose() {
     _model.dispose();
+    _notifications.dispose();
     super.dispose();
   }
 
@@ -102,7 +109,7 @@ class Controller extends ControllerMVC {
 //    app.signIn();
     await signOut();
     await Navigator.push(
-        context, MaterialPageRoute<void>(builder: (context) => const SignIn()));
+        state.context, MaterialPageRoute<void>(builder: (context) => const SignIn()));
 //   refresh();
   }
 
@@ -166,7 +173,7 @@ class Controller extends ControllerMVC {
     final DateTime threshold = DateTime.now();
     bool oneShot;
     while (it.moveNext()) {
-      int id = it.current['rowid'];
+      final int id = it.current['rowid'];
       if (id == null) {
         continue;
       }
@@ -206,38 +213,33 @@ class Controller extends ControllerMVC {
 
   static List<Map<String, dynamic>> recs;
 
-  void _setupNotifications() {
-    notifications = ScheduleNotifications(
-      runtimeType.toString(),
-      'Working Memory Channel',
-      'The Working Memory app sets Notifications',
-    )
-    ..init(onSelectNotification: (String payload) async {
-      if (payload == null || payload.trim().isEmpty) {
-        return null;
-      }
-//      await Navigator.push(
-//        context,
-//        MaterialPageRoute(builder: (context) => SecondScreen(payload)),
-//      );
-      return;
-    });
-
-    notifications.getNotificationAppLaunchDetails().then((details) {});
-  }
-
-  ScheduleNotifications notifications;
+//  ScheduleNotifications notifications;
+  FlutterNotifications _notifications;
 
   /// Establish any notifications indicated in the record.
-  int _setNotification(Map<String, dynamic> rec) {
+  Future<int> _setNotification(Map<String, dynamic> rec) async {
     int id = -1;
     final DateTime time = rec['DateTime'];
     if (time != null) {
-      id = notifications.schedule(
-        time,
-        title: rec['Item'],
-        body: 'WorkingMemory',
-      );
+//      final vibrationPattern = Int64List(4);
+//      vibrationPattern[0] = 0;
+//      vibrationPattern[1] = 1000;
+//      vibrationPattern[2] = 5000;
+//      vibrationPattern[3] = 2000;
+//
+//      id = notifications.schedule(
+//        time,
+//        title: rec['Item'],
+//        body: 'WorkingMemory',
+//        sound: const RawResourceAndroidNotificationSound('slow_spring_board'),
+//        largeIcon: const DrawableResourceAndroidBitmap('sample_large_icon'),
+//          vibrationPattern: vibrationPattern,
+//          enableLights: true,
+//          color: const Color.fromARGB(255, 255, 0, 0),
+//          ledColor: const Color.fromARGB(255, 255, 0, 0),
+//          ledOnMs: 1000,
+//          ledOffMs: 500,);
+      id = await _notifications.set(time, rec['Item'], 'WorkingMemory');
       id ??= -1;
     }
     return id;
@@ -246,7 +248,7 @@ class Controller extends ControllerMVC {
   bool _cancelNotification(int id) {
     final bool cancel = id != null && id > -1;
     if (cancel) {
-      notifications.cancel(id);
+      _notifications.cancel(id);
     }
     return cancel;
   }
@@ -425,9 +427,9 @@ class ToDoEdit extends DataFields {
 
   @override
   Future<bool> save(Map<String, dynamic> rec) async {
-    final int id = con?._setNotification(rec);
+    final int id = await con?._setNotification(rec);
     if (id > -1) {
-      rec['alarmId'] = id;
+      rec['AlarmId'] = id;
     }
     final bool save = await _model.save(rec);
     if (!save) {

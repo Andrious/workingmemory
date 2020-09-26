@@ -28,109 +28,124 @@ import 'package:workingmemory/src/controller.dart';
 class SignIn extends StatefulWidget {
   const SignIn({Key key}) : super(key: key);
   @override
-  State createState() => SignInState();
+  State createState() => _SignInState();
 }
 
-class SignInState extends StateMVC<SignIn> {
-  SignInState() : super() {
+class _SignInState extends StateMVC<SignIn> {
+  _SignInState() : super() {
     app = WorkingController();
   }
   WorkingController app;
+  Widget working = Container();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 10, right: 40),
-          child: GestureDetector(
-            onTap: () async {
-              final bool signIn = await app.signInWithFacebook();
-              if (signIn) {
-                Navigator.pop(context);
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.all(15),
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-              ),
-              child: const Icon(
-                FontAwesomeIcons.facebook,
-                //                 color: Color(0xFF0084ff),
-              ),
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 10, right: 40),
-          child: GestureDetector(
-            onTap: () async {
-              final bool signIn = await app.signInWithTwitter();
-              if (signIn) {
-                Navigator.pop(context);
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.all(15),
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-              ),
-              child: const Icon(
-                FontAwesomeIcons.twitter,
-                //                 color: Color(0xFF0084ff),
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 10, right: 40),
+            child: GestureDetector(
+              onTap: () async {
+                _working();
+                final bool signIn = await app.signInWithFacebook();
+                if (signIn) {
+                  Navigator.pop(context);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                child: const Icon(
+                  FontAwesomeIcons.facebook,
+                  //                 color: Color(0xFF0084ff),
+                ),
               ),
             ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 10, right: 40),
-          child: GestureDetector(
-            onTap: () async {
-              final bool signIn = await app.signInEmailPassword(context);
-              if (signIn) {
-                Navigator.pop(context);
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.all(15),
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
+          Padding(
+            padding: const EdgeInsets.only(top: 10, right: 40),
+            child: GestureDetector(
+              onTap: () async {
+                _working();
+                final bool signIn = await app.signInWithTwitter();
+                if (signIn) {
+                  Navigator.pop(context);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                child: const Icon(
+                  FontAwesomeIcons.twitter,
+                  //                 color: Color(0xFF0084ff),
+                ),
               ),
-              child: const Icon(
-                FontAwesomeIcons.envelope,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 10, right: 40),
+            child: GestureDetector(
+              onTap: () async {
+                _working();
+                final bool signIn = await app.signInEmailPassword(context);
+                if (signIn) {
+                  Navigator.pop(context);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                child: const Icon(
+                  FontAwesomeIcons.envelope,
 //                  color: Color(0xFF0084ff),
+                ),
               ),
             ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: GestureDetector(
-            onTap: () async {
-              final bool signIn = await app.signInWithGoogle();
-              if (signIn) {
-                Navigator.pop(context);
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.all(15),
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-              ),
-              child: const Icon(
-                FontAwesomeIcons.google,
-                //                 color: Color(0xFF0084ff),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: GestureDetector(
+              onTap: () async {
+                _working();
+                final bool signIn = await app.signInWithGoogle();
+                if (signIn) {
+                  Navigator.pop(context);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                child: const Icon(
+                  FontAwesomeIcons.google,
+                  //                 color: Color(0xFF0084ff),
+                ),
               ),
             ),
           ),
-        ),
-      ],
-    );
+        ],
+      ),
+      working,
+    ]);
+  }
+
+  void _working() {
+    working = App.useMaterial
+        ? const Center(child: CircularProgressIndicator())
+        : const Center(child: CupertinoActivityIndicator());
+    setState(() {});
   }
 }

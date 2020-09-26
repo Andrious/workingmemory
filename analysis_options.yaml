@@ -1,11 +1,12 @@
-#include: package:pedantic/analysis_options.yaml
+# Article: https://medium.com/podiihq/setting-up-lint-rules-in-dart-flutter-1ebbed0418a6
+
+# include: package:pedantic/analysis_options.yaml
 
 #          OR
 
 # Strict Flutter lint Rules
 # List of all rules: https://dart-lang.github.io/linter/lints/ for lint rules documentation
 # Update from http://dart-lang.github.io/linter/lints/options/options.html
-
 analyzer:
   errors:
     missing_required_param: error
@@ -64,7 +65,7 @@ linter:
     - camel_case_extensions
     - camel_case_types
     - cancel_subscriptions
-    - cascade_invocations
+    #- cascade_invocations
     - close_sinks
     - comment_references
     # - constant_identifier_names # we are using those all around

@@ -43,7 +43,7 @@ class TodoAndroid extends StateMVC<TodoPage> {
           onPressed: () async {
             final bool save = await _con.data.onPressed();
             if (save) {
-              Navigator.pop(context);
+              Navigator.of(context, rootNavigator: true).pop();
             } else {
               Scaffold.of(context).showSnackBar(const SnackBar(
                 content: Text('There is an error.'),

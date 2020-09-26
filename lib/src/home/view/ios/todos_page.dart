@@ -63,7 +63,7 @@ class TodosiOS extends StateMVC<TodosPage> {
           trailing: CupertinoButton(
             padding: const EdgeInsets.all(10),
             onPressed: () {
-              editToDo(con.context);
+              editToDo(con?.state?.context);
             },
             child: const Text('New'),
           ),

@@ -19,7 +19,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:workingmemory/src/view.dart' show Menu;
+import 'package:workingmemory/src/view.dart' show Menu, unawaited;
 
 import 'package:workingmemory/src/controller.dart' show Controller;
 
@@ -60,7 +60,7 @@ class WorkMenu extends Menu {
         _con.logOut();
         break;
       case 'SignIn':
-        _con.signIn();
+        unawaited(_con.signIn());
         break;
       default:
     }

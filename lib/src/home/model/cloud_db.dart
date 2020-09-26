@@ -99,7 +99,7 @@ class CloudDB {
   }
 
   Future<List<Map<String, dynamic>>> getRecs() =>
-      _dbHelper.rawQuery('SELECT * FROM ' + _dbName);
+      _dbHelper.rawQuery('SELECT * FROM $_dbName');
 
   Future<List<Map<String, dynamic>>> getRec(String key) async {
     List<Map<String, dynamic>> recs;

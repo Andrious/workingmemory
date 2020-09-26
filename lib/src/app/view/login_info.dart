@@ -42,7 +42,7 @@ class LoginInfo {
   Widget scaffold(AppView _vw) {
     return Scaffold(
         appBar: AppBar(title: const Text('My Home Page')),
-        endDrawer: AppDrawer(),
+        endDrawer: const AppDrawer(),
         body: body(_vw));
   }
 

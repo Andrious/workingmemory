@@ -30,12 +30,12 @@ class WorkingView extends AppView {
   factory WorkingView() => _this ??= WorkingView._();
   WorkingView._()
       : super(
-          con: _app,
+          con: WorkingController(), //_app,
           title: 'Working Memory',
           home: const TodosPage(),
           debugShowCheckedModeBanner: false,
         ) {
-    idKey = _app.keyId;
+//    idKey = _app.keyId;
   }
   static WorkingView _this;
 
@@ -46,9 +46,9 @@ class WorkingView extends AppView {
   /// Allow for easy access to 'the View' throughout the application.
   static WorkingView get view => _this;
 
-  /// Instantiate here so to get the 'keyId.'
-  static final WorkingController _app = WorkingController();
-  String idKey;
+//  /// Instantiate here so to get the 'keyId.'
+//  static final WorkingController _app = WorkingController();
+//  String idKey;
 
 //  @override
 //  ThemeData onTheme() => ThemeData(

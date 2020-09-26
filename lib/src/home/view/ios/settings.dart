@@ -100,7 +100,7 @@ class SettingsScreen extends StatelessWidget {
       item = SettingsItem(
           label: 'Sign In',
           onPress: () {
-            Navigator.of(con.context).push(
+            Navigator.of(con.state.context).push(
               CupertinoPageRoute<void>(
                 builder: (context) => SignIn(),
                 title: 'Preferred Categories',

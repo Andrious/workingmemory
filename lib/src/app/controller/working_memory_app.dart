@@ -58,13 +58,11 @@ void runApp(
 
 class WorkingController extends AppController {
   factory WorkingController() => _this ??= WorkingController._();
-//
-//  /// Allow for easy access to 'the Controller' throughout the application.
-//  static WorkingMemoryApp get con => _this;
+
   WorkingController._() {
     _auth = Auth(listener: _logInUser);
-    _con = Controller();
     _remoteConfig = RemoteConfig();
+    _con = Controller();
   }
   static WorkingController _this;
 
@@ -129,7 +127,7 @@ class WorkingController extends AppController {
       _loggedIn = await signInAnonymously();
     }
     if (_auth.isAnonymous) {
-      _auth.listener = _con.recordDump;
+      _auth.listener = _con?.recordDump;
     }
     return _loggedIn;
   }
@@ -164,7 +162,7 @@ class WorkingController extends AppController {
 
     if (!signIn) {
       final Exception ex = _auth.getError();
-      await showBox(text: ex.toString(), context: context);
+      await showBox(text: ex.toString(), context: _con?.state?.context);
     }
     return signIn;
   }
@@ -191,7 +189,7 @@ class WorkingController extends AppController {
     final bool signIn = await _auth.signInWithGoogle();
     if (!signIn) {
       final Exception ex = _auth.getError();
-      await showBox(text: ex.toString(), context: context);
+      await showBox(text: ex.toString(), context: _con?.state?.context);
     }
     await rebuild();
     return signIn;
@@ -205,8 +203,9 @@ class WorkingController extends AppController {
     _loggedIn = await _auth.isLoggedIn();
     _con.refresh();
     // Pops only if on the stack and not on the first screen.
-    if (_con.context != null) {
-      await Navigator.of(_con.context).maybePop();
+    final BuildContext context = _con?.state?.context;
+    if (context != null) {
+      await Navigator.of(context).maybePop();
     }
   }
 

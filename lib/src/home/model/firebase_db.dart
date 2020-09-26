@@ -49,12 +49,12 @@ class FireBaseDB {
       );
 
   FireBaseDB._(
-    var once,
-    var onChildAdded,
-    var onChildRemoved,
-    var onChildChanged,
-    var onChildMoved,
-    var onValue,
+    void Function(DataSnapshot data) once,
+    void Function(Event event) onChildAdded,
+    void Function(Event event) onChildRemoved,
+    void Function(Event event) onChildChanged,
+    void Function(Event event) onChildMoved,
+    void Function(Event event) onValue,
   ) {
     _db = f.FireBaseDB.init(
       once: once,
@@ -125,7 +125,7 @@ class FireBaseDB {
       return key;
     }
 
-    final foxRec = Map.from(rec);
+    final Map<String, dynamic> foxRec = Map.from(rec);
 
     key = foxRec[_keyFld];
 
@@ -139,7 +139,8 @@ class FireBaseDB {
         rec[_keyFld] = key;
       }
 
-      await dbRef.update({key: foxRec}).catchError((Exception ex) {
+      await dbRef
+          .update({key: foxRec}).catchError((Object ex, StackTrace stack) {
         key = '';
         _db?.setError(ex);
       });
@@ -244,11 +245,15 @@ class FireBaseDB {
 
     DataSnapshot data;
 
-    try {
-      data = await tasksRef.orderByKey().once();
-    } catch (ex) {
-      data = null;
-      _db?.setError(ex);
+    final online = await isOnline();
+
+    if (online) {
+      try {
+        data = await tasksRef.orderByKey().once();
+      } catch (ex) {
+        data = null;
+        _db?.setError(ex);
+      }
     }
 
     if (data?.value == null || data?.value is! Map) {

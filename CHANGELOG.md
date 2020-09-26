@@ -1,3 +1,7 @@
+## 1.3.0
+ September 25, 2020
+- flutter_local_notifications package was installed.
+ 
 ## 1.2.0
  August 14, 2020
 - Introduced analysis_options.yaml with strict Dart style guide.
