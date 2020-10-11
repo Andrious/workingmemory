@@ -20,6 +20,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:workingmemory/src/view.dart';
+
 import 'package:workingmemory/src/controller.dart' show App, AppSettings, Prefs;
 
 //TODO: Write an article on this. 'Store concept.'
@@ -95,15 +97,14 @@ class Settings {
               children: <TextSpan>[
                 TextSpan(
                     style: aboutTextStyle,
-                    text:
+                    text: I10n.s(
                         'This is an early-stage, open-source project demonstrating '
                         'the use of the MVC design pattern with Flutter and produce '
                         "a 'ToDo List' application that works in "
-                        '${AppSettings.defaultTargetPlatform == TargetPlatform.iOS ? 'multiple platforms' : 'iOS and Android'} '
-                        'from a single codebase.'),
+                        'multiple platforms from a single codebase.')),
                 TextSpan(
                   style: aboutTextStyle,
-                  text: '.\n\nThe source code is available on Github:',
+                  text: '\n\n${I10n.s('The source code is available on Github:')}',
                 ),
                 AppSettings.linkTextSpan(
                   style: linkStyle,

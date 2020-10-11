@@ -34,9 +34,12 @@ import 'package:package_info/package_info.dart' show PackageInfo;
 import 'package:workingmemory/src/controller.dart'
     show AppController, Controller;
 
-import 'package:auth/auth.dart' show Auth, FirebaseUser, GoogleSignInAccount;
+import 'package:auth/auth.dart' show Auth;
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+
+import 'package:i10n_translator/i10n.dart';
+
 
 void runApp(
   Widget app, {
@@ -73,6 +76,7 @@ class WorkingController extends AppController {
     await signIn();
     await _remoteConfig.initAsync();
     await _con.initAsync();
+    await I10n.initAsync();
     return true;
   }
 
@@ -94,6 +98,7 @@ class WorkingController extends AppController {
     _con.dispose();
     _auth?.dispose();
     _remoteConfig.dispose();
+    I10n.dispose();
     super.dispose();
   }
 

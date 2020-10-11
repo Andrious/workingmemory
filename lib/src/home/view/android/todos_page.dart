@@ -20,7 +20,6 @@
 import 'package:flutter/material.dart'
     show
         AppBar,
-        Axis,
         Border,
         BorderSide,
         BoxDecoration,
@@ -46,13 +45,12 @@ import 'package:flutter/material.dart'
         SnackBar,
         SnackBarAction,
         Text,
-        Theme,
         Widget;
 
-import 'package:workingmemory/src/view.dart'
-    show SettingsDrawer, StateMVC, TodoPage, TodosPage, WorkMenu;
+import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart' show App, Controller;
+
 
 class TodosAndroid extends StateMVC<TodosPage> {
   TodosAndroid() : super(Controller()) {
@@ -68,7 +66,7 @@ class TodosAndroid extends StateMVC<TodosPage> {
     return Scaffold(
       drawer: const SettingsDrawer(),
       appBar: AppBar(
-        title: const Text('My ToDos'),
+        title: I10n.t('My ToDos'),
         actions: <Widget>[
           _menu.show(this),
         ],
@@ -77,7 +75,6 @@ class TodosAndroid extends StateMVC<TodosPage> {
         onPressed: editToDo,
         child: const Icon(
           Icons.add,
-          semanticLabel: 'Add',
         ),
       ),
       body: SafeArea(
@@ -94,7 +91,7 @@ class TodosAndroid extends StateMVC<TodosPage> {
                       Scaffold.of(context).showSnackBar(SnackBar(
                           content: const Text('You deleted an item.'),
                           action: SnackBarAction(
-                              label: 'UNDO',
+                              label: I10n.s('UNDO'),
                               onPressed: () {
                                 _con.data.undo(_con.data.items[index]);
                               })));
@@ -132,7 +129,7 @@ class TodosAndroid extends StateMVC<TodosPage> {
 
   Future<void> editToDo([Map todo]) async {
     final Route<Map<String, dynamic>> route = MaterialPageRoute(
-      settings: const RouteSettings(name:'/todos/todo'),
+      settings: const RouteSettings(name: '/todos/todo'),
       builder: (BuildContext context) => TodoPage(todo: todo),
       fullscreenDialog: true,
     );

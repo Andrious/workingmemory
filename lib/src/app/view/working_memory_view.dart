@@ -18,30 +18,71 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:mvc_application/view.dart' show AppView;
+import 'package:workingmemory/src/controller.dart' show WorkingController;
 
-import 'package:workingmemory/src/controller.dart' show App, WorkingController;
-
-import 'package:workingmemory/src/view.dart' show App, AppView, TodosPage;
+import 'package:workingmemory/src/view.dart'
+    show AppView, Prefs, I10n, I10nDelegate, TodosPage;
 
 //import 'package:workingmemory/src/view/LoginInfo.dart' show LoginInfo;
 
+import 'package:flutter_localizations/flutter_localizations.dart'
+    show
+        GlobalCupertinoLocalizations,
+        GlobalMaterialLocalizations,
+        GlobalWidgetsLocalizations;
+
+/// The 'View' of the application.
 class WorkingView extends AppView {
   factory WorkingView() => _this ??= WorkingView._();
   WorkingView._()
       : super(
           con: WorkingController(), //_app,
           title: 'Working Memory',
-          home: const TodosPage(),
+          home: TodosPage(key: pageKey),
           debugShowCheckedModeBanner: false,
+          switchUI: Prefs.getBool('switchUI'),
+          localizationsDelegates: [
+            I10nDelegate(),
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+          ],
+          localeListResolutionCallback:
+              (List<Locale> locales, Iterable<Locale> supportedLocales) {
+            final pref = Prefs.getString('locale');
+            final locale = pref.split('-');
+            return pref.isEmpty
+                ? locales?.first
+                : locale.length == 1
+                    ? Locale(locale[0])
+                    : Locale(locale[0], locale[1]);
+          },
         ) {
 //    idKey = _app.keyId;
   }
   static WorkingView _this;
+  static Key pageKey = UniqueKey();
 
   /// Conceivably, you could define your own WidgetsApp.
   @override
   Widget buildApp(BuildContext context) => super.buildApp(context);
+
+  @override
+  Locale onLocale() {
+    final List<String> locale = Prefs.getString('locale', 'en').split('-');
+    String languageCode;
+    String countryCode;
+    if (locale.length == 2) {
+      languageCode = locale.first;
+      countryCode = locale.last;
+    } else {
+      languageCode = locale.first;
+    }
+    return Locale(languageCode, countryCode);
+  }
+
+  @override
+  Iterable<Locale> onSupportedLocales() => I10n.supportedLocales;
 
   /// Allow for easy access to 'the View' throughout the application.
   static WorkingView get view => _this;

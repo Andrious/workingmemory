@@ -105,7 +105,7 @@ class FlutterNotifications {
     });
 
     final initializationSettings = InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
+         android: initializationSettingsAndroid,  iOS: initializationSettingsIOS);
 
     _flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: (String payload) async {
@@ -175,7 +175,7 @@ class FlutterNotifications {
         IOSNotificationDetails(sound: 'slow_spring_board.aiff');
 
     final platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+        android: androidPlatformChannelSpecifics, iOS: iOSPlatformChannelSpecifics);
 
     final id = Random().nextInt(999);
 

@@ -1,3 +1,9 @@
+## 1.4.0
+ October 10, 2020
+- Introduced i10n.csv for translations.
+- iso_spinner.dart.
+- flutter_local_notifications.dart updated.
+
 ## 1.3.0
  September 25, 2020
 - flutter_local_notifications package was installed.

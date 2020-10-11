@@ -60,12 +60,23 @@ class TodosiOS extends StateMVC<TodosPage> {
     _menu = WorkMenu();
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
+          leading: CupertinoButton(
+            padding: const EdgeInsets.all(10),
+            onPressed: () async {
+              await showCupertinoModalPopup(
+                context: context,
+                builder: (BuildContext context) => const SettingsWidget(),
+              );
+              refresh();
+            },
+            child: I10n.t('Settings'),
+          ),
           trailing: CupertinoButton(
             padding: const EdgeInsets.all(10),
             onPressed: () {
               editToDo(con?.state?.context);
             },
-            child: const Text('New'),
+            child: I10n.t('New'),
           ),
         ),
         child: SafeArea(
@@ -73,32 +84,33 @@ class TodosiOS extends StateMVC<TodosPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CupertinoSegmentedControl<int>(
-                  groupValue: _segment,
-                  children: const <int, Widget>{
-                    0: Text('New'),
-                    1: Text('Settings'),
-                  },
-                  onValueChanged: (i) {
-                    setState(() {
-                      _segment = i;
-                      switch (i) {
-                        case 0:
-                          break;
-                        case 1:
-                          break;
-                        case 2:
-                          break;
-                      }
-                    });
-                  },
-                ),
+                // CupertinoSegmentedControl<int>(
+                //   groupValue: _segment,
+                //   children: <int, Widget>{
+                //     0: I10n.t('New'),
+                //     1: I10n.t('Settings'),
+                //   },
+                //   onValueChanged: (i) {
+                //     setState(() {
+                //       _segment = i;
+                //       switch (i) {
+                //         case 0:
+                //           break;
+                //         case 1:
+                //           break;
+                //         case 2:
+                //           break;
+                //       }
+                //     });
+                //   },
+                // ),
                 Expanded(child: MemoryList(parent: this)),
               ],
             )));
   }
 
-  Future<void> editToDo(BuildContext context, [Map todo]) async {
+  Future<void> editToDo(BuildContext context,
+      [Map<String, dynamic> todo]) async {
     await showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) => TodoPage(todo: todo),

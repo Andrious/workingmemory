@@ -374,7 +374,7 @@ class ToDoEdit extends DataFields {
   DateTime dateTime;
   bool saveNeeded;
 
-  final DateFormat dateFormat = DateFormat('EEEE, MMM dd  h:mm a');
+  DateFormat get dateFormat => DateFormat('EEEE, MMM dd  h:mm a', App.locale.languageCode);
 
   Widget get title => Text(hasName ? _item : 'New');
 
