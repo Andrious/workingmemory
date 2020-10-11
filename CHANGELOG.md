@@ -1,3 +1,7 @@
+## 1.5.0
+ October 11, 2020
+- Allowing buttons to switch around.
+
 ## 1.4.0
  October 10, 2020
 - Introduced i10n.csv for translations.

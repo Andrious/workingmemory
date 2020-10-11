@@ -19,6 +19,8 @@
 
 import 'dart:async' show Future;
 
+import 'package:workingmemory/src/model.dart' hide Icon;
+
 import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart' show Controller, theme;
@@ -29,6 +31,8 @@ class TodoiOS extends StateMVC<TodoPage> {
     con = controller;
   }
   Controller con;
+  Widget _leading;
+  Widget _trailing;
 
   @override
   void initState() {
@@ -39,30 +43,10 @@ class TodoiOS extends StateMVC<TodoPage> {
 
   @override
   Widget build(BuildContext context) {
+    _scaffoldButtons();
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-          middle: con.data.title,
-          trailing: CupertinoButton(
-            padding: const EdgeInsets.all(
-                10), // https://github.com/flutter/flutter/issues/32701
-            onPressed: () async {
-              final bool saved = await con.data.onPressed();
-              if (!saved) {
-                Scaffold.of(context).showSnackBar(SnackBar(
-                  content: Text(con.data.errorText),
-                ));
-              } else {
-                if (widget.onPressed == null) {
-                  Navigator.pop(context);
-                } else {
-                  widget.onPressed();
-                }
-              }
-            },
-            child: const Text(
-              'Save',
-            ),
-          )),
+          middle: con.data.title, leading: _leading, trailing: _trailing),
       child: Form(
           onWillPop: _onWillPop,
           child: con.data.linkForm(
@@ -72,6 +56,7 @@ class TodoiOS extends StateMVC<TodoPage> {
   }
 
   Future<bool> _onWillPop() async {
+    //
     if (!con.data.hasChanged) {
       return true;
     }
@@ -94,23 +79,9 @@ class TodoiOS extends StateMVC<TodoPage> {
                 Animation<double> secondaryAnimation) {
               return SafeArea(
                 child: CupertinoAlertDialog(
-                  content: Text('Discard new event?', style: dialogTextStyle),
-                  actions: <Widget>[
-                    CupertinoButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(
-                            false); // Pops the confirmation dialog but not the page.
-                      },
-                      child: const Text('CANCEL'),
-                    ),
-                    CupertinoButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(
-                            true); // Returning true to _onWillPop will pop again.
-                      },
-                      child: const Text('DISCARD'),
-                    )
-                  ],
+                  content: Text(I10n.s('Discard new event?'),
+                      style: dialogTextStyle),
+                  actions: _listButtons(),
                 ),
               );
             },
@@ -122,23 +93,9 @@ class TodoiOS extends StateMVC<TodoPage> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                content: Text('Discard new event?', style: dialogTextStyle),
-                actions: <Widget>[
-                  FlatButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(
-                          false); // Pops the confirmation dialog but not the page.
-                    },
-                    child: const Text('CANCEL'),
-                  ),
-                  FlatButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(
-                          true); // Returning true to _onWillPop will pop again.
-                    },
-                    child: const Text('DISCARD'),
-                  )
-                ],
+                content:
+                    Text(I10n.s('Discard new event?'), style: dialogTextStyle),
+                actions: _listButtons(),
               );
             },
           ) ??
@@ -157,7 +114,7 @@ class TodoiOS extends StateMVC<TodoPage> {
             initialValue: con.data.item,
             validator: (v) {
               if (v.trim().isEmpty) {
-                return 'Cannot be empty.';
+                return I10n.s('Cannot be empty.');
               }
               return null;
             },
@@ -207,7 +164,9 @@ class TodoiOS extends StateMVC<TodoPage> {
             borderRadius: const BorderRadius.all(Radius.circular(8)),
           ),
           child: IconItems(
-              icons: { for (var e in con.favIcons) e.values.first : e.values.first },
+              icons: {
+                for (var e in con.favIcons) e.values.first: e.values.first
+              },
               icon: con.data.icon,
               onTap: (icon) {
                 con.setState(() {
@@ -225,7 +184,83 @@ class TodoiOS extends StateMVC<TodoPage> {
               await con.saveIcon(icon);
               con.setState(() {});
             })));
-
     return widgets;
+  }
+
+  void _scaffoldButtons() {
+    Widget temp;
+    _leading = null;
+    _trailing = CupertinoButton(
+      padding: const EdgeInsets.all(
+          10), // https://github.com/flutter/flutter/issues/32701
+      onPressed: () async {
+        final bool saved = await con.data.onPressed();
+        if (saved) {
+          if (widget.onPressed == null) {
+            Navigator.pop(context);
+          } else {
+            widget.onPressed();
+          }
+        }
+      },
+      child: I10n.t(
+        'Save',
+      ),
+    );
+
+    // Switch the buttons around when indicated.
+    if (Settings.getLeftHanded()) {
+      temp = _trailing;
+      _trailing = null;
+      _leading = temp;
+    }
+  }
+
+  List<Widget> _listButtons() {
+    Widget leading;
+    Widget trailing;
+    Widget temp;
+
+    if (App.useCupertino) {
+      leading = CupertinoButton(
+        onPressed: () {
+          Navigator.of(context)
+              .pop(false); // Pops the confirmation dialog but not the page.
+        },
+        child: I10n.t('Cancel'),
+      );
+
+      trailing = CupertinoButton(
+        onPressed: () {
+          Navigator.of(context)
+              .pop(true); // Returning true to _onWillPop will pop again.
+        },
+        child: I10n.t('Discard'),
+      );
+    } else {
+      leading = FlatButton(
+        onPressed: () {
+          Navigator.of(context)
+              .pop(false); // Pops the confirmation dialog but not the page.
+        },
+        child: I10n.t('Cancel'),
+      );
+
+      trailing = FlatButton(
+        onPressed: () {
+          Navigator.of(context)
+              .pop(true); // Returning true to _onWillPop will pop again.
+        },
+        child: I10n.t('Discard'),
+      );
+    }
+
+    // Switch the buttons around when indicated.
+    if (Settings.getLeftHanded()) {
+      temp = leading;
+      leading = trailing;
+      trailing = temp;
+    }
+    return [leading, trailing];
   }
 }

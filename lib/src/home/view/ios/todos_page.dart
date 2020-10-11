@@ -53,31 +53,20 @@ class TodosiOS extends StateMVC<TodosPage> {
 
   WorkMenu _menu;
 
+  Widget _leading;
+  Widget _trailing;
+
   @override
   Widget build(BuildContext context) {
 //    if (!con.app.loggedIn) return SignIn();
     // Rebuilt the menu if state changes.
     _menu = WorkMenu();
+    // Supply the leading and trailing buttons.
+    _supplyButtons();
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-          leading: CupertinoButton(
-            padding: const EdgeInsets.all(10),
-            onPressed: () async {
-              await showCupertinoModalPopup(
-                context: context,
-                builder: (BuildContext context) => const SettingsWidget(),
-              );
-              refresh();
-            },
-            child: I10n.t('Settings'),
-          ),
-          trailing: CupertinoButton(
-            padding: const EdgeInsets.all(10),
-            onPressed: () {
-              editToDo(con?.state?.context);
-            },
-            child: I10n.t('New'),
-          ),
+          leading: _leading,
+          trailing: _trailing,
         ),
         child: SafeArea(
             top: false,
@@ -121,6 +110,35 @@ class TodosiOS extends StateMVC<TodosPage> {
   @override
   void onError(FlutterErrorDetails details) {
     super.onError(details);
+  }
+
+  void _supplyButtons(){
+
+    _leading = CupertinoButton(
+      padding: const EdgeInsets.all(10),
+      onPressed: () async {
+        await showCupertinoModalPopup(
+          context: context,
+          builder: (BuildContext context) => const SettingsWidget(),
+        );
+        refresh();
+      },
+      child: I10n.t('Settings'),
+    );
+
+    _trailing = CupertinoButton(
+      padding: const EdgeInsets.all(10),
+      onPressed: () {
+        editToDo(con?.state?.context);
+      },
+      child: I10n.t('New'),
+    );
+
+    if(Settings.getLeftHanded()){
+      final temp = _leading;
+      _leading = _trailing;
+      _trailing = temp;
+    }
   }
 }
 

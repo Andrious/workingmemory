@@ -18,9 +18,11 @@
 
 import 'dart:async' show Future;
 
+import 'package:workingmemory/src/model.dart' hide Icon;
+
 import 'package:workingmemory/src/view.dart';
 
-import 'package:workingmemory/src/controller.dart' show Controller, theme;
+import 'package:workingmemory/src/controller.dart';
 
 class TodoAndroid extends StateMVC<TodoPage> {
   TodoAndroid() : super(Controller()) {
@@ -34,28 +36,17 @@ class TodoAndroid extends StateMVC<TodoPage> {
 //    con.edit.addState(this);
     _con.data.init(widget.todo);
   }
+  Widget _leading;
+  Widget _trailing;
 
   @override
   Widget build(BuildContext context) {
+    _scaffoldButtons();
     return Scaffold(
-      appBar: AppBar(title: _con.data.title, actions: [
-        FlatButton(
-          onPressed: () async {
-            final bool save = await _con.data.onPressed();
-            if (save) {
-              Navigator.of(context, rootNavigator: true).pop();
-            } else {
-              Scaffold.of(context).showSnackBar(const SnackBar(
-                content: Text('There is an error.'),
-              ));
-            }
-          },
-          child: Text(
-            'SAVE',
-            style: theme.textTheme.bodyText2.copyWith(color: Colors.white),
-          ),
-        ),
-      ]),
+      appBar: AppBar(
+        title: Settings.getLeftHanded() ? _leading : _con.data.title,
+        actions: _trailing == null ? null : [_trailing],
+      ),
       body: Form(
         onWillPop: _onWillPop,
         child: _con.data.linkForm(ListView(
@@ -78,23 +69,9 @@ class TodoAndroid extends StateMVC<TodoPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              content: Text('Discard new event?', style: dialogTextStyle),
-              actions: <Widget>[
-                FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(
-                        false); // Pops the confirmation dialog but not the page.
-                  },
-                  child: const Text('CANCEL'),
-                ),
-                FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(
-                        true); // Returning true to _onWillPop will pop again.
-                  },
-                  child: const Text('DISCARD'),
-                )
-              ],
+              content:
+                  Text(I10n.s('Discard new event?'), style: dialogTextStyle),
+              actions: _listButtons(),
             );
           },
         ) ??
@@ -113,7 +90,7 @@ class TodoAndroid extends StateMVC<TodoPage> {
           ),
           validator: (v) {
             if (v.isEmpty) {
-              return 'Cannot be empty.';
+              return I10n.s('Cannot be empty.');
             }
             return null;
           },
@@ -168,6 +145,64 @@ class TodoAndroid extends StateMVC<TodoPage> {
             })));
 
     return widgets;
+  }
+
+  void _scaffoldButtons() {
+    Widget temp;
+    _leading = null;
+    _trailing = FlatButton(
+      onPressed: () async {
+        final bool save = await _con.data.onPressed();
+        if (save) {
+          Navigator.of(context, rootNavigator: true).pop();
+        } else {
+          Scaffold.of(context).showSnackBar(SnackBar(
+            content: I10n.t('There is an error.'),
+          ));
+        }
+      },
+      child: Text(
+        I10n.s('Save'),
+        style: theme.textTheme.bodyText2.copyWith(color: Colors.white),
+      ),
+    );
+
+    // Switch the buttons around when indicated.
+    if (Settings.getLeftHanded()) {
+      temp = _trailing;
+      _trailing = null;
+      _leading = temp;
+    }
+  }
+
+  List<Widget> _listButtons() {
+    Widget leading;
+    Widget trailing;
+    Widget temp;
+
+    leading = FlatButton(
+      onPressed: () {
+        Navigator.of(context)
+            .pop(false); // Pops the confirmation dialog but not the page.
+      },
+      child: I10n.t('Cancel'),
+    );
+
+    trailing = FlatButton(
+      onPressed: () {
+        Navigator.of(context)
+            .pop(true); // Returning true to _onWillPop will pop again.
+      },
+      child: I10n.t('Discard'),
+    );
+
+    // Switch the buttons around when indicated.
+    if (Settings.getLeftHanded()) {
+      temp = leading;
+      leading = trailing;
+      trailing = temp;
+    }
+    return [leading, trailing];
   }
 }
 

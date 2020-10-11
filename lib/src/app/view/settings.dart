@@ -241,6 +241,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
     return interface;
   }
 
+  // ignore: avoid_positional_boolean_parameters
   void orderItems(bool value) {
     Settings.setOrder(value);
     setState(() {
@@ -249,6 +250,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
     _refresh = true;
   }
 
+  // ignore: avoid_positional_boolean_parameters
   void switchButton(bool value) {
     Settings.setLeftHanded(value);
     setState(() {
