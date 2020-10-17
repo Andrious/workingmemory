@@ -2,18 +2,18 @@ name: workingmemory
 description: A ToDo List for a not so working memory
 publish_to: none
 
-version: 1.5.0
+version: 1.6.0
 
 environment:
-  sdk: '>=2.7.0 <3.0.0'
+  sdk: '>=2.10.0 <3.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
   # https://pub.dev/packages/mvc_application
-  mvc_application: #^5.0.0
-     path: ../../../packages/mvc_application
+  mvc_application: ^5.0.0
+#     path: ../../../packages/mvc_application
 #    git:
 #      url: git://github.com/AndriousSolutions/mvc_application.git
 
@@ -21,39 +21,37 @@ dependencies:
   remote_config: ^1.0.0
 #    path: ../../../packages/remote_config
 
+  # https://pub.dev/packages/timezone/
+  timezone: ^0.5.0
+
   # https://pub.dev/packages/dbutils
   dbutils: ^2.0.0
 #    path: ../../../packages/dbutils
 
   # Facebook entry in AndroidManifest.xml
   # https://pub.dev/packages/auth
-  auth: ^6.0.0
+  auth: ^7.0.0
 #    path: ../../Libs/auth
-
-#  # https://pub.dev/packages/sqflite
-#  sqflite: ^1.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   # https://pub.dev/packages/cupertino_icons
-  cupertino_icons: any #^0.1.0
+  cupertino_icons: 1.0.0
 
 # to set the properties localizationDelegates and supportedLocales of MaterialApp
   # Otherwise materialocalization is not found.
   flutter_localizations:
     sdk: flutter
 
+  # https://pub.dev/packages/flutter_cupertino_localizations
   flutter_cupertino_localizations: ^1.0.0
-
-#  # https://pub.dartlang.org/packages/intl
-#  intl: any #^0.15.7
 
   # https://pub.dev/packages/font_awesome_flutter
   font_awesome_flutter: ^8.0.0
 
   # https://pub.dev/packages/firebase_crashlytics
   # Missing iOS Integration.
-  firebase_crashlytics: ^0.1.0
+  firebase_crashlytics: ^0.2.0
 
   # https://pub.dev/packages/rxdart
 #  Used by the class FlutterNotifications

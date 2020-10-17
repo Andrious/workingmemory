@@ -16,7 +16,7 @@
 ///          Created  23 Jun 2018
 ///
 
-import 'dart:async' show Future, FutureOr;
+import 'dart:async' show Future;
 
 import 'package:workingmemory/src/model.dart'
     show CloudDB, Database, FireBaseDB, Settings, SQLiteDB;
@@ -276,6 +276,13 @@ class Model {
         }
         final Map<String, dynamic> rec = Map.from(it.current.value);
         if (rec['deleted'] == 1) {
+          final dateTime = DateTime.tryParse(rec['DateTime']);
+          if(dateTime != null){
+            final difference = DateTime.now().difference(dateTime);
+            if(difference.inDays > 365){
+              unawaited(_fbDB.delete(it.current.key));
+            }
+          }
           continue;
         }
         rec[fbKeyField] = it.current.key;
@@ -397,7 +404,6 @@ class ToDo extends SQLiteDB {
        DateTime VARCHAR, 
        DateTimeEpoch Long, 
        TimeZone VARCHAR, 
-       ReminderEpoch Long, 
        ReminderChk integer default 0, 
        LEDColor integer default 0, 
        AlarmId integer default -1,

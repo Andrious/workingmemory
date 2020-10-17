@@ -36,19 +36,27 @@ import 'package:workingmemory/src/controller.dart'
 
 import 'package:auth/auth.dart' show Auth;
 
+import 'package:firebase_core/firebase_core.dart' show Firebase;
+
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 import 'package:i10n_translator/i10n.dart';
 
 
+// ignore: avoid_void_async
 void runApp(
   Widget app, {
   FlutterExceptionHandler handler,
   ErrorWidgetBuilder builder,
   ReportErrorHandler reportError,
-}) {
+}) async {
+  //
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp();
+
   // Supply Firebase Crashlytics
-  final Crashlytics crash = Crashlytics.instance;
+  final FirebaseCrashlytics crash = FirebaseCrashlytics.instance;
 
   handler ??= crash.recordFlutterError;
 
@@ -116,11 +124,7 @@ class WorkingController extends AppController {
       userStamp();
     }
 
-    Crashlytics.instance.setUserEmail(_auth.email);
-
-    Crashlytics.instance.setUserIdentifier(_auth.displayName);
-
-    Crashlytics.instance.setUserName(_auth.displayName);
+    FirebaseCrashlytics.instance.setUserIdentifier(_auth.displayName);
   }
 
   // 'disconnect' from Firebase
@@ -205,7 +209,7 @@ class WorkingController extends AppController {
 
   @override
   Future<void> rebuild() async {
-    _loggedIn = await _auth.isLoggedIn();
+    _loggedIn = _auth.isLoggedIn();
     _con.refresh();
     // Pops only if on the stack and not on the first screen.
     final BuildContext context = _con?.state?.context;

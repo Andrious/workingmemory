@@ -89,7 +89,7 @@ class TodosAndroid extends StateMVC<TodosPage> {
                     onDismissed: (DismissDirection direction) {
                       _con.data.delete(_con.data.items[index]);
                       Scaffold.of(context).showSnackBar(SnackBar(
-                          content: const Text('You deleted an item.'),
+                          content: I10n.t('You deleted an item.'),
                           action: SnackBarAction(
                               label: I10n.s('UNDO'),
                               onPressed: () {

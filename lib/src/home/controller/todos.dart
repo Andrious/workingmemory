@@ -69,7 +69,7 @@ class Controller extends ControllerMVC {
   }
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _notifications = FlutterNotifications(state?.context);
   }
@@ -108,9 +108,9 @@ class Controller extends ControllerMVC {
   Future<void> signIn() async {
 //    app.signIn();
     await signOut();
-    await Navigator.push(
-        state.context, MaterialPageRoute<void>(builder: (context) => const SignIn()));
-//   refresh();
+    await Navigator.push(state.context,
+        MaterialPageRoute<void>(builder: (context) => const SignIn()));
+   refresh();
   }
 
   void logOut() => app.logOut();
@@ -149,14 +149,13 @@ class Controller extends ControllerMVC {
     return newRec;
   }
 
-  Future<void> recordDump(FirebaseUser user) async {
+  void recordDump(User user) {
     if (user == null) {
       return;
     }
-    final bool dump = await _model.recordDump();
-    if (dump) {
-      await requery();
-    }
+    _model.recordDump().then((dump) {
+      requery();
+    });
   }
 
   String get defaultIcon => _model.defaultIcon;
@@ -218,7 +217,7 @@ class Controller extends ControllerMVC {
 
   /// Establish any notifications indicated in the record.
   Future<int> _setNotification(Map<String, dynamic> rec) async {
-    int id = -1;
+    int id;
     final DateTime time = rec['DateTime'];
     if (time != null) {
 //      final vibrationPattern = Int64List(4);
@@ -239,8 +238,22 @@ class Controller extends ControllerMVC {
 //          ledColor: const Color.fromARGB(255, 255, 0, 0),
 //          ledOnMs: 1000,
 //          ledOffMs: 500,);
-      id = await _notifications.set(time, rec['Item'], 'WorkingMemory');
+
+      id = rec['AlarmId'];
+
+      // Cancel the previous notification if any.
+      if (id > -1) {
+        await _notifications.cancel(id);
+      }
+
+      id = await _notifications.set(
+          state.context, time, rec['TimeZone'], rec['Item'], 'WorkingMemory');
+
       id ??= -1;
+
+      if (id > -1) {
+        rec['AlarmId'] = id;
+      }
     }
     return id;
   }
@@ -374,7 +387,8 @@ class ToDoEdit extends DataFields {
   DateTime dateTime;
   bool saveNeeded;
 
-  DateFormat get dateFormat => DateFormat('EEEE, MMM dd  h:mm a', App.locale.languageCode);
+  DateFormat get dateFormat =>
+      DateFormat('EEEE, MMM dd  h:mm a', App.locale.languageCode);
 
   Widget get title => Text(hasName ? _item : 'New');
 
@@ -427,11 +441,13 @@ class ToDoEdit extends DataFields {
 
   @override
   Future<bool> save(Map<String, dynamic> rec) async {
+    //
     final int id = await con?._setNotification(rec);
-    if (id > -1) {
-      rec['AlarmId'] = id;
-    }
+
+    rec['TimeZone'] = Prefs.getString('timezone');
+
     final bool save = await _model.save(rec);
+
     if (!save) {
       con?._cancelNotification(id);
     }

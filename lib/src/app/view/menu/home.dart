@@ -19,6 +19,8 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:workingmemory/src/model.dart' show Settings;
+
 import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart' show Controller;
@@ -50,7 +52,9 @@ class WorkMenu extends Menu {
   @override
   List<PopupMenuItem<dynamic>> menuItems() => [
         PopupMenuItem(value: 'Resync', child: I10n.t('Resync')),
-        PopupMenuItem(value: 'interface', child: Text('${I10n.s('Interface:')} $interface')),
+        PopupMenuItem(
+            value: 'interface',
+            child: Text('${I10n.s('Interface:')} $interface')),
         PopupMenuItem(
             value: 'Locale',
             child: Text('${I10n.s('Locale:')} ${App.locale.toLanguageTag()}')),
@@ -68,16 +72,16 @@ class WorkMenu extends Menu {
       case 'interface':
         App.changeUI(App.useMaterial ? 'Cupertino' : 'Material');
         bool switchUI;
-        if(App.useMaterial){
-          if(UniversalPlatform.isAndroid){
+        if (App.useMaterial) {
+          if (UniversalPlatform.isAndroid) {
             switchUI = false;
-          }else{
+          } else {
             switchUI = true;
           }
-        }else{
-          if(UniversalPlatform.isAndroid){
+        } else {
+          if (UniversalPlatform.isAndroid) {
             switchUI = true;
-          }else{
+          } else {
             switchUI = false;
           }
         }
@@ -102,6 +106,7 @@ class WorkMenu extends Menu {
           press02: () {
             spinner.onSelectedItemChanged(initialItem);
           },
+          switchButtons: Settings.getLeftHanded(),
         ).show();
 
         break;

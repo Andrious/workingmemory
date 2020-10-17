@@ -4,13 +4,12 @@ import 'dart:typed_data' show Int64List;
 import 'dart:ui';
 
 import 'package:intl/intl.dart' show DateFormat;
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:timezone/timezone.dart' as tz;
+
+import 'package:workingmemory/src/view.dart';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:rxdart/subjects.dart';
-
-/// IMPORTANT: running the following code on its own won't work as there is setup required for each platform head project.
-/// Please download the complete example app from the GitHub repository where all the setup has been done
 
 class FlutterNotifications {
   factory FlutterNotifications(BuildContext context) =>
@@ -75,7 +74,7 @@ class FlutterNotifications {
         title = null;
       }
 
-      final String content = data[data.length-1];
+      final String content = data[data.length - 1];
 
       await showDialog(
         context: context,
@@ -105,7 +104,7 @@ class FlutterNotifications {
     });
 
     final initializationSettings = InitializationSettings(
-         android: initializationSettingsAndroid,  iOS: initializationSettingsIOS);
+        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
 
     _flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: (String payload) async {
@@ -140,14 +139,32 @@ class FlutterNotifications {
   String get payload => _notificationAppLaunchDetails?.payload;
 
   /// Schedules a notification that specifies a different icon, sound and vibration pattern
-  Future<int> set(DateTime dateTime, String title, String body) async {
+  Future<int> set(
+    BuildContext context,
+    DateTime dateTime,
+    String timeZone,
+    String title,
+    String body, {
+    bool androidAllowWhileIdle,
+    UILocalNotificationDateInterpretation uiLocalNotificationDateInterpretation,
+  }) async {
     //
     if (dateTime == null ||
-        DateTime.now().isAfter(dateTime) ||
         title == null ||
         title.isEmpty ||
         body == null ||
         body.isEmpty) {
+      return -1;
+    }
+
+    if (DateTime.now().isAfter(dateTime)) {
+      final now = DateTime.now();
+      final message =
+          '\n\n${I10n.s('That time has past:')}\n$dateTime\n\n${I10n.s('Current time:')}\n$now';
+      await MsgBox(context: context).show(
+        title: message,
+        msg: I10n.s('Please correct time.'),
+      );
       return -1;
     }
 
@@ -175,24 +192,77 @@ class FlutterNotifications {
         IOSNotificationDetails(sound: 'slow_spring_board.aiff');
 
     final platformChannelSpecifics = NotificationDetails(
-        android: androidPlatformChannelSpecifics, iOS: iOSPlatformChannelSpecifics);
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics);
 
-    final id = Random().nextInt(999);
+    int id = Random().nextInt(999);
 
     final String date = DateFormat('EEEE, MMM dd  h:mm a').format(dateTime);
 
     final String payload = '$title\n$date';
 
-    await _flutterLocalNotificationsPlugin.schedule(
-      id,
-      title,
-      body,
-      dateTime,
-      platformChannelSpecifics,
-      payload: payload,
-    );
+    androidAllowWhileIdle ??= true;
 
+    uiLocalNotificationDateInterpretation ??=
+        UILocalNotificationDateInterpretation.wallClockTime;
+
+    final location = await _getLocation(context, timeZone);
+
+    final scheduledDate = tz.TZDateTime.from(dateTime, location);
+
+    try {
+      await _flutterLocalNotificationsPlugin.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        platformChannelSpecifics,
+        androidAllowWhileIdle: androidAllowWhileIdle,
+        payload: payload,
+        uiLocalNotificationDateInterpretation:
+            uiLocalNotificationDateInterpretation,
+      );
+    } catch (ex) {
+      id = -1;
+      App.catchError(ex);
+    }
     return id;
+  }
+
+  Future<tz.Location> _getLocation(
+      BuildContext context, String userTimeZone) async {
+    final timeZone = TimeZone();
+
+    // Retrieve the app's last used timezone.
+    if (userTimeZone == null || userTimeZone.isEmpty) {
+      userTimeZone = Prefs.getString('timezone');
+    }
+
+    // The device's timezone.
+    String timeZoneName = await timeZone.getTimeZoneName();
+
+    // Merely use the device's timezone.
+    if (userTimeZone.isEmpty) {
+      //
+      await Prefs.setString('timezone', timeZoneName);
+    } else if (userTimeZone != timeZoneName) {
+      //
+      final message =
+          "We're in a new timezone.\n\nWe are now in the timezone:\n$timeZoneName\n\nShall we stay in the timezone?:\n$userTimeZone";
+      final stay = await showBox(
+        context: context,
+        text: message,
+        button01: Option(text: 'Stay', result: true),
+        button02: Option(text: 'New', result: false),
+      );
+      // Stay with your previously used timezone.
+      if (stay) {
+        timeZoneName = userTimeZone;
+      } else {
+        await Prefs.setString('timezone', timeZoneName);
+      }
+    }
+    return timeZone.getLocation(timeZoneName);
   }
 
   /// Cancel a specific notification.

@@ -1,3 +1,11 @@
+## 1.6.0
+ October 16, 2020
+- Removed data field, ReminderEpoch Long.
+- Delete Firebase records more than a year old.
+- Updated notifications.dart to consider timezones.
+- More multi-language dialogue windows.
+- Cancel a notification before modifying it.
+
 ## 1.5.0
  October 11, 2020
 - Allowing buttons to switch around.

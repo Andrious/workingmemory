@@ -41,7 +41,7 @@ class TodoAndroid extends StateMVC<TodoPage> {
 
   @override
   Widget build(BuildContext context) {
-    _scaffoldButtons();
+    _scaffoldButtons(context);
     return Scaffold(
       appBar: AppBar(
         title: Settings.getLeftHanded() ? _leading : _con.data.title,
@@ -147,14 +147,14 @@ class TodoAndroid extends StateMVC<TodoPage> {
     return widgets;
   }
 
-  void _scaffoldButtons() {
+  void _scaffoldButtons(BuildContext context) {
     Widget temp;
     _leading = null;
     _trailing = FlatButton(
       onPressed: () async {
         final bool save = await _con.data.onPressed();
         if (save) {
-          Navigator.of(context, rootNavigator: true).pop();
+          Navigator.of(this.context, rootNavigator: true).pop();
         } else {
           Scaffold.of(context).showSnackBar(SnackBar(
             content: I10n.t('There is an error.'),

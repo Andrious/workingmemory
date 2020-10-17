@@ -12,7 +12,6 @@ id integer primary key autoincrement
 , DateTime VARCHAR
 , DateTimeEpoch Long
 , TimeZone VARCHAR
-, ReminderEpoch Long
 , ReminderChk integer default 0
 , LEDColor integer default 0
 , Fired integer default 0
