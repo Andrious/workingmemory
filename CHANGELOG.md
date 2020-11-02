@@ -1,3 +1,13 @@
+## 1.7.0
+ November 02, 2020
+- Update to mvc_application 6.1.0
+- Removed class WorkingView to use class, AppState
+- Introduce 'Dark Mode' switch to the App.
+- Avoid infinite loops with constructor calls moved to initAsync()
+- Remove an Anonymous sign in with a user login.
+- Enhanced 'local' sync of offline records
+- Utilize the DatabaseReference's onChildAdded() function for live syncing of device changes.
+
 ## 1.6.0
  October 16, 2020
 - Removed data field, ReminderEpoch Long.

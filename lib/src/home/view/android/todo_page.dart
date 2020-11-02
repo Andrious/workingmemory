@@ -36,12 +36,14 @@ class TodoAndroid extends StateMVC<TodoPage> {
 //    con.edit.addState(this);
     _con.data.init(widget.todo);
   }
+
   Widget _leading;
   Widget _trailing;
+  BuildContext _scaffoldContext;
 
   @override
   Widget build(BuildContext context) {
-    _scaffoldButtons(context);
+    _scaffoldButtons();
     return Scaffold(
       appBar: AppBar(
         title: Settings.getLeftHanded() ? _leading : _con.data.title,
@@ -79,6 +81,7 @@ class TodoAndroid extends StateMVC<TodoPage> {
   }
 
   List<Widget> _listWidgets() {
+    //
     final widgets = <Widget>[
       Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -134,30 +137,34 @@ class TodoAndroid extends StateMVC<TodoPage> {
               })));
     }
 
-    widgets.add(Container(
-        height: 600,
-        child: IconItems(
-            icons: _con.icons,
-            icon: _con.data.icon,
-            onTap: (icon) async {
-              await _con.saveIcon(icon);
-              setState(() {});
-            })));
+    widgets.add(Builder(builder: (BuildContext context) {
+      // So to access the Scaffold's state object.
+      _scaffoldContext = context;
+      return Container(
+          height: 600,
+          child: IconItems(
+              icons: _con.icons,
+              icon: _con.data.icon,
+              onTap: (icon) async {
+                await _con.saveIcon(icon);
+                setState(() {});
+              }));
+    }));
 
     return widgets;
   }
 
-  void _scaffoldButtons(BuildContext context) {
+  void _scaffoldButtons() {
     Widget temp;
     _leading = null;
     _trailing = FlatButton(
       onPressed: () async {
         final bool save = await _con.data.onPressed();
         if (save) {
-          Navigator.of(this.context, rootNavigator: true).pop();
+          Navigator.of(_scaffoldContext, rootNavigator: true).pop();
         } else {
-          Scaffold.of(context).showSnackBar(SnackBar(
-            content: I10n.t('There is an error.'),
+          Scaffold.of(_scaffoldContext).showSnackBar(SnackBar(
+            content: I10n.t('Not saved.'),
           ));
         }
       },

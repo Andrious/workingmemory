@@ -102,10 +102,10 @@ class WorkMenu extends Menu {
           context: _con.state.context,
           title: I10n.s('Current Language'),
           body: [spinner],
-          press01: () {},
-          press02: () {
+          press01: () {
             spinner.onSelectedItemChanged(initialItem);
           },
+          press02: () {},
           switchButtons: Settings.getLeftHanded(),
         ).show();
 

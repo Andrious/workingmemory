@@ -29,7 +29,12 @@ class SettingsWidget extends StatefulWidget {
   _SettingsWidgetState createState() => _SettingsWidgetState();
 }
 
-class _SettingsWidgetState extends State<SettingsWidget> {
+class _SettingsWidgetState extends StateMVC<SettingsWidget> {
+  _SettingsWidgetState() : super(ThemeController()) {
+    _theme = controller;
+  }
+  ThemeController _theme;
+
   @override
   void initState() {
     super.initState();
@@ -191,6 +196,30 @@ class _SettingsWidgetState extends State<SettingsWidget> {
           onChanged: switchButton,
         ),
       ]),
+      ListTile(
+        leading: _theme.isDarkMode
+            ? Image.asset(
+                'assets/images/moon.png',
+                height: 30,
+                width: 26,
+              )
+            : Image.asset(
+                'assets/images/sunny.png',
+                height: 30,
+                width: 26,
+              ),
+        title: I10n.t('Dark Mode'),
+        trailing: Switch(
+          value: _theme.isDarkMode,
+          onChanged: (val) {
+            _theme.darkMode = val;
+            if (!val) {
+              App.setThemeData();
+            }
+            refresh();
+          },
+        ),
+      ),
     ];
 
     if (App.useCupertino) {

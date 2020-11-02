@@ -15,17 +15,14 @@
 ///
 ///          Created  10 Apr 2019
 ///
-///           import 'package:workingmemory/working_memory_view.dart';
 
 export 'dart:io' show Platform;
 
 export 'package:mvc_application/view.dart';
 
-export 'package:workingmemory/src/app/view/working_memory_view.dart';
+export 'package:workingmemory/src/app/view/settings.dart';
 
-export 'file:///C:/Programs/Tools/Projects/Flutter/apps/reminders/workingmemory/lib/src/app/view/settings.dart';
-
-export 'file:///C:/Programs/Tools/Projects/Flutter/apps/reminders/workingmemory/lib/src/app/view/menu/iso_spinner.dart';
+export 'package:workingmemory/src/app/view/menu/iso_spinner.dart';
 
 export 'package:workingmemory/src/app/view/sign_in.dart';
 
@@ -53,4 +50,4 @@ export 'package:workingmemory/src/home/view/ios/settings/notification_settings.d
 
 export 'package:workingmemory/src/home/view/icon_items.dart';
 
-export 'file:///C:/Programs/Tools/Projects/Flutter/apps/reminders/workingmemory/lib/src/app/view/menu/home.dart';
+export 'package:workingmemory/src/app/view/menu/home.dart';

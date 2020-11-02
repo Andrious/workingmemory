@@ -19,14 +19,11 @@ import 'dart:async' show Future;
 
 import 'dart:collection' show LinkedHashMap;
 
-import 'package:workingmemory/src/model.dart' show Semaphore;
+import 'package:workingmemory/src/model.dart';
 
 import 'package:dbutils/firebase_db.dart' as f;
 
 import 'package:workingmemory/src/controller.dart' show App, WorkingController;
-
-import 'package:firebase_database/firebase_database.dart'
-    show DataSnapshot, DatabaseReference, Event, Query;
 
 import 'package:flutter/widgets.dart' show AppLifecycleState;
 
@@ -100,6 +97,7 @@ class FireBaseDB {
   }
 
   Future<String> insertRec(Map<String, dynamic> itemToDo) async {
+    //
     String key = '';
 
     DatabaseReference dbRef;
@@ -119,6 +117,7 @@ class FireBaseDB {
   }
 
   Future<String> updateRec(Map<String, dynamic> rec) async {
+    //
     String key = '';
 
     if (!rec.containsKey(_keyFld)) {
@@ -152,29 +151,34 @@ class FireBaseDB {
     return key;
   }
 
-  DatabaseReference get userRef {
-    // infinite loop if instantiated in constructor.
-    String id = WorkingController().uid;
-
-    if (id == null || id.trim().isEmpty) {
-      id = null;
-    } else {
-      id = id.trim();
-    }
-
-    DatabaseReference ref = reference().child('users');
-
-    if (id == null) {
-      ref = ref.child('dummy');
-    } else {
-      ref = ref.child(id);
-    }
-    return ref;
-  }
+  DatabaseReference get userRef => databaseReference('users');
+  DatabaseReference _anonymousUser;
 
   DatabaseReference get yourDeviceRef => yourDevicesRef.child(App.installNum);
+  DatabaseReference _anonymousDeviceRef;
 
-  DatabaseReference get yourDevicesRef {
+  DatabaseReference get yourDevicesRef => databaseReference('devices');
+
+  DatabaseReference get favIconsRef => databaseReference('favicons');
+
+  DatabaseReference get tasksRef {
+//
+    if (_tasksRef != null) {
+      return _tasksRef;
+    }
+    return _tasksRef = databaseReference('tasks');
+  }
+
+  DatabaseReference _tasksRef;
+
+  DatabaseReference databaseReference(String path) {
+//
+    if (path == null || path.trim().isEmpty) {
+      path = '';
+    } else {
+      path = path.trim();
+    }
+
     // infinite loop if instantiated in constructor.
     String id = WorkingController().uid;
 
@@ -183,28 +187,15 @@ class FireBaseDB {
     } else {
       id = id.trim();
     }
-
     DatabaseReference ref;
 
-    if (id == null) {
+    if (path.isEmpty) {
+      ref = reference().child('dummy');
+    } else if (id == null) {
       // Important to provide a reference that is not likely there in case called by deletion routine.
-      ref = reference().child('devices').child('dummy');
+      ref = reference().child(path).child('dummy');
     } else {
-      ref = reference().child('devices').child(id);
-    }
-    return ref;
-  }
-
-  DatabaseReference get tasksRef {
-    DatabaseReference ref;
-
-    // infinite loop if instantiated in constructor.
-    final String id = WorkingController().uid;
-
-    if (id.isEmpty) {
-      ref = _db?.reference()?.child('tasks')?.child('dummy');
-    } else {
-      ref = _db?.reference()?.child('tasks')?.child(id);
+      ref = reference().child(path).child(id);
     }
     return ref;
   }
@@ -378,6 +369,12 @@ class FireBaseDB {
 
   void dispose() => _db.dispose();
 
+  set changedListener(void Function(Event event) func) =>
+      _db.changedListener = func;
+
+  set addedListener(void Function(Event event) func) =>
+      _db.addedListener = func;
+
   Future<bool> isOnline() => _db.isOnline();
 
   static Future<void> goOnline() => _db.goOnline();
@@ -400,4 +397,29 @@ class FireBaseDB {
     }
     return stamp;
   }
+
+  Future<bool> deleteRef(DatabaseReference ref) async {
+    bool delete = false;
+    if (ref != null) {
+      try {
+        await ref.set(null);
+        delete = true;
+      } catch (ex) {
+        delete = false;
+      }
+    }
+    return delete;
+  }
+
+  void removeAnonymous() {
+    if (_anonymousUser == null) {
+      _anonymousUser = userRef;
+      _anonymousDeviceRef = yourDevicesRef;
+    } else {
+      deleteRef(_anonymousUser);
+      deleteRef(_anonymousDeviceRef);
+    }
+  }
+
+  void setEvents(Query ref) => _db.setEvents(ref);
 }

@@ -104,7 +104,8 @@ class Settings {
                         'multiple platforms from a single codebase.')),
                 TextSpan(
                   style: aboutTextStyle,
-                  text: '\n\n${I10n.s('The source code is available on Github:')}',
+                  text:
+                      '\n\n${I10n.s('The source code is available on Github:')}',
                 ),
                 AppSettings.linkTextSpan(
                   style: linkStyle,

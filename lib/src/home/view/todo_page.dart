@@ -33,4 +33,3 @@ class TodoPage extends StatefulWidget {
   // ignore: no_logic_in_create_state
   State createState() => App.useMaterial ? TodoAndroid() : TodoiOS();
 }
-

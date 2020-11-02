@@ -17,26 +17,48 @@
 ///
 ///           import 'package:workingmemory/model.dart';
 
+/// sql
 export 'package:dbutils/sqlite_db.dart' show SQLiteDB, Transaction;
 
+/// sql plugin
 export 'package:sqflite/sqflite.dart' show Database;
 
+/// remote
 export 'package:remote_config/remote_config.dart'
     show RemoteConfig, RemoteConfigValue;
 
+/// Firebase
+export 'package:firebase_database/firebase_database.dart'
+    show DataSnapshot, DatabaseReference, Event, Query;
+
+/// App's model
 export 'package:workingmemory/src/home/model/appmodel.dart' show AppModel;
 
+/// Cloud sync
 export 'package:workingmemory/src/home/model/cloud_db.dart'
     show CloudDB, OnLoginListener;
 
+/// List of icons
 export 'package:workingmemory/src/home/model/icons.dart' show Icons;
 
+/// model
 export 'package:workingmemory/src/home/model/model.dart';
 
+/// database "todo"
+export 'package:workingmemory/src/home/model/todo.dart';
+
+/// favourite icons
+export 'package:workingmemory/src/home/model/favourite_icons.dart';
+
+/// model firebase
 export 'package:workingmemory/src/home/model/firebase_db.dart' show FireBaseDB;
 
-export 'package:workingmemory/src/home/model/sync_db.dart' show SyncDB;
+/// local sync
+export 'package:workingmemory/src/home/model/localsync_db.dart'
+    show LocalSyncDB;
 
+/// semaphore
 export 'package:workingmemory/src/home/model/semaphore.dart' show Semaphore;
 
+/// settings
 export 'package:workingmemory/src/home/model/settings.dart';

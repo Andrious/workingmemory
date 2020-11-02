@@ -34,19 +34,19 @@ import 'package:flutter/material.dart'
 import 'package:workingmemory/src/controller.dart'
     show AppDrawer, WorkingController;
 
-import 'package:mvc_application/view.dart' show AppView;
+import 'package:mvc_application/view.dart' show AppState;
 
 class LoginInfo {
   final WorkingController con = WorkingController();
 
-  Widget scaffold(AppView _vw) {
+  Widget scaffold(AppState _vw) {
     return Scaffold(
         appBar: AppBar(title: const Text('My Home Page')),
         endDrawer: const AppDrawer(),
         body: body(_vw));
   }
 
-  Widget body(AppView _vw) {
+  Widget body(AppState _vw) {
     Future<String> _uid = Future.value(con.uid);
 
     return Column(

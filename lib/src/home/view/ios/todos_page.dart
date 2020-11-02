@@ -49,18 +49,12 @@ class TodosiOS extends StateMVC<TodosPage> {
     con = controller;
   }
   Controller con;
-  int _segment = 0;
-
-  WorkMenu _menu;
 
   Widget _leading;
   Widget _trailing;
 
   @override
   Widget build(BuildContext context) {
-//    if (!con.app.loggedIn) return SignIn();
-    // Rebuilt the menu if state changes.
-    _menu = WorkMenu();
     // Supply the leading and trailing buttons.
     _supplyButtons();
     return CupertinoPageScaffold(
@@ -73,26 +67,6 @@ class TodosiOS extends StateMVC<TodosPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // CupertinoSegmentedControl<int>(
-                //   groupValue: _segment,
-                //   children: <int, Widget>{
-                //     0: I10n.t('New'),
-                //     1: I10n.t('Settings'),
-                //   },
-                //   onValueChanged: (i) {
-                //     setState(() {
-                //       _segment = i;
-                //       switch (i) {
-                //         case 0:
-                //           break;
-                //         case 1:
-                //           break;
-                //         case 2:
-                //           break;
-                //       }
-                //     });
-                //   },
-                // ),
                 Expanded(child: MemoryList(parent: this)),
               ],
             )));
@@ -107,13 +81,8 @@ class TodosiOS extends StateMVC<TodosPage> {
     refresh();
   }
 
-  @override
-  void onError(FlutterErrorDetails details) {
-    super.onError(details);
-  }
-
-  void _supplyButtons(){
-
+  void _supplyButtons() {
+    //
     _leading = CupertinoButton(
       padding: const EdgeInsets.all(10),
       onPressed: () async {
@@ -134,7 +103,7 @@ class TodosiOS extends StateMVC<TodosPage> {
       child: I10n.t('New'),
     );
 
-    if(Settings.getLeftHanded()){
+    if (Settings.getLeftHanded()) {
       final temp = _leading;
       _leading = _trailing;
       _trailing = temp;
@@ -161,8 +130,6 @@ class MemoryList extends StatelessWidget {
                   largeTitle: Text('Working Memory'),
                 ),
                 SliverSafeArea(
-//                  top: false,
-//                  minimum: const EdgeInsets.only(top: 8),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -199,7 +166,6 @@ class MemoryList extends StatelessWidget {
                                           color: Colors.white, size: 36)))),
                           child: Container(
                             decoration: BoxDecoration(
-                                color: App.themeData.canvasColor,
                                 border: Border(
                                     bottom: BorderSide(
                                         color: App.themeData.dividerColor))),

@@ -21,12 +21,13 @@ class ISOSpinner extends StatefulWidget {
   /// Assign the specified Locale.
   Future<void> onSelectedItemChanged(int index) async {
     final List<Locale> localesList = locales();
-    if(localesList != null) {
+    if (localesList != null) {
       s.App.locale = localesList[index];
       await s.Prefs.setString('locale', localesList[index].toLanguageTag());
       s.App.refresh();
     }
   }
+
   @override
   State createState() => _SpinnerState();
 }
@@ -47,6 +48,7 @@ class _SpinnerState extends State<ISOSpinner> {
     }
     controller = FixedExtentScrollController(initialItem: index);
   }
+
   List<Locale> locales;
   FixedExtentScrollController controller;
 

@@ -23,7 +23,20 @@ import 'package:intl/intl.dart' show DateFormat;
 
 import 'package:workingmemory/src/model.dart' as m;
 
-import 'package:workingmemory/src/view.dart';
+import 'package:workingmemory/src/view.dart'
+    show
+        App,
+        AppLifecycleState,
+        DataFields,
+        FormState,
+        MaterialPageRoute,
+        Navigator,
+        Prefs,
+        SignIn,
+        Text,
+        TextEditingController,
+        ThemeData,
+        Widget;
 
 import 'package:workingmemory/src/controller.dart';
 
@@ -34,8 +47,10 @@ final ThemeData theme = App.themeData;
 class Controller extends ControllerMVC {
   factory Controller() => _this ??= Controller._();
   Controller._() : super() {
+    // The data for the app.
     _model = m.Model();
     _dataFields = ToDoEdit(this);
+    _icons = m.Icons.code;
   }
   static Controller _this;
 
@@ -61,9 +76,11 @@ class Controller extends ControllerMVC {
 
   @override
   Future<bool> initAsync() async {
+    // Initiate the 'Model' aspect of this app.
     final bool init = await _model.initAsync();
-    final List<Map<String, dynamic>> records = await data.query();
-    unawaited(setAlarms(records));
+//    final List<Map<String, dynamic>> records = await data.query();
+//    unawaited(setAlarms(records));
+    await data.query();
     _favIcons = await _model.listIcons();
     return init;
   }
@@ -89,7 +106,7 @@ class Controller extends ControllerMVC {
   List<Map<String, dynamic>> _favIcons;
 
   Map<String, String> get icons => _icons;
-  final Map<String, String> _icons = m.Icons.code;
+  Map<String, String> _icons;
 
   Future<bool> saveIcon(String icon) async {
     data.icon = icon;
@@ -106,11 +123,9 @@ class Controller extends ControllerMVC {
   }
 
   Future<void> signIn() async {
-//    app.signIn();
-    await signOut();
     await Navigator.push(state.context,
         MaterialPageRoute<void>(builder: (context) => const SignIn()));
-   refresh();
+    refresh();
   }
 
   void logOut() => app.logOut();
@@ -138,17 +153,18 @@ class Controller extends ControllerMVC {
 
   Map<String, dynamic> newRec(
       Map<String, dynamic> diffRec, Map<String, dynamic> oldRec) {
-    final Map<String, dynamic> newRec = {};
-
+    Map<String, dynamic> _newRec = {};
     if (oldRec == null) {
-      newRec.addAll(diffRec);
+      _newRec = _model.newRec(diffRec);
     } else {
-      newRec.addAll(oldRec);
-      newRec.addEntries(diffRec.entries);
+      oldRec.addAll(diffRec);
+      _newRec = oldRec;
     }
-    return newRec;
+    return _newRec;
   }
 
+  // Dump the user's records to Firebase.
+  // Add Firebase records to the local database.
   void recordDump(User user) {
     if (user == null) {
       return;
@@ -160,7 +176,10 @@ class Controller extends ControllerMVC {
 
   String get defaultIcon => _model.defaultIcon;
 
-  void reSync() => _model.reSync();
+  void reSync() {
+    _model.reSync();
+    refresh();
+  }
 
   bool itemsOrdered([bool ordered]) => _model.itemsOrdered(ordered);
 
@@ -216,30 +235,22 @@ class Controller extends ControllerMVC {
   FlutterNotifications _notifications;
 
   /// Establish any notifications indicated in the record.
-  Future<int> _setNotification(Map<String, dynamic> rec) async {
-    int id;
-    final DateTime time = rec['DateTime'];
-    if (time != null) {
-//      final vibrationPattern = Int64List(4);
-//      vibrationPattern[0] = 0;
-//      vibrationPattern[1] = 1000;
-//      vibrationPattern[2] = 5000;
-//      vibrationPattern[3] = 2000;
-//
-//      id = notifications.schedule(
-//        time,
-//        title: rec['Item'],
-//        body: 'WorkingMemory',
-//        sound: const RawResourceAndroidNotificationSound('slow_spring_board'),
-//        largeIcon: const DrawableResourceAndroidBitmap('sample_large_icon'),
-//          vibrationPattern: vibrationPattern,
-//          enableLights: true,
-//          color: const Color.fromARGB(255, 255, 0, 0),
-//          ledColor: const Color.fromARGB(255, 255, 0, 0),
-//          ledOnMs: 1000,
-//          ledOffMs: 500,);
+  Future<int> setNotification(Map<String, dynamic> rec) async {
+    //
+    final dateTime = rec['DateTime'];
+    DateTime time;
+    if (dateTime is String) {
+      time = DateTime.parse(dateTime);
+    } else if (dateTime is DateTime) {
+      time = dateTime;
+    } else {
+      return -1;
+    }
 
-      id = rec['AlarmId'];
+    int id;
+
+    if (time != null) {
+      id = rec['AlarmId'] ?? -1;
 
       // Cancel the previous notification if any.
       if (id > -1) {
@@ -258,7 +269,7 @@ class Controller extends ControllerMVC {
     return id;
   }
 
-  bool _cancelNotification(int id) {
+  bool cancelNotification(int id) {
     final bool cancel = id != null && id > -1;
     if (cancel) {
       _notifications.cancel(id);
@@ -266,91 +277,6 @@ class Controller extends ControllerMVC {
     return cancel;
   }
 }
-
-//class ToDoEdit extends _ToDoList {
-//  bool hasName;
-//  TextEditingController changer;
-//  bool hasChanged = false;
-//
-////  final scaffoldKey = GlobalKey<ScaffoldState>();
-//
-//  final formKey = GlobalKey<FormState>();
-//
-//  void init([Map todo]) {
-//    this.todo = todo;
-//
-//    hasName = this.todo?.isNotEmpty ?? false;
-//
-//    if (hasName) {
-//      item = todo['Item'];
-//      dateTime = DateTime.tryParse(todo['DateTime']);
-//      icon = todo['Icon'];
-//    } else {
-//      item = ' ';
-//      icon = Controller().defaultIcon;
-//    }
-//
-//    changer = TextEditingController(text: item);
-//    changer.addListener(() {
-//      hasChanged = changer.value.text != item;
-//    });
-//
-//    dateTime = dateTime ?? DateTime.now();
-//  }
-//
-//  Widget get title => Text(hasName ? item : 'New');
-//
-//  Future<bool> onPressed() async {
-//    bool save = formKey.currentState.validate();
-//    if (save) {
-//      formKey.currentState.save();
-//      save = await this.save(
-//          {'Item': changer.text.trim(), 'DateTime': dateTime, 'Icon': icon},
-//          this.todo);
-//      await retrieve();
-//    }
-//    return save;
-//  }
-//
-//  Future<bool> save(
-//      Map<String, dynamic> diffRec, Map<String, dynamic> oldRec) async {
-//    bool save = await Controller().saveRec(diffRec, oldRec);
-//    return save;
-//  }
-//
-//  Future<bool> delete(Map<String, dynamic> data) =>
-//      _model.delete(data).then((delete) async {
-//        await Controller().data.query();
-//        return delete;
-//      });
-//
-//  Future<bool> unDelete(Map<String, dynamic> data) =>
-//      _model.unDelete(data).then((un) async {
-//        await Controller().data.query();
-//        return un;
-//      });
-//}
-//
-//typedef MapCallback = void Function(Map data);
-//
-//class _ToDoList extends _ToDoFields {
-//  _ToDoList() : super() {
-//    scaffoldKey = GlobalKey<ScaffoldState>();
-//    _model = m.Model();
-//  }
-//  final DateFormat dateFormat = DateFormat('EEEE, MMM dd  h:mm a');
-//  GlobalKey<ScaffoldState> scaffoldKey;
-//  m.Model _model;
-//
-//  List<Map<String, dynamic>> get items => _items;
-//  List<Map<String, dynamic>> _items = [];
-//
-//  /// Retrieve the to-do items from the database
-//  Future<List<Map<String, dynamic>>> retrieve() async {
-//    _items = await _model.list();
-//    return _items;
-//  }
-//}
 
 class _ToDoFields {
   Map<String, dynamic> todo;
@@ -442,14 +368,17 @@ class ToDoEdit extends DataFields {
   @override
   Future<bool> save(Map<String, dynamic> rec) async {
     //
-    final int id = await con?._setNotification(rec);
-
     rec['TimeZone'] = Prefs.getString('timezone');
 
-    final bool save = await _model.save(rec);
+    final int id = await con?.setNotification(rec);
 
-    if (!save) {
-      con?._cancelNotification(id);
+    bool save = id > -1;
+
+    if (save) {
+      save = await _model.save(rec);
+      if (!save) {
+        con?.cancelNotification(id);
+      }
     }
     return save;
   }

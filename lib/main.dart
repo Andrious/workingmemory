@@ -17,14 +17,60 @@
 ///
 ///                   https://github.com/Andrious/workingmemory
 
-import 'package:workingmemory/src/view.dart' show Key, WorkingView;
+import 'package:workingmemory/src/view.dart' hide runApp;
 
-import 'package:workingmemory/src/controller.dart' show App, runApp;
+import 'package:workingmemory/src/controller.dart';
 
 void main() => runApp(WorkingMemory());
 
-class WorkingMemory extends App {
-  WorkingMemory({Key key}):super(key: key);
+class WorkingMemory extends AppStatefulWidget {
+  //
+  WorkingMemory({Key key}) : super(key: key);
+
+  static final Key pageKey = UniqueKey();
+
   @override
-  WorkingView createView() => WorkingView();
+  // Set up 'the View' of the MVC design pattern.
+  AppState createView() => AppState(
+        con: WorkingController(),
+        title: 'Working Memory',
+        home: TodosPage(key: pageKey),
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: [
+          I10nDelegate(),
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+        ],
+        localeListResolutionCallback:
+            (List<Locale> locales, Iterable<Locale> supportedLocales) {
+          Locale locale;
+          // Retrieve the last locale used.
+          final localePref = Prefs.getString('locale');
+          if (localePref.isNotEmpty) {
+            final localeCode = localePref.split('-');
+            String languageCode;
+            String countryCode;
+            if (localeCode.length == 2) {
+              languageCode = localeCode.first;
+              countryCode = localeCode.last;
+            } else {
+              languageCode = localeCode.first;
+            }
+            locale = Locale(languageCode, countryCode);
+          } else {
+            // Use the device's locale.
+            if (locales.isNotEmpty) {
+              locale = locales.first;
+            } else if (supportedLocales.isNotEmpty) {
+              // Use the first supported locale.
+              locale = supportedLocales.first;
+            }
+          }
+          return locale;
+        },
+        supportedLocales: I10n.supportedLocales,
+        switchUI: Prefs.getBool('switchUI'),
+        inTheme: () => ThemeController().getTheme(),
+      );
 }

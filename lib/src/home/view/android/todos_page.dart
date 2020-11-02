@@ -51,7 +51,6 @@ import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart' show App, Controller;
 
-
 class TodosAndroid extends StateMVC<TodosPage> {
   TodosAndroid() : super(Controller()) {
     _con = controller;
@@ -105,7 +104,6 @@ class TodosAndroid extends StateMVC<TodosPage> {
                                 color: Colors.white, size: 36))),
                     child: Container(
                       decoration: BoxDecoration(
-                          color: App.themeData.canvasColor,
                           border: Border(
                               bottom: BorderSide(
                                   color: App.themeData.dividerColor))),
@@ -127,7 +125,7 @@ class TodosAndroid extends StateMVC<TodosPage> {
     );
   }
 
-  Future<void> editToDo([Map todo]) async {
+  Future<void> editToDo([Map<String, dynamic> todo]) async {
     final Route<Map<String, dynamic>> route = MaterialPageRoute(
       settings: const RouteSettings(name: '/todos/todo'),
       builder: (BuildContext context) => TodoPage(todo: todo),

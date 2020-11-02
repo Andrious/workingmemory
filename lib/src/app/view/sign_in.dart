@@ -23,7 +23,6 @@ import 'package:workingmemory/src/controller.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-
 class SignIn extends StatefulWidget {
   const SignIn({Key key}) : super(key: key);
   @override

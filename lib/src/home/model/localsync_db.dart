@@ -17,10 +17,10 @@
 
 import 'package:workingmemory/src/model.dart';
 
-class SyncDB extends SQLiteDB {
-  factory SyncDB() => _this ??= SyncDB._();
-  SyncDB._(): super();
-  static SyncDB _this;
+class LocalSyncDB extends SQLiteDB {
+  factory LocalSyncDB() => _this ??= LocalSyncDB._();
+  LocalSyncDB._() : super();
+  static LocalSyncDB _this;
 
   final String _table = 'sync';
 
@@ -67,6 +67,7 @@ class SyncDB extends SQLiteDB {
   }
 
   Future<int> update(Map<String, dynamic> recValues) async {
+    //
     int result = 0;
 
     final id = recValues['id'];
@@ -102,6 +103,14 @@ class SyncDB extends SQLiteDB {
       result = recs['id'];
     }
     return result;
+  }
+
+  Future<bool> deleteLocalSync(int id) async {
+    if (id == null || id < 1) {
+      return false;
+    }
+    final row = await super.deleteRec(_table, where: 'id = ?', whereArgs: [id]);
+    return row > 0;
   }
 }
 
