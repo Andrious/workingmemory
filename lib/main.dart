@@ -17,11 +17,13 @@
 ///
 ///                   https://github.com/Andrious/workingmemory
 
-import 'package:workingmemory/src/view.dart' hide runApp;
+import 'package:workingmemory/src/view.dart';
 
-import 'package:workingmemory/src/controller.dart';
+import 'package:workingmemory/src/controller.dart' hide runApp;
 
 void main() => runApp(WorkingMemory());
+
+
 
 class WorkingMemory extends AppStatefulWidget {
   //
@@ -33,6 +35,7 @@ class WorkingMemory extends AppStatefulWidget {
   // Set up 'the View' of the MVC design pattern.
   AppState createView() => AppState(
         con: WorkingController(),
+        switchUI: Prefs.getBool('switchUI'),
         title: 'Working Memory',
         home: TodosPage(key: pageKey),
         debugShowCheckedModeBanner: false,
@@ -70,7 +73,10 @@ class WorkingMemory extends AppStatefulWidget {
           return locale;
         },
         supportedLocales: I10n.supportedLocales,
-        switchUI: Prefs.getBool('switchUI'),
-        inTheme: () => ThemeController().getTheme(),
+        inTheme: () => ThemeController().setIfDarkMode(),
+        inError: (details) {
+          super.onError(details);
+        },
+        inAsyncError: (details) => false,
       );
 }

@@ -212,8 +212,10 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
         trailing: Switch(
           value: _theme.isDarkMode,
           onChanged: (val) {
-            _theme.darkMode = val;
-            if (!val) {
+            _theme.isDarkMode = val;
+            if (val) {
+              App.themeData = _theme.setDarkMode();
+            }else{
               App.setThemeData();
             }
             refresh();
@@ -285,6 +287,12 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
     setState(() {
       _leftHanded = value;
     });
+  }
+
+  // A custom error routine if you want.
+  @override
+  void onError(FlutterErrorDetails details){
+    super.onError(details);
   }
 }
 

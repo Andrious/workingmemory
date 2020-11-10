@@ -27,7 +27,7 @@ import 'package:flutter/material.dart'
         Widget,
         WidgetsFlutterBinding;
 
-import 'package:flutter/foundation.dart' show FlutterExceptionHandler;
+import 'package:flutter/foundation.dart' show FlutterErrorDetails, FlutterExceptionHandler;
 
 import 'package:mvc_application/controller.dart' as c show runApp;
 
@@ -54,7 +54,7 @@ void runApp(
   Widget app, {
   FlutterExceptionHandler handler,
   ErrorWidgetBuilder builder,
-  ReportErrorHandler reportError,
+  ReportErrorHandler errorReport,
 }) async {
   // Allow for FirebaseCrashlytics.instance
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,11 +66,12 @@ void runApp(
 
   handler ??= crash.recordFlutterError;
 
-  reportError ??= crash.recordError;
+  errorReport ??= crash.recordError;
 
-//  crash.enableInDevMode = true;
+  // If true, then crash reporting data is sent to Firebase.
+  await crash.setCrashlyticsCollectionEnabled(false);
 
-  c.runApp(app, handler: handler, builder: builder, reportError: reportError);
+  c.runApp(app, handler: handler, builder: builder, errorReport: errorReport);
 }
 
 /// The Controller for the Application as a whole.
@@ -259,4 +260,10 @@ class WorkingController extends AppController {
   String get token => _auth.accessToken;
 
   String get tokenId => _auth.idToken;
+
+  /// Override if you like to customize error handling.
+  @override
+  void onError(FlutterErrorDetails details) {
+    super.onError(details);
+  }
 }

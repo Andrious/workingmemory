@@ -1,3 +1,9 @@
+## 1.8.0
+ November 09, 2020
+- Enhanced 'Dark Mode' feature
+- Introduced Widget & Async error handling.
+- Changed runApp.reportError to runApp.errorReport
+
 ## 1.7.0
  November 02, 2020
 - Update to mvc_application 6.1.0

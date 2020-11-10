@@ -51,6 +51,7 @@ import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart' show App, Controller;
 
+/// MVC design pattern is the 'View' -- the build() in this State object.
 class TodosAndroid extends StateMVC<TodosPage> {
   TodosAndroid() : super(Controller()) {
     _con = controller;
@@ -133,5 +134,11 @@ class TodosAndroid extends StateMVC<TodosPage> {
     );
     await Navigator.of(context).push(route);
     refresh();
+  }
+
+  // A custom error routine if you want.
+  @override
+  void onError(FlutterErrorDetails details){
+    super.onError(details);
   }
 }

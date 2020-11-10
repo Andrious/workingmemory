@@ -16,13 +16,7 @@
 ///          Created  07 Jun 2020
 ///
 
-import 'package:workingmemory/src/view.dart'
-    show
-        App,
-        CupertinoThemeData,
-        MaterialBasedCupertinoThemeData,
-        ThemeData,
-        ThemeMode;
+import 'package:workingmemory/src/view.dart' show ThemeData;
 
 import 'package:workingmemory/src/controller.dart' show ControllerMVC, Prefs;
 
@@ -34,15 +28,6 @@ class ThemeController extends ControllerMVC {
   }
   static ThemeController _this;
   bool _isDarkmode;
-
-  /// Get App's Material theme data
-  ThemeData get themeData => App.themeData;
-
-  /// Get the App's IOS theme data
-  CupertinoThemeData get iOSTheme => App.iOSTheme;
-
-  /// Supply the appropriate theme.
-  ThemeMode get themeMode => _isDarkmode ? ThemeMode.dark : ThemeMode.system;
 
   /// Indicate if in 'dark mode' or not
   bool get isDarkMode => _isDarkmode;
@@ -56,70 +41,13 @@ class ThemeController extends ControllerMVC {
     Prefs.setBool('darkmode', _isDarkmode);
   }
 
-  /// Indicate if in 'dark mode' or not.
-  bool get darkMode => _isDarkmode;
-
-  /// Set the App's dark mode or not.
-  set darkMode(bool set) {
-    isDarkMode = set;
-    if (_isDarkmode) {
-      App.themeData = ThemeData.dark();
-      App.iOSTheme = ThemeData.dark();
-    }
+  /// Explicitly return the 'dark theme.'
+  ThemeData setDarkMode() {
+    isDarkMode = true;
+    return ThemeData.dark();
   }
 
-  /// Explicitly set to 'light mode.'
-  bool setLightMode() {
-    final _light = setUIBrightness(darkMode: false);
-    setTheme();
-    return _light;
-  }
-
-  /// Explicitly set to 'dark mode.'
-  bool setDarkMode() {
-    final _dark = setUIBrightness(darkMode: true);
-    setTheme();
-    return _dark;
-  }
-
-  /// Assign the App's theme to dark mode only if specified.
-  bool setIfDarkMode() {
-    darkMode = _isDarkmode;
-    return _isDarkmode;
-  }
-
-  /// Set the App's user interface brightness.
-  bool setUIBrightness({bool darkMode}) {
-    isDarkMode = darkMode;
-    if (!_isDarkmode) {
-      App.themeData = ThemeData.light();
-    }
-    // Rebuild the State.
-    refresh();
-    return _isDarkmode;
-  }
-
-  /// Return the App's theme
-  /// but not before changing it to 'dark mode' if to be set.
-  ThemeData getTheme() {
-    setIfDarkMode();
-    return App.themeData;
-  }
-
-  /// Set the App's theme
-  bool setTheme([ThemeData theme]) {
-    //
-    if (theme == null) {
-      return false;
-    }
-    // Material theme.
-    App.themeData = theme;
-    // Cupertino theme.
-    App.iOSTheme = MaterialBasedCupertinoThemeData(
-      materialTheme: App.themeData,
-    );
-    // Rebuild the State.
-    refresh();
-    return true;
-  }
+  /// Returns 'dark theme' only if specified.
+  /// Otherwise, it returns null.
+  ThemeData setIfDarkMode() => _isDarkmode ? setDarkMode() : null;
 }

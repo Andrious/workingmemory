@@ -2,7 +2,7 @@ name: workingmemory
 description: A ToDo List for a not so working memory
 publish_to: none
 
-version: 1.6.0
+version: 1.8.0
 
 environment:
   sdk: '>=2.10.0 <3.0.0'
@@ -13,7 +13,7 @@ dependencies:
 
   # https://pub.dev/packages/mvc_application
   mvc_application: ^6.0.0
-#     path: ../../../packages/mvc_application
+#    path: ../../../packages/mvc_application
 #    git:
 #      url: git://github.com/AndriousSolutions/mvc_application.git
 
