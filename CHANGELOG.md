@@ -1,3 +1,9 @@
+
+
+## 1.9.0
+ February 02, 2022
+- Upgraded code
+
 ## 1.8.0
  November 09, 2020
 - Enhanced 'Dark Mode' feature

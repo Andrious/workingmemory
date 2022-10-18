@@ -24,16 +24,16 @@ import 'package:workingmemory/src/controller.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignIn extends StatefulWidget {
-  const SignIn({Key key}) : super(key: key);
+  const SignIn({Key? key}) : super(key: key);
   @override
   State createState() => _SignInState();
 }
 
-class _SignInState extends StateMVC<SignIn> {
+class _SignInState extends StateX<SignIn> {
   _SignInState() : super() {
     app = WorkingController();
   }
-  WorkingController app;
+  late WorkingController app;
   Widget working = Container();
 
   @override

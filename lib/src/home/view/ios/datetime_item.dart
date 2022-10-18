@@ -25,7 +25,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:workingmemory/src/view.dart' show showCupertinoDatePicker;
 
 class DTiOS extends StatelessWidget {
-  DTiOS({Key key, DateTime dateTime, @required this.onChanged})
+  DTiOS({Key? key, required DateTime dateTime, required this.onChanged})
       : assert(onChanged != null),
         date = DateTime(dateTime.year, dateTime.month, dateTime.day),
         time = DateTime(0, 0, 0, dateTime.hour, dateTime.minute),
@@ -41,7 +41,7 @@ class DTiOS extends StatelessWidget {
     final DateTime initDate = date;
     final DateTime initTime = time;
     return DefaultTextStyle(
-        style: theme.textTheme.subtitle1,
+        style: theme.textTheme.subtitle1!,
         child: Row(children: <Widget>[
           Expanded(
               child: Container(

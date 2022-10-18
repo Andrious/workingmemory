@@ -16,49 +16,38 @@
 ///          Created  22 Aug 2018
 import 'dart:async' show Future;
 
-import 'package:flutter/material.dart'
-    show
-        AppBar,
-        AsyncSnapshot,
-        Color,
-        Column,
-        CrossAxisAlignment,
-        FutureBuilder,
-        Navigator,
-        RaisedButton,
-        Scaffold,
-        Text,
-        TextStyle,
-        Widget;
+import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart'
     show AppDrawer, WorkingController;
 
-import 'package:mvc_application/view.dart' show AppState;
-
+///
 class LoginInfo {
+  ///
   final WorkingController con = WorkingController();
 
+  ///
   Widget scaffold(AppState _vw) {
     return Scaffold(
         appBar: AppBar(title: const Text('My Home Page')),
-        endDrawer: const AppDrawer(),
+        endDrawer: AppDrawer(),
         body: body(_vw));
   }
 
+  ///
   Widget body(AppState _vw) {
     Future<String> _uid = Future.value(con.uid);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        RaisedButton(
+        ElevatedButton(
           onPressed: () {
             Navigator.of(_vw.context).pushNamed('/todos');
           },
-          child: const Text('My Todos'),
+          child: Text('Working Memory'.tr),
         ),
-        RaisedButton(
+        ElevatedButton(
           onPressed: () {
             _vw.setState(() {
               _uid = con.signInSilently().then((log) {
@@ -68,7 +57,7 @@ class LoginInfo {
           },
           child: const Text('Test signInSilently'),
         ),
-        RaisedButton(
+        ElevatedButton(
           onPressed: () {
             _vw.setState(() {
               _uid = con.signInWithGoogle().then((log) {

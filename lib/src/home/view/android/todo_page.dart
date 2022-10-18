@@ -24,11 +24,13 @@ import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart';
 
-class TodoAndroid extends StateMVC<TodoPage> {
+///
+class TodoAndroid extends StateX<TodoPage> {
+  ///
   TodoAndroid() : super(Controller()) {
-    _con = controller;
+    _con = controller as Controller;
   }
-  Controller _con;
+  late Controller _con;
 
   @override
   void initState() {
@@ -37,9 +39,9 @@ class TodoAndroid extends StateMVC<TodoPage> {
     _con.data.init(widget.todo);
   }
 
-  Widget _leading;
-  Widget _trailing;
-  BuildContext _scaffoldContext;
+  Widget? _leading;
+  Widget? _trailing;
+  late BuildContext _scaffoldContext;
 
   @override
   Widget build(BuildContext context) {
@@ -47,14 +49,16 @@ class TodoAndroid extends StateMVC<TodoPage> {
     return Scaffold(
       appBar: AppBar(
         title: Settings.getLeftHanded() ? _leading : _con.data.title,
-        actions: _trailing == null ? null : [_trailing],
+        actions: _trailing == null ? null : [_trailing!],
       ),
       body: Form(
         onWillPop: _onWillPop,
-        child: _con.data.linkForm(ListView(
-          padding: const EdgeInsets.all(16),
-          children: _listWidgets(),
-        )),
+        child: _con.data.linkForm(
+          ListView(
+            padding: const EdgeInsets.all(16),
+            children: _listWidgets(),
+          ),
+        ),
       ),
     );
   }
@@ -64,15 +68,14 @@ class TodoAndroid extends StateMVC<TodoPage> {
       return true;
     }
 
-    final TextStyle dialogTextStyle = theme.textTheme.subtitle1
-        .copyWith(color: theme.textTheme.caption.color);
+    final TextStyle dialogTextStyle = theme!.textTheme.subtitle1!
+        .copyWith(color: theme!.textTheme.caption!.color);
 
     return await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              content:
-                  Text(I10n.s('Discard new event?'), style: dialogTextStyle),
+              content: Text('Discard new event?'.tr, style: dialogTextStyle),
               actions: _listButtons(),
             );
           },
@@ -92,22 +95,25 @@ class TodoAndroid extends StateMVC<TodoPage> {
             filled: true,
           ),
           validator: (v) {
-            if (v.isEmpty) {
-              return I10n.s('Cannot be empty.');
+            if (v!.isEmpty) {
+              return 'Cannot be empty.'.tr;
             }
             return null;
           },
           onSaved: (value) {
-            _con.data.item = value;
+            _con.data.item = value!;
           },
         ),
       ),
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
         Center(
-            child: Icon(IconData(int.tryParse(_con.data.icon),
-                fontFamily: 'MaterialIcons'))),
+          child: Icon(
+            IconData(int.tryParse(_con.data.icon!)!,
+                fontFamily: 'MaterialIcons'),
+          ),
+        ),
         DateTimeItem(
-          dateTime: _con.data.dateTime,
+          dateTime: _con.data.dateTime!,
           onChanged: (DateTime value) {
             setState(() {
               _con.data.dateTime = value;
@@ -118,8 +124,9 @@ class TodoAndroid extends StateMVC<TodoPage> {
       ]),
     ];
 
-    if (_con.favIcons.isNotEmpty) {
-      widgets.add(Container(
+    if (_con.favIcons!.isNotEmpty) {
+      widgets.add(
+        Container(
           height: 100,
           decoration: BoxDecoration(
             border: Border.all(width: 4),
@@ -127,50 +134,59 @@ class TodoAndroid extends StateMVC<TodoPage> {
           ),
           child: IconItems(
               icons: {
-                for (var e in _con.favIcons) e.values.first: e.values.first
+                for (var e in _con.favIcons!) e.values.first: e.values.first
               },
-              icon: _con.data.icon,
+              icon: _con.data.icon!,
               onTap: (icon) {
                 setState(() {
                   _con.data.icon = icon;
                 });
-              })));
+              }),
+        ),
+      );
     }
 
-    widgets.add(Builder(builder: (BuildContext context) {
-      // So to access the Scaffold's state object.
-      _scaffoldContext = context;
-      return Container(
-          height: 600,
-          child: IconItems(
+    widgets.add(
+      Builder(
+        builder: (BuildContext context) {
+          // So to access the Scaffold's state object.
+          _scaffoldContext = context;
+          return Container(
+            height: 600,
+            child: IconItems(
               icons: _con.icons,
-              icon: _con.data.icon,
+              icon: _con.data.icon!,
               onTap: (icon) async {
                 await _con.saveIcon(icon);
                 setState(() {});
-              }));
-    }));
-
+              },
+            ),
+          );
+        },
+      ),
+    );
     return widgets;
   }
 
   void _scaffoldButtons() {
-    Widget temp;
+    Widget? temp;
     _leading = null;
-    _trailing = FlatButton(
+    _trailing = ElevatedButton(
       onPressed: () async {
         final bool save = await _con.data.onPressed();
         if (save) {
           Navigator.of(_scaffoldContext, rootNavigator: true).pop();
         } else {
-          Scaffold.of(_scaffoldContext).showSnackBar(SnackBar(
-            content: I10n.t('Not saved.'),
-          ));
+          ScaffoldMessenger.maybeOf(_scaffoldContext)?.showSnackBar(
+            SnackBar(
+              content: Text('Not saved.'.tr),
+            ),
+          );
         }
       },
       child: Text(
-        I10n.s('Save'),
-        style: theme.textTheme.bodyText2.copyWith(color: Colors.white),
+        'Save'.tr,
+        style: theme!.textTheme.bodyText2!.copyWith(color: Colors.white),
       ),
     );
 
@@ -187,20 +203,20 @@ class TodoAndroid extends StateMVC<TodoPage> {
     Widget trailing;
     Widget temp;
 
-    leading = FlatButton(
+    leading = ElevatedButton(
       onPressed: () {
         Navigator.of(context)
             .pop(false); // Pops the confirmation dialog but not the page.
       },
-      child: I10n.t('Cancel'),
+      child: L10n.t('Cancel'),
     );
 
-    trailing = FlatButton(
+    trailing = ElevatedButton(
       onPressed: () {
         Navigator.of(context)
             .pop(true); // Returning true to _onWillPop will pop again.
       },
-      child: I10n.t('Discard'),
+      child: L10n.t('Discard'),
     );
 
     // Switch the buttons around when indicated.
@@ -213,6 +229,7 @@ class TodoAndroid extends StateMVC<TodoPage> {
   }
 }
 
+///
 enum DismissDialogAction {
   cancel,
   discard,

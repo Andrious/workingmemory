@@ -18,22 +18,30 @@
 
 import 'package:workingmemory/src/view.dart' show ThemeData;
 
-import 'package:workingmemory/src/controller.dart' show ControllerMVC, Prefs;
+import 'package:workingmemory/src/controller.dart'
+    show App, StateXController, Prefs;
 
 /// The App's theme controller
-class ThemeController extends ControllerMVC {
+class ThemeController extends StateXController {
+  ///
   factory ThemeController() => _this ??= ThemeController._();
   ThemeController._() {
     _isDarkmode = Prefs.getBool('darkmode', false);
   }
-  static ThemeController _this;
-  bool _isDarkmode;
+  static ThemeController? _this;
+  late bool _isDarkmode;
+
+  @override
+  Future<bool> initAsync() async {
+    App.themeData = setIfDarkMode();
+    return true;
+  }
 
   /// Indicate if in 'dark mode' or not
-  bool get isDarkMode => _isDarkmode;
+  bool? get isDarkMode => _isDarkmode;
 
   /// Record if the App's in dark mode or not.
-  set isDarkMode(bool set) {
+  set isDarkMode(bool? set) {
     if (set == null) {
       return;
     }
@@ -49,5 +57,21 @@ class ThemeController extends ControllerMVC {
 
   /// Returns 'dark theme' only if specified.
   /// Otherwise, it returns null.
-  ThemeData setIfDarkMode() => _isDarkmode ? setDarkMode() : null;
+  ThemeData? setIfDarkMode() {
+    ThemeData? data;
+
+    if (!_isDarkmode) {
+      data = null;
+    } else {
+      data = setDarkMode();
+    }
+    return data;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    // always nullify when disposed.
+    _this = null;
+  }
 }

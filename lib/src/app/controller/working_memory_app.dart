@@ -18,29 +18,22 @@
 
 import 'dart:async' show Future;
 
-import 'package:flutter/material.dart'
-    show
-        AppLifecycleState,
-        BuildContext,
-        ErrorWidgetBuilder,
-        Navigator,
-        Widget,
-        WidgetsFlutterBinding;
+import 'package:flutter/foundation.dart'
+    show FlutterErrorDetails, FlutterExceptionHandler;
 
-import 'package:flutter/foundation.dart' show FlutterErrorDetails, FlutterExceptionHandler;
-
-import 'package:mvc_application/controller.dart' as c show runApp;
+import 'package:fluttery_framework/controller.dart'; // as c;
 
 import 'package:workingmemory/src/model.dart'
-    show CloudDB, FireBaseDB, RemoteConfig;
+    show CloudDB, DefaultFirebaseOptions, FireBaseDB, RemoteConfig;
 
-import 'package:workingmemory/src/view.dart'
-    show I10n, ReportErrorHandler, showBox;
+import 'package:workingmemory/src/view.dart' show ReportErrorHandler, showBox;
+
+import 'package:workingmemory/src/view.dart' as v;
 
 import 'package:workingmemory/src/controller.dart'
-    show AppController, Controller;
+    show AppController, Controller, ThemeController;
 
-import 'package:package_info/package_info.dart' show PackageInfo;
+import 'package:package_info_plus/package_info_plus.dart' show PackageInfo;
 
 import 'package:auth/auth.dart' show Auth;
 
@@ -50,57 +43,83 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart'
     show FirebaseCrashlytics;
 
 // ignore: avoid_void_async
-void runApp(
+///
+Future<void> runApp(
   Widget app, {
-  FlutterExceptionHandler handler,
-  ErrorWidgetBuilder builder,
-  ReportErrorHandler errorReport,
+  FlutterExceptionHandler? handler,
+  ErrorWidgetBuilder? builder,
+  ReportErrorHandler? report,
+  bool allowNewHandlers = false,
 }) async {
   // Allow for FirebaseCrashlytics.instance
   WidgetsFlutterBinding.ensureInitialized();
-  // Allow for FirebaseCrashlytics.instance
-  await Firebase.initializeApp();
+
+  if (Firebase.apps.isEmpty) {
+    // Allow for FirebaseCrashlytics.instance
+    await Firebase
+        .initializeApp(); //(options: DefaultFirebaseOptions.currentPlatform);
+  }
 
   // Supply Firebase Crashlytics
   final FirebaseCrashlytics crash = FirebaseCrashlytics.instance;
 
   handler ??= crash.recordFlutterError;
 
-  errorReport ??= crash.recordError;
+  report ??= crash.recordError;
 
   // If true, then crash reporting data is sent to Firebase.
   await crash.setCrashlyticsCollectionEnabled(false);
 
-  c.runApp(app, handler: handler, builder: builder, errorReport: errorReport);
+  v.runApp(
+    app,
+    errorHandler: handler,
+    errorScreen: builder,
+    errorReport: report,
+    allowNewHandlers: allowNewHandlers,
+  );
 }
 
 /// The Controller for the Application as a whole.
 class WorkingController extends AppController {
+  ///
   factory WorkingController() => _this ??= WorkingController._();
   WorkingController._();
-  static WorkingController _this;
+  static WorkingController? _this;
 
   @override
   Future<bool> initAsync() async {
     await super.initAsync();
+    // Set this app's theme.
+    final _theme = ThemeController();
+    await _theme.initAsync();
+
     // Firebase remote configuration.
-    _remoteConfig = RemoteConfig();
-    await _remoteConfig.initAsync();
+    _remoteConfig = RemoteConfig(key: 'rij;vwf553676-tgh2pc;jblrgncwjfc2cgncc');
+//    await _remoteConfig.initAsync();
     // Provide the sign in and the loading database info.
-    _auth = Auth(listener: _logInUser);
-    await signIn();
+    _auth = Auth(
+      listener: _logInUser,
+      firebaseOptions: DefaultFirebaseOptions.currentPlatform,
+    );
+
     // Removed from constructor to prevent a stack overflow.
+    // Must be initialized before signIn();
     _con = Controller();
+    if (!App.hotReload) {
+      await signIn();
+    }
     await _con.initAsync();
+
     return true;
   }
 
-  Controller _con;
-  bool _loggedIn;
-  Auth _auth;
+  late Controller _con;
+  late bool _loggedIn;
+  late Auth _auth;
 
+  ///
   RemoteConfig get config => _remoteConfig;
-  RemoteConfig _remoteConfig;
+  late RemoteConfig _remoteConfig;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -110,16 +129,20 @@ class WorkingController extends AppController {
 
   @override
   void dispose() {
-    _con.dispose();
-    _auth?.dispose();
-    _remoteConfig.dispose();
-    I10n.dispose();
-    super.dispose();
+    if (!App.hotReload) {
+      _con.dispose();
+      _auth.dispose();
+      _remoteConfig.dispose();
+//    L10n.dispose();
+      _this = null;
+      super.dispose();
+    }
   }
 
+  ///
   bool get loggedIn => _loggedIn;
 
-  // logout and refresh
+  /// logout and refresh
   void logOut() {
     signOut();
     rebuild();
@@ -133,7 +156,7 @@ class WorkingController extends AppController {
     FirebaseCrashlytics.instance.setUserIdentifier(_auth.displayName);
   }
 
-  // 'disconnect' from Firebase
+  /// 'disconnect' from Firebase
   Future<void> signOut() => _auth.signOut().then(_logInUser);
 
   /// Sign in the user to Firebase
@@ -143,26 +166,31 @@ class WorkingController extends AppController {
       _loggedIn = await signInAnonymously();
     }
     if (_auth.isAnonymous) {
-      FireBaseDB().removeAnonymous();
-      _auth.listener = _con?.recordDump;
+      await FireBaseDB().removeAnonymous();
+      _auth.listener = _con.recordDump;
     }
     return _loggedIn;
   }
 
+  ///
   Future<bool> signInAnonymously() => _auth.signInAnonymously();
 
+  ///
   Future<bool> signInSilently() => _auth.signInSilently();
 
+  ///
   Future<bool> signInWithFacebook() async {
-    FireBaseDB().removeAnonymous();
+    await FireBaseDB().removeAnonymous();
     await _auth.delete();
     await signOut();
     final signIn = _auth.signInWithFacebook();
     return signIn;
   }
-  //    List<String> items = App.packageName.split(".");
 
+  //    List<String> items = App.packageName.split(".");
+  ///
   Future<bool> signInWithTwitter() async {
+//    return Future.value(false);
     //
     final PackageInfo info = await PackageInfo.fromPlatform();
 
@@ -176,31 +204,38 @@ class WorkingController extends AppController {
     if (two.isEmpty) {
       return false;
     }
-    FireBaseDB().removeAnonymous();
+    await FireBaseDB().removeAnonymous();
     await _auth.delete();
     await signOut();
 
     final bool signIn = await _auth
         .signInWithTwitter(
-          key: one,
-          secret: two,
-        )
-        .catchError(getError);
+      key: one,
+      secret: two,
+    )
+        .catchError(
+      (error) async => false,
+      test: (error) {
+        getError(error);
+        return true;
+      },
+    );
 
     if (!signIn) {
-      final Exception ex = _auth.getError();
-      await showBox(text: ex.toString(), context: _con?.state?.context);
+      final Exception? ex = _auth.getError();
+      await showBox(text: ex.toString(), context: (_con.state?.context)!);
     }
     return signIn;
   }
 
+  ///
   Future<bool> signInEmailPassword(BuildContext context) async {
     //
     const String email = '';
 
     const String password = '';
 
-    FireBaseDB().removeAnonymous();
+    await FireBaseDB().removeAnonymous();
     await _auth.delete();
     await signOut();
 
@@ -210,60 +245,97 @@ class WorkingController extends AppController {
     );
 
     if (!signIn) {
-      final Exception ex = _auth.getError();
+      final Exception? ex = _auth.getError();
       await showBox(text: ex.toString(), context: context);
     }
     return signIn;
   }
 
+  ///
   Future<bool> signInWithGoogle() async {
-    FireBaseDB().removeAnonymous();
+    await FireBaseDB().removeAnonymous();
     await _auth.delete();
     await signOut();
     final bool signIn = await _auth.signInWithGoogle();
     if (!signIn) {
-      final Exception ex = _auth.getError();
-      await showBox(text: ex.toString(), context: _con?.state?.context);
+      final Exception? ex = _auth.getError();
+      await showBox(text: ex.toString(), context: (_con.state?.context)!);
     }
     await rebuild();
     return signIn;
   }
 
-  // Stamp the user information to the firebase database.
+  /// Stamp the user information to the firebase database.
   void userStamp() => FireBaseDB().userStamp();
 
-  @override
+  ///
   Future<void> rebuild() async {
     _loggedIn = _auth.isLoggedIn();
-    refresh();
+    setState(() {});
     // Pops only if on the stack and not on the first screen.
-    final BuildContext context = _con?.state?.context;
+    final BuildContext? context = _con.state?.context;
     if (context != null) {
       await Navigator.of(context).maybePop();
     }
   }
 
+  ///
   String get uid => _auth.uid;
 
+  ///
   String get email => _auth.email;
 
+  ///
   String get name => _auth.displayName;
 
+  ///
   String get provider => _auth.providerId;
 
+  ///
   bool get isNewUser => _auth.isNewUser;
 
+  ///
   bool get isAnonymous => _auth.isAnonymous;
 
+  ///
   String get photo => _auth.photoUrl;
 
+  ///
   String get token => _auth.accessToken;
 
+  ///
   String get tokenId => _auth.idToken;
 
   /// Override if you like to customize error handling.
   @override
   void onError(FlutterErrorDetails details) {
     super.onError(details);
+  }
+
+  ///
+  bool get hasError => _error != null;
+
+  ///
+  bool get inError => _error != null;
+  Object? _error;
+
+  ///
+  Exception? getError([Object? error]) {
+    // Return the stored exception
+    Exception? ex;
+    if (_error != null) {
+      ex = _error as Exception;
+    }
+    // Empty the stored exception
+    if (error == null) {
+      _error = null;
+    } else {
+      if (error is! Exception) {
+        error = Exception(error.toString());
+      }
+      _error = error;
+    }
+    // Return the exception just past if any.
+    return ex ??= error as Exception;
   }
 }

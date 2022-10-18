@@ -15,39 +15,49 @@
 ///
 ///          Created  23 Jun 2018
 ///
+///
+import 'dart:async';
 
+///
 import 'dart:collection' show LinkedHashMap;
 
+///
 import 'package:firebase_database/firebase_database.dart'
-    show DataSnapshot, DatabaseReference, Event;
+    show DatabaseReference, DatabaseEvent;
 
+///
 import 'package:workingmemory/src/controller.dart'
-    show App, Controller, WorkingController;
+    show App, Controller, DeviceInfo, WorkingController;
 
+///
 import 'package:workingmemory/src/model.dart'
     show AppModel, FireBaseDB, Model, Semaphore, LocalSyncDB;
 
+///
 import 'package:workingmemory/src/view.dart';
 
 /// What is done, with every change, it's recorded in every other device
 /// to be synced when those devices start up.
 class CloudDB {
+  ///
   factory CloudDB() => _this ??= CloudDB._();
   CloudDB._() {
 //    _appModel = AppModel();
     _fbDB = FireBaseDB();
     _con = Controller();
     _model = _con.model;
+    _offlineSync = LocalSyncDB();
+    _dataSync = DataSync();
   }
-  static CloudDB _this;
+  static CloudDB? _this;
 
-  FireBaseDB _fbDB;
-  AppModel _appModel;
+  late FireBaseDB _fbDB;
+  AppModel? _appModel;
 
-  Controller _con;
-  Model _model;
-  LocalSyncDB _offlineSync;
-  DataSync _dataSync;
+  late Controller _con;
+  late Model _model;
+  late LocalSyncDB _offlineSync;
+  late DataSync _dataSync;
 
   /// A flag indicating it's syncing right now.
   bool _syncing = false;
@@ -57,31 +67,37 @@ class CloudDB {
 
   static const String _dbName = 'sync';
 
+  ///
   Future<bool> initAsync() {
 //    _fbDB.changedListener = changedListener;
-    _fbDB.addedListener = syncRecListener;
-    _dataSync = DataSync();
-    _offlineSync = LocalSyncDB();
+//    _fbDB.addedListener = syncRecListener;
     return _offlineSync.open();
   }
 
-  int get timeStamp => DataSync.timeStamp;
+  ///
+//  int get timeStamp => DataSync.timeStamp;
+  String get timeStamp => DataSync.timeStamp;
 
-  // Set the device entry in the cloud with an assigned timestamp.
-  Future<void> timeStampDevice() => _dataSync.timeStampDevice();
+  /// Set the device entry in the cloud with an assigned timestamp.
+  Future<void>? timeStampDevice() => _dataSync.timeStampDevice();
 
+  ///
   static void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
     } else if (state == AppLifecycleState.resumed) {}
   }
 
+  ///
   void dispose() {
-    _offlineSync.disposed();
-    FireBaseDB.goOffline();
+    if (!App.hotReload) {
+      _offlineSync.disposed();
+      FireBaseDB.goOffline();
+      _this = null;
+    }
   }
 
   /// Synchronize any changes made in other devices while running here.
-  void syncRecListener(Event event) {
+  void syncRecListener(DatabaseEvent event) {
     // Map<String, dynamic> data;
     // final DataSnapshot snapshot = event.snapshot;
     // if (snapshot?.value == null || snapshot?.value is! Map) {
@@ -98,15 +114,16 @@ class CloudDB {
   /// Perform a synchronization of any records specified as 'new' or 'changed'
   /// since the last time this function was run.
   Future<bool> sync() async {
+    bool synced = false;
     // Don't call this function again while it's running.
     if (_syncing) {
-      return _syncing;
+      return synced;
     }
     _syncing = true;
-    bool synced;
     try {
-      synced = await _dataSync.sync(this);
+      // Do 'offline' first
       synced = await offlineSync();
+      synced = await _dataSync.sync(this);
     } catch (ex) {
       synced = false;
       App.catchError(ex);
@@ -128,8 +145,8 @@ class CloudDB {
     bool sync = true;
     dynamic recId;
     String id;
-    List<Map<String, dynamic>> recs;
-    Map<String, dynamic> rec;
+    List<Map<String, dynamic>?>? recs;
+    Map<String, dynamic>? rec;
     bool isDeleted;
 
     // Any changes made offline.
@@ -157,7 +174,7 @@ class CloudDB {
       } else {
         //
         rec = recs[0];
-        isDeleted = rec['deleted'] == 1;
+        isDeleted = rec!['deleted'] == 1;
       }
 
       if (rec == null) {
@@ -221,7 +238,7 @@ class CloudDB {
       _offlineSync.rawQuery('SELECT * FROM $_dbName');
 
   /// Return a specific 'offline' change record.
-  Future<List<Map<String, dynamic>>> getOfflineRec(String key) async {
+  Future<List<Map<String, dynamic>>> getOfflineRec(String? key) async {
     List<Map<String, dynamic>> recs;
     if (key == null || key.trim().isEmpty) {
       recs = [{}];
@@ -321,38 +338,45 @@ class CloudDB {
   }
 }
 
+///
 abstract class OnLoginListener {
+  ///
   void onLogin();
 }
 
+///
 class DataSync {
+  ///
   factory DataSync() => _this ??= DataSync._();
   DataSync._() {
-    _installNum = App.installNum;
+    _installNum = App.installNum!;
     _appCon = WorkingController();
     _fireDB = FireBaseDB();
     _con = Controller();
     _model = _con.model;
   }
-  static DataSync _this;
-  String _installNum;
-  WorkingController _appCon;
-  FireBaseDB _fireDB;
-  Controller _con;
-  Model _model;
-  String _id;
-  DatabaseReference _syncRef;
-  DatabaseReference _syncINRef;
+  static DataSync? _this;
+  late String _installNum;
+  late WorkingController _appCon;
+  late FireBaseDB _fireDB;
+  late Controller _con;
+  late Model _model;
+  String? _id;
+  DatabaseReference? _syncRef;
+  DatabaseReference? _syncINRef;
 
+  ///
   void init() {}
 
   /// Set the last time this device has 'updated' data.
   Future<void> timeStampDevice() => devRef.set(timeStamp);
 
+  ///
   DatabaseReference get devRef => _fireDB.yourDeviceRef;
 
-  // Set the timeStamp this program was last run.
-  static int get timeStamp => DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  /// Set the timeStamp this program was last run.
+//  static int get timeStamp => DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  static String get timeStamp => DateTime.now().toIso8601String();
 
   @override
   bool operator ==(Object other) =>
@@ -362,23 +386,27 @@ class DataSync {
   @override
   int get hashCode => 0;
 
+  ///
   Future<DatabaseReference> getSyncINRef() async {
     final DatabaseReference ref = await yourSyncRef();
     if (_syncINRef == null) {
-      _syncINRef = ref.child(_installNum).child('IN');
-      _fireDB.setEvents(_syncINRef);
+//      refref.child(_installNum).child('IN');
+//      _syncINRef = ref.child('IN');
+      _syncINRef = ref;
+      _fireDB.setEvents(_syncINRef!);
     }
-    return _syncINRef;
+    return _syncINRef!;
   }
 
+  ///
   Future<DatabaseReference> yourSyncRef() async {
     //
     final online = await isOnline();
 
-    String id;
+    String? id;
 
     if (online) {
-      id = _appCon.uid;
+      id = _fireDB.fbKey; //_appCon.uid;
     } else {
       id = null;
     }
@@ -392,9 +420,9 @@ class DataSync {
     // Save the reference.
     if (_syncRef != null) {
       if (_id != null && id == _id) {
-        return _syncRef;
+        return _syncRef!;
       } else {
-        await _syncRef.remove();
+        await _syncRef!.remove();
       }
     }
     // Set to null so a 'new' reference can be made.
@@ -408,10 +436,10 @@ class DataSync {
     } else {
       _syncRef = _fireDB.reference().child('sync').child(id);
     }
-    return _syncRef;
+    return _syncRef!;
   }
 
-  // Is connected to the Internet.
+  /// Is connected to the Internet.
   Future<bool> isOnline() => _fireDB.isOnline();
 
   /// Synchronize any changes made on other devices.
@@ -424,19 +452,31 @@ class DataSync {
     }
 
     // Any changes from the user's other devices.
-    final DatabaseReference syncRef = await getSyncINRef();
+//    final DatabaseReference syncRef = await getSyncINRef();
+    final DatabaseReference ref = await yourSyncRef();
+    final DatabaseReference syncRef = ref.child(DeviceInfo.deviceId);
 
     //   final DataSnapshot syncINRef = await syncRef.child('IN').once();
-    final DataSnapshot syncINRef = await syncRef.once();
+    DatabaseEvent? syncINRef;
+
+    try {
+      syncINRef = await syncRef.once();
+    } catch (ex) {
+      syncINRef = null;
+    }
 
     // Nothing to sync.
-    if (syncINRef.value == null || syncINRef.value is! Map) {
+    if (syncINRef == null ||
+        syncINRef.snapshot.value == null ||
+        syncINRef.snapshot.value is! Map) {
       return false;
     }
 
+    final recs = syncINRef.snapshot.value as Map;
     bool synced = false;
 
-    syncINRef.value.forEach((k, v) async {
+    //   syncINRef.snapshot.value?.forEach((k, v) async {
+    recs.forEach((k, v) async {
       //
       final key = v['key'];
 
@@ -464,13 +504,13 @@ class DataSync {
 
         if (!synced) {
           //
-          final List<Map<String, dynamic>> local = await _model.getRecord(key);
+          final List<Map<String, dynamic>>? local = await _model.getRecord(key);
 
-          final LinkedHashMap<String, Map<String, dynamic>> _cloud =
-              await _fireDB.records();
+          final _cloud = await _fireDB.records()
+              as LinkedHashMap<String, Map<String, dynamic>>;
 
           // Add to the local device.
-          if (local.isEmpty) {
+          if (local!.isEmpty) {
             if (action == 'DELETE') {
               // It's been deleted and not to be added anyway.
               synced = true;
@@ -544,6 +584,7 @@ class DataSync {
     return synced;
   }
 
+  ///
   Future<void> reSync() async {
     final Map<String, dynamic> recs = await _fireDB.records();
     recs.forEach((key, value) {
@@ -551,7 +592,8 @@ class DataSync {
     });
   }
 
-  Future<bool> insert(final String key, final String action) async {
+  ///
+  Future<bool> insert(final String? key, final String? action) async {
     if (key == null || key.trim().isEmpty) {
       return false;
     }
@@ -570,21 +612,36 @@ class DataSync {
     return insert;
   }
 
+  ///
   Future<bool> replace(String key, Map<String, dynamic> recValues) async {
     // Retrieve all your devices.
     final DatabaseReference dRef = _fireDB.yourDevicesRef;
 
-    DataSnapshot snapshot = await dRef.once();
+    DatabaseEvent? snapshot;
 
-    if (snapshot.value == null || snapshot.value is! Map) {
+    try {
+      snapshot = await dRef.once();
+    } catch (e) {
+      snapshot = null;
+    }
+
+    if (snapshot == null ||
+        snapshot.snapshot.value == null ||
+        snapshot.snapshot.value is! Map) {
       return false;
     }
 
-    final Map<String, dynamic> data = Map.from(snapshot.value)
-      // Remove the device you're current on.
-      ..removeWhere((key, value) => key == _installNum);
+    // final Map<String, dynamic> data =
+    //     Map.from(snapshot.snapshot.value as Map<String, dynamic>)
+    //       // Remove the device you're current on.
+    //       ..removeWhere((key, value) => key == _installNum);
 
-    final bool replace = data.isNotEmpty;
+    final data = Map<String, dynamic>.from(snapshot.snapshot.value as Map);
+    // Remove the device you're current on.
+    if (!App.inDebugger) {
+      data.removeWhere((key, value) => key == DeviceInfo.deviceId);
+    }
+    bool replace = data.isNotEmpty;
 
     // Retrieve all your sync records.
     final DatabaseReference syncRef = await yourSyncRef();
@@ -593,51 +650,61 @@ class DataSync {
     final Iterator<dynamic> it = data.entries.iterator;
 
     while (it.moveNext()) {
-      if (it.current.value == null || it.current.value is! int) {
+      final dateTimeStamp = it.current.value;
+      if (dateTimeStamp == null ||
+          dateTimeStamp is! String ||
+          dateTimeStamp.isEmpty) {
         continue;
       }
-      if (it.current.key is! String) {
+      final deviceId = it.current.key;
+      if (deviceId is! String) {
         continue;
       }
       // Remove devices that are more than a year old.
-      final DateTime timeStamp = Semaphore.getDateTime(it.current.value);
+//      final DateTime timeStamp = Semaphore.getDateTime(it.current.value);
+      final DateTime timeStamp = DateTime.parse(dateTimeStamp);
       final int daysOld = DateTime.now().difference(timeStamp).inDays;
-      if (daysOld > 365) {
+      if (daysOld > 365 * 7) {
         try {
           // Delete that record
-          await dRef.child(it.current.key).set(null);
-          await syncRef.child(it.current.key).set(null);
+          await dRef.child(deviceId).set(null);
+          await syncRef.child(deviceId).set(null);
         } catch (ex) {
           // there's no such child.
           continue;
         }
         continue;
       }
-      // Go through the sync entries.
-      final DatabaseReference ref = syncRef.child(it.current.key);
+      // Go through the records for this device.
+//      final DatabaseReference ref = syncRef.child(deviceId).child('IN');
+      final DatabaseReference ref = syncRef.child(deviceId);
       snapshot = await dRef.once();
-      if (snapshot.value == null || snapshot.value is! Map) {
+      if (snapshot.snapshot.value == null || snapshot.snapshot.value is! Map) {
         continue;
       }
       // Is there already a sync record.
-      snapshot = await ref.child('IN').orderByChild('key').equalTo(key).once();
-      if (snapshot.value == null || snapshot.value is! Map) {
-        key = await insertRef(ref.child('IN'), recValues);
+      snapshot = await ref.orderByChild('key').equalTo(key).once();
+      if (snapshot.snapshot.value == null || snapshot.snapshot.value is! Map) {
+        final newKey = await insertRef(ref, recValues);
+        replace = newKey.isNotEmpty;
       } else {
-        final Map<dynamic, dynamic> data = snapshot.value;
-        data.forEach((k, v) {
-          syncRef.child('IN').child(k).update({k: recValues});
-        });
+        // final Map<dynamic, dynamic> data =
+        //     snapshot.snapshot.value as Map<dynamic, dynamic>;
+        // data.forEach((k, v) {
+        //   ref.child(k).update({k: recValues});
+        // });
+        await ref.child(key).update(recValues);
       }
     }
     return replace;
   }
 
+  ///
   Future<String> insertRef(
       DatabaseReference dbRef, Map<String, dynamic> recValues) async {
     String key;
     try {
-      key = dbRef.push().key;
+      key = dbRef.push().key!;
       await dbRef.update({key: recValues});
     } catch (ex) {
       key = '';
@@ -645,5 +712,6 @@ class DataSync {
     return key;
   }
 
+  ///
   void dispose() {}
 }

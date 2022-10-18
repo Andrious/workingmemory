@@ -1,15 +1,15 @@
-import 'package:package_info/package_info.dart' as lib;
+import 'package:package_info_plus/package_info_plus.dart' as lib;
 
 class PackageInfo {
-  static lib.PackageInfo info;
+  static lib.PackageInfo? info;
 
   Future<void> init() async {
     info = await lib.PackageInfo.fromPlatform();
   }
 
-  static String get name => info?.packageName;
+  static String? get name => info?.packageName;
 
-  static String get version => info?.version;
+  static String? get version => info?.version;
 
-  static String get number => info?.buildNumber;
+  static String? get number => info?.buildNumber;
 }

@@ -16,38 +16,12 @@
 ///          Created  10 Apr 2019
 ///
 
+export 'dart:async' show unawaited;
+
 export 'dart:io' show Platform;
 
-export 'package:mvc_application/view.dart';
+export 'package:fluttery_framework/view.dart';
 
-export 'package:workingmemory/src/app/view/settings.dart';
+export 'package:workingmemory/src/app/app_view.dart';
 
-export 'package:workingmemory/src/app/view/menu/iso_spinner.dart';
-
-export 'package:workingmemory/src/app/view/sign_in.dart';
-
-export 'package:workingmemory/src/home/view/todos_page.dart';
-
-export 'package:workingmemory/src/home/view/android/todos_page.dart';
-
-export 'package:workingmemory/src/home/view/ios/todos_page.dart';
-
-export 'package:workingmemory/src/home/view/todo_page.dart';
-
-export 'package:workingmemory/src/home/view/android/todo_page.dart';
-
-export 'package:workingmemory/src/home/view/ios/todo_page.dart';
-
-export 'package:workingmemory/src/home/view/android/datetime_item.dart';
-
-export 'package:workingmemory/src/home/view/ios/datetime_item.dart';
-
-export 'package:workingmemory/src/home/view/datetime_item.dart';
-
-export 'package:workingmemory/src/home/view/ios/settings.dart';
-
-export 'package:workingmemory/src/home/view/ios/settings/notification_settings.dart';
-
-export 'package:workingmemory/src/home/view/icon_items.dart';
-
-export 'package:workingmemory/src/app/view/menu/home.dart';
+export 'package:workingmemory/src/home/home_view.dart';

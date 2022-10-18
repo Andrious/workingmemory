@@ -25,14 +25,15 @@ import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart' show Controller, theme;
 
-class TodoiOS extends StateMVC<TodoPage> {
-  //
+///
+class TodoiOS extends StateX<TodoPage> {
+  ///
   TodoiOS() : super(Controller()) {
-    con = controller;
+    con = controller as Controller;
   }
-  Controller con;
-  Widget _leading;
-  Widget _trailing;
+  late Controller con;
+  Widget? _leading;
+  Widget? _trailing;
 
   @override
   void initState() {
@@ -61,8 +62,8 @@ class TodoiOS extends StateMVC<TodoPage> {
       return true;
     }
 
-    final TextStyle dialogTextStyle = theme.textTheme.subtitle1
-        .copyWith(color: theme.textTheme.caption.color);
+    final TextStyle dialogTextStyle = theme!.textTheme.subtitle1!
+        .copyWith(color: theme!.textTheme.caption!.color);
 
     bool willPop;
 
@@ -72,14 +73,12 @@ class TodoiOS extends StateMVC<TodoPage> {
             context: context,
             barrierDismissible: true,
             barrierLabel: 'label',
-            barrierColor: const Color(0x80000000),
-            transitionDuration: const Duration(milliseconds: 200),
             pageBuilder: (BuildContext buildContext,
                 Animation<double> animation,
                 Animation<double> secondaryAnimation) {
               return SafeArea(
                 child: CupertinoAlertDialog(
-                  content: Text(I10n.s('Discard new event?'),
+                  content: Text(L10n.s('Discard new event?'),
                       style: dialogTextStyle),
                   actions: _listButtons(),
                 ),
@@ -94,7 +93,7 @@ class TodoiOS extends StateMVC<TodoPage> {
             builder: (BuildContext context) {
               return AlertDialog(
                 content:
-                    Text(I10n.s('Discard new event?'), style: dialogTextStyle),
+                    Text(L10n.s('Discard new event?'), style: dialogTextStyle),
                 actions: _listButtons(),
               );
             },
@@ -113,8 +112,8 @@ class TodoiOS extends StateMVC<TodoPage> {
         child: FormField<String>(
             initialValue: con.data.item,
             validator: (v) {
-              if (v.trim().isEmpty) {
-                return I10n.s('Cannot be empty.');
+              if (v!.trim().isEmpty) {
+                return L10n.s('Cannot be empty.');
               }
               return null;
             },
@@ -141,11 +140,11 @@ class TodoiOS extends StateMVC<TodoPage> {
 //                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Center(
-                child: Icon(IconData(int.tryParse(con.data.icon),
+                child: Icon(IconData(int.tryParse(con.data.icon!)!,
                     fontFamily: 'MaterialIcons'))),
 //                    Text('From', style: theme.textTheme.caption),
             DTiOS(
-              dateTime: con.data.dateTime,
+              dateTime: con.data.dateTime!,
               onChanged: (DateTime value) {
                 setState(() {
                   con.data.dateTime = value;
@@ -156,8 +155,9 @@ class TodoiOS extends StateMVC<TodoPage> {
           ]),
     ];
 
-    if (con.favIcons.isNotEmpty) {
-      widgets.add(Container(
+    if (con.favIcons!.isNotEmpty) {
+      widgets.add(
+        Container(
           height: 100,
           decoration: BoxDecoration(
             border: Border.all(width: 4),
@@ -165,30 +165,35 @@ class TodoiOS extends StateMVC<TodoPage> {
           ),
           child: IconItems(
               icons: {
-                for (var e in con.favIcons) e.values.first: e.values.first
+                for (var e in con.favIcons!) e.values.first: e.values.first
               },
-              icon: con.data.icon,
+              icon: con.data.icon!,
               onTap: (icon) {
                 con.setState(() {
                   con.data.icon = icon;
                 });
-              })));
+              }),
+        ),
+      );
     }
 
-    widgets.add(Container(
+    widgets.add(
+      Container(
         height: 600,
         child: IconItems(
             icons: con.icons,
-            icon: con.data.icon,
+            icon: con.data.icon!,
             onTap: (icon) async {
               await con.saveIcon(icon);
               con.setState(() {});
-            })));
+            }),
+      ),
+    );
     return widgets;
   }
 
   void _scaffoldButtons() {
-    Widget temp;
+    Widget? temp;
     _leading = null;
     _trailing = CupertinoButton(
       padding: const EdgeInsets.all(
@@ -199,13 +204,11 @@ class TodoiOS extends StateMVC<TodoPage> {
           if (widget.onPressed == null) {
             Navigator.pop(context);
           } else {
-            widget.onPressed();
+            widget.onPressed!();
           }
         }
       },
-      child: I10n.t(
-        'Save',
-      ),
+      child: L10n.t('Save'),
     );
 
     // Switch the buttons around when indicated.
@@ -227,7 +230,7 @@ class TodoiOS extends StateMVC<TodoPage> {
           Navigator.of(context)
               .pop(false); // Pops the confirmation dialog but not the page.
         },
-        child: I10n.t('Cancel'),
+        child: L10n.t('Cancel'),
       );
 
       trailing = CupertinoButton(
@@ -235,23 +238,23 @@ class TodoiOS extends StateMVC<TodoPage> {
           Navigator.of(context)
               .pop(true); // Returning true to _onWillPop will pop again.
         },
-        child: I10n.t('Discard'),
+        child: L10n.t('Discard'),
       );
     } else {
-      leading = FlatButton(
+      leading = TextButton(
         onPressed: () {
           Navigator.of(context)
               .pop(false); // Pops the confirmation dialog but not the page.
         },
-        child: I10n.t('Cancel'),
+        child: L10n.t('Cancel'),
       );
 
-      trailing = FlatButton(
+      trailing = TextButton(
         onPressed: () {
           Navigator.of(context)
               .pop(true); // Returning true to _onWillPop will pop again.
         },
-        child: I10n.t('Discard'),
+        child: L10n.t('Discard'),
       );
     }
 

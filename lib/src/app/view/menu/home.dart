@@ -17,50 +17,60 @@
 ///
 ///
 
-import 'package:flutter/material.dart';
-
 import 'package:workingmemory/src/model.dart' show Settings;
 
 import 'package:workingmemory/src/view.dart';
 
 import 'package:workingmemory/src/controller.dart' show Controller;
 
-import 'package:universal_platform/universal_platform.dart';
-
+///
 class WorkMenu extends Menu {
+  ///
   WorkMenu() : super() {
+    //
     _con = Controller();
 
     if (_con.app.loggedIn) {
       if (_con.app.isAnonymous) {
         tailItems = [
-          PopupMenuItem(value: 'SignIn', child: I10n.t('Sign in...')),
+          PopupMenuItem(value: 'SignIn', child: L10n.t('Sign in...')),
         ];
       } else {
         tailItems = [
-          PopupMenuItem(value: 'Logout', child: I10n.t('Logout')),
+          PopupMenuItem(value: 'Logout', child: L10n.t('Logout')),
         ];
       }
     } else {
       tailItems = [
-        PopupMenuItem(value: 'SignIn', child: I10n.t('Sign in...')),
+        PopupMenuItem(value: 'SignIn', child: L10n.t('Sign in...')),
       ];
     }
   }
-  Controller _con;
+  late Controller _con;
 
   @override
   List<PopupMenuItem<dynamic>> menuItems() => [
-        PopupMenuItem(value: 'Resync', child: I10n.t('Resync')),
         PopupMenuItem(
+            key: const Key('resyncMenuItem'),
+            value: 'Resync',
+            child: L10n.t('Resync')),
+        PopupMenuItem(
+            key: const Key('localeMenuItem'),
             value: 'interface',
-            child: Text('${I10n.s('Interface:')} $interface')),
+            child: Text('${L10n.s('Interface:')} $interface')),
         PopupMenuItem(
+            key: const Key('localeMenuItem'),
             value: 'Locale',
-            child: Text('${I10n.s('Locale:')} ${App.locale.toLanguageTag()}')),
+            child: Text('${'Locale:'.tr} ${App.locale?.toLanguageTag()}')),
+        if (App.useMaterial)
+          PopupMenuItem(
+            key: const Key('colorMenuItem'),
+            value: 'color',
+            child: L10n.t('Colour Theme'),
+          ),
       ];
 
-  // Supply what the interface
+  /// Supply what the interface
   String get interface => App.useMaterial ? 'Material' : 'Cupertino';
 
   @override
@@ -88,19 +98,26 @@ class WorkMenu extends Menu {
         await Prefs.setBool('switchUI', switchUI);
         break;
       case 'Locale':
-        // await MsgBox(
-        //   context: context,
-        //   title: I10n.s('Current Language'),
-        //   msg: I10n.s('Pick another:'),
-        //   body: const [ISOSpinner()],
-        // ).show();
+        //
+        final locales = App.supportedLocales!;
 
-        final initialItem = I10n.supportedLocales.indexOf(App.locale);
-        final spinner = ISOSpinner(initialItem: initialItem);
+        final initialItem = locales.indexOf(App.locale!);
+
+        final spinner = ISOSpinner(
+          initialItem: initialItem,
+          supportedLocales: locales,
+          onSelectedItemChanged: (int index) async {
+            // Retrieve the available locales.
+            final locale = L10n.getLocale(index);
+            if (locale != null) {
+              App.locale = locale;
+              App.setState(() {});
+            }
+          },
+        );
 
         await DialogBox(
-          context: _con.state.context,
-          title: I10n.s('Current Language'),
+          title: 'Current Language'.tr,
           body: [spinner],
           press01: () {
             spinner.onSelectedItemChanged(initialItem);
@@ -110,6 +127,9 @@ class WorkMenu extends Menu {
         ).show();
 
         break;
+      case 'color':
+        await showColorPicker();
+        break;
       case 'Logout':
         _con.logOut();
         break;
@@ -118,5 +138,24 @@ class WorkMenu extends Menu {
         break;
       default:
     }
+  }
+
+  ///
+  static Future<void> showColorPicker() async {
+    // Set the current colour
+    ColorPicker.color = Color(App.themeData!.primaryColor.value);
+
+    await ColorPicker.showColorPicker(
+      context: App.context!,
+      onColorChange: (Color value) {
+        /// Implement to take in a color change.
+      },
+      onChange: ([ColorSwatch<int?>? value]) {
+        //
+        App.setThemeData(swatch: value);
+        App.setState(() {});
+      },
+      shrinkWrap: true,
+    );
   }
 }

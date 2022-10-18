@@ -17,21 +17,11 @@
 ///
 ///           import 'package:workingmemory/working_memory_app.dart';
 
-export 'package:mvc_application/controller.dart'
-    show
-        App,
-        AppController,
-        AppDrawer,
-        ControllerMVC,
-        ScheduleNotifications,
-        RawResourceAndroidNotificationSound,
-        DrawableResourceAndroidBitmap
-    hide runApp;
+export 'package:fluttery_framework/controller.dart'
+    show App, AppController, AppDrawer, DeviceInfo, StateXController;
 
-export 'package:mvc_application/settings.dart' show AppSettings, Prefs;
+export 'package:workingmemory/src/app/app_controller.dart';
 
-export 'package:workingmemory/src/app/controller/working_memory_app.dart';
+export 'package:workingmemory/src/home/home_controller.dart';
 
-export 'package:workingmemory/src/app/controller/theme_controller.dart';
-
-export 'package:workingmemory/src/home/controller/todos.dart';
+export 'package:fluttery_framework/settings.dart' show AppSettings, Prefs;

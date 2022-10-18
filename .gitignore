@@ -1,6 +1,13 @@
 # Good to keep this file with the code.
 #.gitignore
 
+<<<<<<< HEAD
+=======
+## Github Action Workflow for Continuous Integration Testing
+# https://medium.com/mobile-development-group/github-actions-for-flutter-cf02923d7b5d
+# .github
+
+>>>>>>> b6749ba (1.9.0)
 # Ignore except for application packages
 #pubspec.lock
 
@@ -19,6 +26,9 @@ doc/api/
 
 # Android Studio
 /*.iml
+
+# Codecov
+lcov.info
 
 # Ignore App signing files
 *.jks
@@ -72,15 +82,16 @@ example/ios/Flutter/flutter_export_environment.sh
 *.ipr
 *.iws
 .idea/
+gen/
 
 # Visual Studio Code related
 .vscode/
 
 # Flutter/Dart/Pub related
-build/
+/build/
 
 # Web related
-lib/generated_plugin_registrant.dart
+/lib/generated_plugin_registrant.dart
 
 # Symbolication related
 app.*.symbolscd
@@ -90,37 +101,30 @@ app.*.map.json
 mapping.txt
 seeds.txt
 unused.txt
-obfuscate/
+/obfuscate/
 
 # Android related
-#google-services.json
-**/android/**/gradle-wrapper.jar
-**/android/.gradle
-**/android/captures/
-**/android/gradlew
-**/android/gradlew.bat
-**/android/local.properties
-**/android/key.properties
-**/android/**/GeneratedPluginRegistrant.java
+google-services.json
+/android/
+!/android/app/build.gradle
+!/android/build.gradle
 
 # iOS/XCode related
-#GoogleService-Info.plist
-**/ios/**/*.mode1v3
-**/ios/**/*.mode2v3
-**/ios/**/*.moved-aside
-**/ios/**/*.pbxuser
-**/ios/**/*.perspectivev3
-**/ios/**/*sync/
-**/ios/**/.sconsign.dblite
-**/ios/**/.tags*
-**/ios/**/.vagrant/
-**/ios/**/DerivedData/
-**/ios/**/Icon?
-**/ios/**/Pods/
-**/ios/**/.symlinks/
-**/ios/**/profile
-**/ios/**/xcuserdata
-**/ios/.generated/
+GoogleService-Info.plist
+/ios/
+
+# Linux related
+/linux/
+
+# macro related
+/macros/
+/macos/
+
+# Web related
+/web/
+
+# Windows related
+/windows/
 
 App.framework
 Flutter.framework
@@ -131,6 +135,7 @@ flutter_assets/
 ServiceDefinitions.json
 GeneratedPluginRegistrant.*
 Info.plist
+<<<<<<< HEAD
 **/ios/Flutter/.last_build_id
 
 # Exceptions to above rules.
@@ -167,3 +172,6 @@ Info.plist
   @com.google.gson.annotations.SerializedName <fields>;
 }
 ##---------------End:   proguard configuration for Gson  ----------
+=======
+
+>>>>>>> b6749ba (1.9.0)

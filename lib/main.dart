@@ -16,44 +16,50 @@
 ///          Created  23 Jun 2018
 ///
 ///                   https://github.com/Andrious/workingmemory
+import 'package:workingmemory/src/controller.dart';
 
-import 'package:workingmemory/src/view.dart';
+import 'package:workingmemory/src/model.dart';
 
-import 'package:workingmemory/src/controller.dart' hide runApp;
+import 'package:workingmemory/src/view.dart' hide runApp;
 
 void main() => runApp(WorkingMemory());
 
-
-
+///
 class WorkingMemory extends AppStatefulWidget {
-  //
-  WorkingMemory({Key key}) : super(key: key);
+  ///
+  WorkingMemory({Key? key})
+      : super(
+          key: key,
+          errorScreen: const ErrorWidgetDisplay(stackTrace: true).builder,
+        );
 
+  ///
   static final Key pageKey = UniqueKey();
 
   @override
   // Set up 'the View' of the MVC design pattern.
-  AppState createView() => AppState(
-        con: WorkingController(),
+  AppState createAppState() => AppState(
+        controller: WorkingController(),
         switchUI: Prefs.getBool('switchUI'),
         title: 'Working Memory',
-        home: TodosPage(key: pageKey),
+//        home: TodosPage(key: pageKey),
+        home: const TodosPage(),
         debugShowCheckedModeBanner: false,
         localizationsDelegates: [
-          I10nDelegate(),
+          L10n.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
         ],
         localeListResolutionCallback:
-            (List<Locale> locales, Iterable<Locale> supportedLocales) {
-          Locale locale;
+            (List<Locale>? locales, Iterable<Locale> supportedLocales) {
+          Locale? locale;
           // Retrieve the last locale used.
           final localePref = Prefs.getString('locale');
           if (localePref.isNotEmpty) {
             final localeCode = localePref.split('-');
             String languageCode;
-            String countryCode;
+            String? countryCode;
             if (localeCode.length == 2) {
               languageCode = localeCode.first;
               countryCode = localeCode.last;
@@ -63,20 +69,30 @@ class WorkingMemory extends AppStatefulWidget {
             locale = Locale(languageCode, countryCode);
           } else {
             // Use the device's locale.
-            if (locales.isNotEmpty) {
+            if (locales != null && locales.isNotEmpty) {
               locale = locales.first;
             } else if (supportedLocales.isNotEmpty) {
               // Use the first supported locale.
               locale = supportedLocales.first;
             }
           }
+          L10n.locale = locale;
           return locale;
         },
-        supportedLocales: I10n.supportedLocales,
-        inTheme: () => ThemeController().setIfDarkMode(),
-        inError: (details) {
-          super.onError(details);
+        inSupportedLocales: () {
+          /// The app's translations
+          L10n.translations = {
+            const Locale('zh', 'CN'): zhCN,
+            const Locale('fr', 'FR'): frFR,
+            const Locale('de', 'DE'): deDE,
+            const Locale('he', 'IL'): heIL,
+            const Locale('ru', 'RU'): ruRU,
+            const Locale('es', 'AR'): esAR,
+          };
+          return L10n.supportedLocales;
         },
+        inTheme: () => ThemeController().setIfDarkMode(),
+        // Example of possibly handling an error while starting up.
         inAsyncError: (details) => false,
       );
 }

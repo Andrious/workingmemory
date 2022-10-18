@@ -18,31 +18,37 @@
 
 import 'package:workingmemory/src/model.dart';
 
+///
 class IconFavourites {
+  ///
   factory IconFavourites() => _this ??= IconFavourites._();
   IconFavourites._() {
     _fbDB = FireBaseDB();
     _db = ToDo();
     _icons = Icons.code;
   }
-  static IconFavourites _this;
-  SQLiteDB _db;
-  FireBaseDB _fbDB;
+  static IconFavourites? _this;
+  late SQLiteDB _db;
+  late FireBaseDB _fbDB;
 
   /// All the icons available to the user.
-  Map<String, String> _icons;
+  late Map<String, String> _icons;
 
+  ///
   static const TABLE_NAME = 'icons';
 
+  ///
   static const CREATE_TABLE = '''
        CREATE TABLE IF NOT EXISTS $TABLE_NAME(
        icon VARCHAR DEFAULT 0xe15b,
        deleted INTEGER DEFAULT 0)
     ''';
 
+  ///
   Future<List<Map<String, dynamic>>> list() => _db.getTable(TABLE_NAME);
 
-  Future<List<Map<String, dynamic>>> retrieve([String icon]) {
+  ///
+  Future<List<Map<String, dynamic>>> retrieve([String? icon]) {
     //
     if (icon == null) {
       icon = '';
@@ -71,21 +77,23 @@ class IconFavourites {
   /// Return favourite icons from Firebase
   Future<List<Map<String, dynamic>>> fbQuery() async {
     //
-    final DataSnapshot snapshot = await _fbDB.favIconsRef.once();
+    final DatabaseEvent dbEvent = await _fbDB.favIconsRef.once();
+    final value = dbEvent.snapshot.value;
 
     Map<String, dynamic> icons;
 
-    if (snapshot.value == null || snapshot.value is! Map) {
+    if (value == null || value is! Map) {
       icons = {};
     } else {
-      icons = Map.from(snapshot.value);
+      icons = Map.from(value);
     }
     return [icons];
   }
 
+  ///
   Future<bool> saveRef(String code) async {
     bool save;
-    final String name = _icons[code];
+    final String name = _icons[code]!;
     try {
       await _fbDB.favIconsRef.child(code).set(name);
       save = true;
@@ -93,5 +101,12 @@ class IconFavourites {
       save = false;
     }
     return save;
+  }
+
+  ///
+  void dispose() {
+    _fbDB.dispose();
+    _db.disposed();
+    _this = null;
   }
 }

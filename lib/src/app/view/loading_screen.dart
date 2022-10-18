@@ -1,4 +1,21 @@
-import 'package:flutter/material.dart';
+///
+/// Copyright (C) 2021 Andrious Solutions
+///
+/// Licensed under the Apache License, Version 2.0 (the "License");
+/// you may not use this file except in compliance with the License.
+/// You may obtain a copy of the License at
+///
+/// http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software
+/// distributed under the License is distributed on an "AS IS" BASIS,
+/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+/// See the License for the specific language governing permissions and
+/// limitations under the License.
+///
+///          Created  04 Nov 2021
+
+import 'package:workingmemory/src/view.dart';
 
 ///
 /// This is just a basic `Scaffold` with a centered `CircularProgressIndicator`
@@ -7,6 +24,7 @@ import 'package:flutter/material.dart';
 /// It's copied from the `flutter_gallery` example project in flutter/flutter
 ///
 class LoadingScreen extends StatefulWidget {
+  ///
   const LoadingScreen(Key key) : super(key: key);
   @override
   _LoadingScreenState createState() => _LoadingScreenState();
@@ -14,8 +32,8 @@ class LoadingScreen extends StatefulWidget {
 
 class _LoadingScreenState extends State<LoadingScreen>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<double> _animation;
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -45,12 +63,14 @@ class _LoadingScreenState extends State<LoadingScreen>
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: Scaffold(
-            appBar: AppBar(title: const Text('Loading...')),
-            body: AnimatedBuilder(
-                animation: _animation,
-                builder: (BuildContext context, Widget child) {
-                  return const Center(child: CircularProgressIndicator());
-                })));
+      home: Scaffold(
+        appBar: AppBar(title: Text('Loading...'.tr)),
+        body: AnimatedBuilder(
+          animation: _animation,
+          builder: (BuildContext context, Widget? child) =>
+              const Center(child: CircularProgressIndicator()),
+        ),
+      ),
+    );
   }
 }

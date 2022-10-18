@@ -23,18 +23,21 @@ import 'package:workingmemory/src/model.dart';
 
 import 'package:dbutils/firebase_db.dart' as f;
 
-import 'package:workingmemory/src/controller.dart' show App, WorkingController;
+import 'package:workingmemory/src/controller.dart'
+    show App, DeviceInfo, Prefs, WorkingController;
 
 import 'package:flutter/widgets.dart' show AppLifecycleState;
 
+///
 class FireBaseDB {
+  ///
   factory FireBaseDB({
-    void Function(DataSnapshot data) once,
-    void Function(Event event) onChildAdded,
-    void Function(Event event) onChildRemoved,
-    void Function(Event event) onChildChanged,
-    void Function(Event event) onChildMoved,
-    void Function(Event event) onValue,
+    void Function(DatabaseEvent data)? once,
+    void Function(DatabaseEvent event)? onChildAdded,
+    void Function(DatabaseEvent event)? onChildRemoved,
+    void Function(DatabaseEvent event)? onChildChanged,
+    void Function(DatabaseEvent event)? onChildMoved,
+    void Function(DatabaseEvent event)? onValue,
   }) =>
       _this ??= FireBaseDB._(
         once,
@@ -46,12 +49,12 @@ class FireBaseDB {
       );
 
   FireBaseDB._(
-    void Function(DataSnapshot data) once,
-    void Function(Event event) onChildAdded,
-    void Function(Event event) onChildRemoved,
-    void Function(Event event) onChildChanged,
-    void Function(Event event) onChildMoved,
-    void Function(Event event) onValue,
+    void Function(DatabaseEvent data)? once,
+    void Function(DatabaseEvent event)? onChildAdded,
+    void Function(DatabaseEvent event)? onChildRemoved,
+    void Function(DatabaseEvent event)? onChildChanged,
+    void Function(DatabaseEvent event)? onChildMoved,
+    void Function(DatabaseEvent event)? onValue,
   ) {
     _db = f.FireBaseDB.init(
       once: once,
@@ -61,30 +64,44 @@ class FireBaseDB {
       onChildMoved: onChildMoved,
       onValue: onValue,
     );
-    _reference = _db.reference();
+    _reference = _db.reference()!;
   }
-  static FireBaseDB _this;
-  static f.FireBaseDB _db;
-  DatabaseReference _reference;
-  Map<String, dynamic> mDataArrayList;
+  static FireBaseDB? _this;
+  static late f.FireBaseDB _db;
+  late DatabaseReference _reference;
 
+  /// Critical to get the fbKey
+  Future<bool> initAsync() async {
+    _fbKey ??= await fbUserKey();
+    return _fbKey?.isNotEmpty ?? false;
+  }
+
+  ///
+  late Map<String, dynamic> mDataArrayList;
+
+  ///
   static bool mShowDeleted = false;
 
-  final String _keyFld = 'KeyFld';
+  ///
   String get key => _keyFld;
+  final String _keyFld = 'KeyFld';
 
+  ///
   DatabaseReference reference() => _reference;
 
+  ///
   Future<bool> save(Map<String, dynamic> itemToDo) async {
     bool save;
 
     if (itemToDo.isEmpty) {
+      //
       final String key = await insertRec(itemToDo);
 
       itemToDo['key'] = key;
 
       save = key.isNotEmpty;
     } else {
+      //
       final key = await updateRec(itemToDo);
 
       save = key.isNotEmpty;
@@ -96,6 +113,7 @@ class FireBaseDB {
     return save;
   }
 
+  ///
   Future<String> insertRec(Map<String, dynamic> itemToDo) async {
     //
     String key = '';
@@ -103,9 +121,9 @@ class FireBaseDB {
     DatabaseReference dbRef;
 
     try {
-      dbRef = tasksRef;
+      dbRef = tasksRef!;
 
-      key = dbRef.push().key;
+      key = dbRef.push().key!;
 
 //      mLastRowID = key;
 
@@ -116,9 +134,10 @@ class FireBaseDB {
     return key;
   }
 
+  ///
   Future<String> updateRec(Map<String, dynamic> rec) async {
     //
-    String key = '';
+    String? key = '';
 
     if (!rec.containsKey(_keyFld)) {
       return key;
@@ -131,7 +150,8 @@ class FireBaseDB {
     foxRec.remove(_keyFld);
 
     try {
-      final DatabaseReference dbRef = tasksRef;
+      //
+      final DatabaseReference dbRef = tasksRef!;
 
       if (key == null || key.isEmpty) {
         key = dbRef.push().key;
@@ -139,39 +159,41 @@ class FireBaseDB {
       }
 
       await dbRef
-          .update({key: foxRec}).catchError((Object ex, StackTrace stack) {
+          .update({key!: foxRec}).catchError((Object ex, StackTrace stack) {
         key = '';
-        _db?.setError(ex);
+        _db.setError(ex);
       });
     } catch (ex) {
       key = '';
-      _db?.setError(ex);
+      _db.setError(ex);
     }
 
-    return key;
+    return key ?? '';
   }
 
-  DatabaseReference get userRef => databaseReference('users');
-  DatabaseReference _anonymousUser;
+  ///
+  DatabaseReference get userRef =>
+      databaseReference('users', WorkingController().uid);
 
-  DatabaseReference get yourDeviceRef => yourDevicesRef.child(App.installNum);
-  DatabaseReference _anonymousDeviceRef;
+  DatabaseReference? _anonymousUser;
 
+  ///
+  DatabaseReference get yourDeviceRef =>
+      yourDevicesRef.child(DeviceInfo.deviceId);
+  DatabaseReference? _anonymousDeviceRef;
+
+  ///
   DatabaseReference get yourDevicesRef => databaseReference('devices');
 
+  ///
   DatabaseReference get favIconsRef => databaseReference('favicons');
 
-  DatabaseReference get tasksRef {
-//
-    if (_tasksRef != null) {
-      return _tasksRef;
-    }
-    return _tasksRef = databaseReference('tasks');
-  }
+  ///
+  DatabaseReference? get tasksRef => _tasksRef ??= databaseReference('tasks');
+  DatabaseReference? _tasksRef;
 
-  DatabaseReference _tasksRef;
-
-  DatabaseReference databaseReference(String path) {
+  ///
+  DatabaseReference databaseReference(String? path, [String? id]) {
 //
     if (path == null || path.trim().isEmpty) {
       path = '';
@@ -180,7 +202,7 @@ class FireBaseDB {
     }
 
     // infinite loop if instantiated in constructor.
-    String id = WorkingController().uid;
+    id ??= fbKey; //WorkingController().uid;
 
     if (id == null || id.trim().isEmpty) {
       id = null;
@@ -200,18 +222,47 @@ class FireBaseDB {
     return ref;
   }
 
+  /// The Firebase Key value for the current user's Firebase records.
+  String get fbKey => _fbKey ?? 'dummy';
+  String? _fbKey;
+
+  ///
+  Future<String> fbUserKey() async {
+    final DatabaseReference dbRef = userRef.child('key');
+    final dataSnapshot = await dbRef.get();
+    final value = dataSnapshot.value as String?;
+    String key = Prefs.getString('fbKey') ?? '';
+    if (key.isEmpty) {
+      if (value == null) {
+        // Likely a brand new user.
+        key = dbRef.push().key!;
+      } else {
+        key = value;
+      }
+      await Prefs.setString('fbKey', key);
+    }
+    if (value == null) {
+      await dbRef.set(key);
+    }
+    // Note, key and value may noy be the same
+    // The user may have started out as anonymous
+    return key;
+  }
+
+  ///
   Future<bool> createCurrentRecs() async {
+    //
     if (Semaphore.got()) {
       return true;
     }
 
-    final Query queryRef = tasksRef.orderByKey();
+    final Query? queryRef = tasksRef?.orderByKey();
 
     if (queryRef == null) {
       return false;
     }
 
-    DataSnapshot snapshot;
+    DatabaseEvent? snapshot;
     try {
       // Just one query
       snapshot = await queryRef.once();
@@ -228,33 +279,37 @@ class FireBaseDB {
     return true;
   }
 
+  ///
   Future<Map<String, dynamic>> records() async {
     // You have the recent data?
     if (Semaphore.got()) {
       return mDataArrayList;
     }
 
-    DataSnapshot data;
+    DatabaseEvent? data;
 
     final online = await isOnline();
 
     if (online) {
       try {
-        data = await tasksRef.orderByKey().once();
+        data = await tasksRef?.orderByKey().once();
       } catch (ex) {
         data = null;
-        _db?.setError(ex);
+        _db.setError(ex);
       }
     }
 
-    if (data?.value == null || data?.value is! Map) {
+    final value = data?.snapshot.value;
+
+    if (value == null || value is! Map) {
       mDataArrayList = {};
     } else {
-      mDataArrayList = Map<String, dynamic>.from(data.value);
+      mDataArrayList = Map<String, dynamic>.from(value);
     }
     return mDataArrayList;
   }
 
+  ///
   Future<Map<String, dynamic>> record(String key) async {
     final Map<String, dynamic> fbRecs = await records();
     Map<String, dynamic> rec;
@@ -273,21 +328,24 @@ class FireBaseDB {
 //    return recs?.values;
 //  }
 
+  ///
   static List<Map<String, String>> recArrayList(
-      DataSnapshot data, bool showDeleted) {
+      DataSnapshot? data, bool showDeleted) {
     final List<Map<String, String>> list = [];
 
     if (data == null || data.value is! LinkedHashMap) {
       return list;
     }
 
-    final LinkedHashMap recs = data.value;
+    ///
+    final LinkedHashMap recs = data.value as LinkedHashMap;
 
-    recs.map((rec, that) => MapEntry(rec, that));
+    recs.map(MapEntry.new);
 
     // This is awesome! No middle man!
     final Object fieldsObj = Object();
 
+    ///
     Map fldObj;
 
 //    for (DataSnapshot shot : snapshot.getChildren()){
@@ -342,7 +400,8 @@ class FireBaseDB {
     return list;
   }
 
-  Future<bool> delete(final String key) async {
+  ///
+  Future<bool> delete(final String? key) async {
     if (key == null || key.isEmpty) {
       return false;
     }
@@ -352,7 +411,7 @@ class FireBaseDB {
     }
     bool delete;
     try {
-      final DatabaseReference rec = tasksRef.child(key);
+      final DatabaseReference rec = tasksRef!.child(key);
       // Delete that record
       await rec.set(null);
       delete = true;
@@ -364,23 +423,36 @@ class FireBaseDB {
     return delete;
   }
 
+  ///
   static void didChangeAppLifecycleState(AppLifecycleState state) =>
       _db.didChangeAppLifecycleState(state);
 
-  void dispose() => _db.dispose();
+  ///
+  void dispose() {
+    if (!App.hotReload) {
+      _db.dispose();
+      _this = null;
+    }
+  }
 
-  set changedListener(void Function(Event event) func) =>
+  // ignore: avoid_setters_without_getters
+  set changedListener(void Function(DatabaseEvent event) func) =>
       _db.changedListener = func;
 
-  set addedListener(void Function(Event event) func) =>
+  // ignore: avoid_setters_without_getters
+  set addedListener(void Function(DatabaseEvent event) func) =>
       _db.addedListener = func;
 
+  ///
   Future<bool> isOnline() => _db.isOnline();
 
-  static Future<void> goOnline() => _db.goOnline();
+  ///
+  static Future<void>? goOnline() => _db.goOnline();
 
-  static Future<void> goOffline() => _db.goOffline();
+  ///
+  static Future<void>? goOffline() => _db.goOffline();
 
+  ///
   bool userStamp() {
     bool stamp = true;
     final WorkingController con = WorkingController();
@@ -398,7 +470,8 @@ class FireBaseDB {
     return stamp;
   }
 
-  Future<bool> deleteRef(DatabaseReference ref) async {
+  ///
+  Future<bool> deleteRef(DatabaseReference? ref) async {
     bool delete = false;
     if (ref != null) {
       try {
@@ -411,15 +484,18 @@ class FireBaseDB {
     return delete;
   }
 
-  void removeAnonymous() {
+  ///
+  Future<void> removeAnonymous() async {
+    await initAsync();
     if (_anonymousUser == null) {
       _anonymousUser = userRef;
       _anonymousDeviceRef = yourDevicesRef;
     } else {
-      deleteRef(_anonymousUser);
-      deleteRef(_anonymousDeviceRef);
+      await deleteRef(_anonymousUser);
+      await deleteRef(_anonymousDeviceRef);
     }
   }
 
-  void setEvents(Query ref) => _db.setEvents(ref);
+  ///
+  void setEvents(Query ref) => _db.setEvents(ref as DatabaseReference);
 }

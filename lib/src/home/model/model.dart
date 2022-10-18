@@ -16,46 +16,58 @@
 ///          Created  23 Jun 2018
 ///
 
-import 'dart:async' show Future;
+import 'dart:async' show Future, unawaited;
 
 import 'package:workingmemory/src/model.dart';
 
 import 'package:workingmemory/src/view.dart';
 
+///
 class Model {
+  ///
   factory Model() => _this ??= Model._();
   Model._();
-  static Model _this;
-  ToDo _tToDo;
-  CloudDB _cloud;
-  FireBaseDB _fbDB;
-  IconFavourites _iconDB;
+  static Model? _this;
+  late ToDo _tToDo;
+  late CloudDB _cloud;
+  late FireBaseDB _fbDB;
+  late IconFavourites _iconDB;
 
+  ///
   static const fbKeyField = 'KeyFld';
 
+  ///flutter doctor -v
   Future<bool> initAsync() async {
     // Removed from constructor to prevent a stack overflow.
     _fbDB = FireBaseDB();
     _cloud = CloudDB();
     _tToDo = ToDo();
     _iconDB = IconFavourites();
-    bool init = await _tToDo.initAsync();
+    bool init = await _fbDB.initAsync();
     if (init) {
-      await _fbDB.records();
-      init = await _cloud.initAsync();
+      init = await _tToDo.initAsync();
+    }
+    if (init) {
+      if (!App.hotReload) {
+        await _fbDB.records();
+        init = await _cloud.initAsync();
+      }
     }
     if (init) {
       // Synchronize any records from other devices.
-      await _cloud.sync();
+      init = await _cloud.sync();
     }
     return init;
   }
 
+  ///
   Future<List<Map<String, dynamic>>> list() =>
       _tToDo.notDeleted(ordered: itemsOrdered());
 
+  ///
   Future<List<Map<String, dynamic>>> listAll() => _tToDo.list();
 
+  ///
   Future<Map<String, dynamic>> recordByKey(String key) async {
     final List<Map<String, dynamic>> recs = await list();
     Map<String, dynamic> rec = {};
@@ -69,11 +81,13 @@ class Model {
     return rec;
   }
 
+  ///
   Item get item => _item ??= Item();
-  Item _item;
+  Item? _item;
 
+  ///
   String get defaultIcon {
-    String icon;
+    String? icon;
     final map = _tToDo.newrec[ToDo.TABLE_NAME];
     if (map != null) {
       icon = map['Icon'];
@@ -81,6 +95,7 @@ class Model {
     return icon ?? '0xe15b';
   }
 
+  ///
   Future<List<Map<String, dynamic>>> listIcons() async {
     List<Map<String, dynamic>> list;
     if (kIsWeb) {
@@ -91,6 +106,7 @@ class Model {
     return list;
   }
 
+  ///
   Future<bool> saveIcon(String icon) async {
     bool save;
     if (kIsWeb) {
@@ -101,10 +117,14 @@ class Model {
     return save;
   }
 
+  ///
   Future<bool> save(Map<String, dynamic> data) async {
+    //
     final Map<String, dynamic> newRec = validRec(data);
 
     bool save = newRec.isNotEmpty;
+
+    final newFireRec = newRec[fbKeyField] == null;
 
     //   await _tToDo.runTxn(() async {
     //  Save to SQLite
@@ -113,17 +133,23 @@ class Model {
     }
     // Save to Firebase
     if (save) {
-      unawaited(saveFirebase(newRec));
+      save = await saveFirebase(newRec);
+    }
+    // Supply the Firebase key field
+    if (newFireRec && save && !kIsWeb) {
+      save = await saveRec(newRec);
     }
     return save;
   }
 
+  ///
   Future<bool> saveRec(Map<String, dynamic> data) async {
     final Map<String, dynamic> rec =
         await _tToDo.saveRec(ToDo.TABLE_NAME, data);
     return rec.isNotEmpty;
   }
 
+  ///
   Future<bool> saveFirebase(Map<String, dynamic> newRec) async {
     // Don't bother is not online.
     final online = await _fbDB.isOnline();
@@ -149,6 +175,7 @@ class Model {
   Map<String, dynamic> newRec(Map<String, dynamic> data) =>
       _tToDo.newRecord(data);
 
+  ///
   Map<String, dynamic> validRec(Map<String, dynamic> data) {
     //
     final Map<String, dynamic> newRec = _tToDo.newRecord(data);
@@ -158,7 +185,7 @@ class Model {
     }
 
     if (!newRec.containsKey('Icon')) {
-      newRec['Icon'] = _tToDo.newrec[ToDo.TABLE_NAME]['Icon'];
+      newRec['Icon'] = _tToDo.newrec[ToDo.TABLE_NAME]!['Icon'];
     }
 
     if (!newRec.containsKey('Item')) {
@@ -201,9 +228,11 @@ class Model {
     return newRec;
   }
 
-  Future<List<Map<String, dynamic>>> getRecord(String id) async =>
-      _tToDo.getRecord(ToDo.TABLE_NAME, id is String ? int.parse(id) : id);
+  ///
+  Future<List<Map<String, dynamic>>>? getRecord(dynamic id) async => _tToDo
+      .getRecord(ToDo.TABLE_NAME, id is String ? int.parse(id) : id as int);
 
+  ///
   Future<bool> delete(Map<String, dynamic> data) async {
     //
     final Map<String, dynamic> newRec = _tToDo.newRecord(data);
@@ -212,26 +241,30 @@ class Model {
 
     final bool delete = await saveRec(newRec);
 
-    if (delete) {
+    final keyFld = newRec[fbKeyField];
+
+    if (keyFld != null && delete) {
       // Remove from tasks Firebase collection.
-      final bool syncDelete = await _fbDB.delete(newRec[fbKeyField]);
+      final bool syncDelete = await _fbDB.delete(keyFld);
       if (syncDelete) {
         // Record the deletion for the next sync.
         await _cloud.insert(newRec[fbKeyField], 'DELETE');
       } else {
         // Record the deletion for the next sync.
-        await _cloud.delete(newRec['rowid'], newRec[fbKeyField]);
+        await _cloud.delete(newRec['rowid'], keyFld);
       }
     }
 
     return delete;
   }
 
+  ///
   Future<bool> unDelete(Map<String, dynamic> data) async {
     data['deleted'] = 0;
     return save(data);
   }
 
+  ///
   Future<bool> deleteRec(String key) async {
     final List<Map<String, dynamic>> rec =
         await _tToDo.getRecord(ToDo.TABLE_NAME, int.parse(key));
@@ -260,18 +293,26 @@ class Model {
     records[key] = rec;
   }
 
+  ///
   void dispose() {
-    _fbDB.dispose();
-    _tToDo.disposed();
+    if (!App.hotReload) {
+      _fbDB.dispose();
+      _cloud.dispose();
+      _tToDo.disposed();
+      _iconDB.dispose();
+      _this = null;
+    }
   }
 
+  ///
   Future<void> sync() => _cloud.sync();
 
+  ///
   Future<bool> reSync() async {
     // Retrieve all the local records.
     final List<Map<String, dynamic>> records = await listAll();
     final Map<dynamic, dynamic> fireDB = await _fbDB.records();
-    String key;
+    String? key;
 
     // Add local records to Firebase
     for (final Map<String, dynamic> rec in records) {
@@ -285,7 +326,7 @@ class Model {
     return synced;
   }
 
-  // Download any Firebase records down to the local database.
+  /// Download any Firebase records down to the local database.
   Future<bool> recordDump() async {
     // Retrieve all the local records.
     final List<Map<String, dynamic>> records = await listAll();
@@ -346,7 +387,8 @@ class Model {
     return dump;
   }
 
-  bool itemsOrdered([bool ordered]) {
+  ///
+  bool itemsOrdered([bool? ordered]) {
     if (ordered == null) {
       ordered = Settings.getOrder();
     } else {
@@ -356,33 +398,46 @@ class Model {
   }
 }
 
+///
 class Item extends FieldWidgets {
-  Item([Map rec]) : super(object: rec, label: 'Item', value: rec['Item']);
+  ///
+  Item([Map? rec]) : super(object: rec, label: 'Item', value: rec!['Item']);
 
   @override
-  void onSaved(dynamic v) => object['Item'] = value = v;
+  void onSaved(dynamic v) {
+    super.onSaved(v);
+    object['Item'] = value = v;
+  }
 
   @override
-  String onValidator(String v) {
-    String errorText;
-    if (v.isEmpty) {
+  String? onValidator(String? v) {
+    super.onValidator(v);
+    String? errorText;
+    if (v!.isEmpty) {
       errorText = 'Item cannot be empty!';
     }
     return errorText;
   }
 }
 
+///
 class Datetime extends FieldWidgets {
-  Datetime([Map rec])
-      : super(object: rec, label: 'Date Time', value: rec['DateTime']);
+  ///
+  Datetime([Map? rec])
+      : super(object: rec, label: 'Date Time', value: rec!['DateTime']);
 
   @override
-  void onSaved(v) => object['DateTime'] = value = v;
+  void onSaved(dynamic v) {
+    super.onSaved(v);
+    object['DateTime'] = value = v;
+  }
 }
 
+///
 class Icon extends FieldWidgets {
-  Icon([Map<String, dynamic> rec])
-      : super(object: rec, label: 'Icon', value: rec['Icon']);
+  ///
+  Icon([Map<String, dynamic>? rec])
+      : super(object: rec, label: 'Icon', value: rec!['Icon']);
 
   @override
   void onSaved(dynamic v) {
