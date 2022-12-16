@@ -1,6 +1,8 @@
-import 'package:workingmemory/src/view.dart';
-
 import 'package:workingmemory/src/controller.dart' show App, Controller;
+
+import 'package:workingmemory/src/model.dart' hide Icon, Icons;
+
+import 'package:workingmemory/src/view.dart';
 
 /// MVC design pattern is the 'View' -- the build() in this State object.
 class TodosAndroid extends StateX<TodosPage> {
@@ -8,76 +10,140 @@ class TodosAndroid extends StateX<TodosPage> {
   TodosAndroid() : super(Controller()) {
     _con = controller as Controller;
   }
+
   late Controller _con;
-  late WorkMenu _menu;
 
   @override
   Widget build(BuildContext context) {
-    // Rebuilt the menu if state changes.
-    _menu = WorkMenu();
+    final _editObj = _con.data;
+    final _items = _editObj.items;
+    final _leftHanded = Settings.isLeftHanded();
+    final offset = OffsetPrefs('AddOffset');
     return Scaffold(
-      drawer: const SettingsDrawer(),
-      appBar: AppBar(
-        title: Text('Working Memory'.tr),
-        actions: [
-          _menu.show(this),
-        ],
+      drawer: Drawer(
+        elevation: 12,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const SettingsWidget(),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: editToDo,
-        child: const Icon(
-          Icons.add,
+      appBar:
+          _appBar(title: Text('Working Memory'.tr), leftHanded: _leftHanded),
+      floatingActionButton: DraggableFab(
+        onDragEnd: offset.set,
+        initPosition: offset.get(),
+        button: FloatingActionButton(
+          onPressed: editToDo,
+          child: const Icon(
+            Icons.add,
+          ),
         ),
       ),
+      floatingActionButtonLocation: _leftHanded
+          ? FloatingActionButtonLocation.startFloat
+          : FloatingActionButtonLocation.endFloat,
       body: SafeArea(
-        child: _con.data.items.isEmpty
-            ? Container()
+        child: _items.isEmpty || _items[0].isEmpty
+            ? const SizedBox()
             : ListView.builder(
                 padding: const EdgeInsets.all(6),
-                itemCount: _con.data.items.length,
+                itemCount: _items.length,
                 itemBuilder: (BuildContext context, int index) {
+                  final icon = Icon(
+                    IconData(int.tryParse(_items[index]['Icon'])!,
+                        fontFamily: 'MaterialIcons'),
+                  );
+                  Widget? leading;
+                  Widget? trailing;
+                  if (_leftHanded) {
+                    trailing = icon;
+                  } else {
+                    leading = icon;
+                  }
                   return Dismissible(
-                    key: ObjectKey(_con.data.items[index]['rowid']),
+                    key: ObjectKey(_items[index]['rowid']),
                     onDismissed: (DismissDirection direction) {
-                      _con.data.delete(_con.data.items[index]);
+                      _editObj.delete(_items[index]);
                       ScaffoldMessenger.maybeOf(context)?.showSnackBar(
                         SnackBar(
                           content: Text('You deleted an item.'.tr),
                           action: SnackBarAction(
                               label: 'UNDO'.tr,
                               onPressed: () {
-                                _con.data.undo(_con.data.items[index]);
+                                _editObj.undo(_items[index]);
                               }),
                         ),
                       );
                     },
                     background: Container(
-                        color: Colors.red,
-                        child: const ListTile(
-                            leading: Icon(Icons.delete,
-                                color: Colors.white, size: 36),
-                            trailing: Icon(Icons.delete,
-                                color: Colors.white, size: 36))),
+                      color: Colors.red,
+                      child: const ListTile(
+                        leading:
+                            Icon(Icons.delete, color: Colors.white, size: 36),
+                        trailing:
+                            Icon(Icons.delete, color: Colors.white, size: 36),
+                      ),
+                    ),
                     child: Container(
                       decoration: BoxDecoration(
-                          border: Border(
-                              bottom: BorderSide(
-                                  color: App.themeData!.dividerColor))),
+                        border: Border(
+                          bottom:
+                              BorderSide(color: App.themeData!.dividerColor),
+                        ),
+                      ),
                       child: ListTile(
-                        leading: Icon(IconData(
-                            int.tryParse(_con.data.items[index]['Icon'])!,
-                            fontFamily: 'MaterialIcons')),
-                        title: Text(_con.data.items[index]['Item']),
-                        subtitle: Text(_con.data.dateFormat.format(
-                            DateTime.tryParse(
-                                _con.data.items[index]['DateTime'])!)),
-                        onTap: () => editToDo(_con.data.items[index]),
+                        leading: leading,
+                        title: Align(
+                          alignment: _leftHanded
+                              ? Alignment.center
+                              : Alignment.centerLeft,
+                          child: Text(_items[index]['Item']),
+                        ),
+                        subtitle: Align(
+                          alignment: _leftHanded
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
+                          child: Text(
+                            _editObj.dateFormat.format(
+                                DateTime.tryParse(_items[index]['DateTime'])!),
+                          ),
+                        ),
+                        trailing: trailing,
+                        onTap: () => editToDo(_items[index]),
                       ),
                     ),
                   );
                 },
               ),
       ),
+    );
+  }
+
+  /// Determine the order of AppBar items
+  AppBar _appBar({Widget? title, bool? leftHanded}) {
+    //
+    leftHanded = leftHanded ?? false;
+
+    final settingsButton = WorkMenu().popupMenuButton;
+
+    List<Widget>? actions;
+
+    // Switch the buttons around when indicated.
+    if (leftHanded) {
+      if (title == null) {
+        title = settingsButton;
+      } else {
+        title = Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [settingsButton, title],
+        );
+      }
+    } else {
+      actions = [settingsButton];
+    }
+    return AppBar(
+      title: title,
+      actions: actions,
     );
   }
 
@@ -89,6 +155,7 @@ class TodosAndroid extends StateX<TodosPage> {
       fullscreenDialog: true,
     );
     await Navigator.of(context).push(route);
+    // Refresh the previous screen
     setState(() {});
   }
 
@@ -96,5 +163,34 @@ class TodosAndroid extends StateX<TodosPage> {
   @override
   void onError(FlutterErrorDetails details) {
     super.onError(details);
+  }
+}
+
+/// Deals with the Add Button's offset
+class OffsetPrefs {
+  /// Must supply a Preference key
+  OffsetPrefs(String? key) {
+    if (key != null && key.isEmpty) {
+      _prefKey = null;
+    } else {
+      _prefKey = key;
+    }
+  }
+  String? _prefKey;
+
+  ///
+  Offset? get() {
+    Offset? position;
+    final offset = Prefs.getStringList(_prefKey);
+    if (offset.isNotEmpty && offset[0].isNum) {
+      position = Offset(double.parse(offset[0]), double.parse(offset[1]));
+    }
+    return position;
+  }
+
+  ///
+  void set(DraggableDetails details) {
+    final offset = <String>['${details.offset.dx}', '${details.offset.dy}'];
+    Prefs.setStringList(_prefKey, offset);
   }
 }

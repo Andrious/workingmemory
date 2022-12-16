@@ -75,7 +75,7 @@ class SettingsScreen extends StatelessWidget {
         label: 'Switch around dialog buttons',
         subtitle: 'Possibly preferred if left-handed.',
         content: CupertinoSwitch(
-          value: Settings.getLeftHanded(),
+          value: Settings.isLeftHanded(),
           onChanged: Settings.setLeftHanded,
         ),
       ),

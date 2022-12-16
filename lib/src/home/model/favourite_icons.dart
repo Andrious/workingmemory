@@ -35,9 +35,11 @@ class IconFavourites {
   late Map<String, String> _icons;
 
   ///
+  // ignore: constant_identifier_names
   static const TABLE_NAME = 'icons';
 
   ///
+  // ignore: constant_identifier_names
   static const CREATE_TABLE = '''
        CREATE TABLE IF NOT EXISTS $TABLE_NAME(
        icon VARCHAR DEFAULT 0xe15b,
@@ -77,8 +79,11 @@ class IconFavourites {
   /// Return favourite icons from Firebase
   Future<List<Map<String, dynamic>>> fbQuery() async {
     //
-    final DatabaseEvent dbEvent = await _fbDB.favIconsRef.once();
-    final value = dbEvent.snapshot.value;
+//    final DatabaseEvent dbEvent = await _fbDB.favIconsRef.once();
+//    final value = dbEvent.snapshot.value;
+
+    final DataSnapshot snapshot = await _fbDB.favIconsRef.get();
+    final value = snapshot.value;
 
     Map<String, dynamic> icons;
 

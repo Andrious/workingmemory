@@ -18,7 +18,7 @@
 
 import 'dart:async' show Future;
 
-import 'package:workingmemory/src/model.dart' hide Icon;
+import 'package:workingmemory/src/model.dart' hide Icon, Icons;
 
 import 'package:workingmemory/src/view.dart';
 
@@ -37,20 +37,17 @@ class TodoAndroid extends StateX<TodoPage> {
     super.initState();
 //    con.edit.addState(this);
     _con.data.init(widget.todo);
+    _offset = OffsetPrefs('SaveOffset');
   }
 
-  Widget? _leading;
-  Widget? _trailing;
+  late OffsetPrefs _offset;
   late BuildContext _scaffoldContext;
 
   @override
   Widget build(BuildContext context) {
-    _scaffoldButtons();
+    final _leftHanded = Settings.isLeftHanded();
     return Scaffold(
-      appBar: AppBar(
-        title: Settings.getLeftHanded() ? _leading : _con.data.title,
-        actions: _trailing == null ? null : [_trailing!],
-      ),
+      appBar: _appBar(title: _con.data.title, leftHanded: _leftHanded),
       body: Form(
         onWillPop: _onWillPop,
         child: _con.data.linkForm(
@@ -60,8 +57,33 @@ class TodoAndroid extends StateX<TodoPage> {
           ),
         ),
       ),
+      floatingActionButton: saveButton,
+      floatingActionButtonLocation: _leftHanded
+          ? FloatingActionButtonLocation.startFloat
+          : FloatingActionButtonLocation.endFloat,
     );
   }
+
+  ///
+  Widget get saveButton => DraggableFab(
+        onDragEnd: _offset.set,
+        initPosition: _offset.get(),
+        button: FloatingActionButton(
+          onPressed: () async {
+            final bool save = await _con.data.onPressed();
+            if (save) {
+              Navigator.of(_scaffoldContext, rootNavigator: true).pop();
+            } else {
+              ScaffoldMessenger.maybeOf(_scaffoldContext)?.showSnackBar(
+                SnackBar(
+                  content: Text('Not saved.'.tr),
+                ),
+              );
+            }
+          },
+          child: const Icon(Icons.save),
+        ),
+      );
 
   Future<bool> _onWillPop() async {
     if (!_con.data.hasChanged) {
@@ -124,7 +146,7 @@ class TodoAndroid extends StateX<TodoPage> {
       ]),
     ];
 
-    if (_con.favIcons!.isNotEmpty) {
+    if (_con.favIcons!.isNotEmpty && _con.favIcons!.first.isNotEmpty) {
       widgets.add(
         Container(
           height: 100,
@@ -151,7 +173,7 @@ class TodoAndroid extends StateX<TodoPage> {
         builder: (BuildContext context) {
           // So to access the Scaffold's state object.
           _scaffoldContext = context;
-          return Container(
+          return SizedBox(
             height: 600,
             child: IconItems(
               icons: _con.icons,
@@ -168,34 +190,40 @@ class TodoAndroid extends StateX<TodoPage> {
     return widgets;
   }
 
-  void _scaffoldButtons() {
-    Widget? temp;
-    _leading = null;
-    _trailing = ElevatedButton(
-      onPressed: () async {
-        final bool save = await _con.data.onPressed();
-        if (save) {
-          Navigator.of(_scaffoldContext, rootNavigator: true).pop();
-        } else {
-          ScaffoldMessenger.maybeOf(_scaffoldContext)?.showSnackBar(
-            SnackBar(
-              content: Text('Not saved.'.tr),
-            ),
-          );
-        }
+  /// Determine the order of AppBar items
+  AppBar _appBar({Widget? title, bool? leftHanded}) {
+    leftHanded = leftHanded ?? false;
+
+    final settingsButton = ElevatedButton(
+      onPressed: () {
+        final notifyColor = LEDColor(
+          pickerColor: Color(_con.data.notifyColor),
+          onColorChanged: (Color color) => _con.data.notifyColor = color.value,
+        );
+        notifyColor.show(context);
       },
-      child: Text(
-        'Save'.tr,
-        style: theme!.textTheme.bodyText2!.copyWith(color: Colors.white),
-      ),
+      child: const Icon(Icons.settings),
     );
 
+    List<Widget>? actions;
+
     // Switch the buttons around when indicated.
-    if (Settings.getLeftHanded()) {
-      temp = _trailing;
-      _trailing = null;
-      _leading = temp;
+    if (leftHanded) {
+      if (title == null) {
+        title = settingsButton;
+      } else {
+        title = Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [settingsButton, title],
+        );
+      }
+    } else {
+      actions = [settingsButton];
     }
+    return AppBar(
+      title: title,
+      actions: actions,
+    );
   }
 
   List<Widget> _listButtons() {
@@ -220,7 +248,7 @@ class TodoAndroid extends StateX<TodoPage> {
     );
 
     // Switch the buttons around when indicated.
-    if (Settings.getLeftHanded()) {
+    if (Settings.isLeftHanded()) {
       temp = leading;
       leading = trailing;
       trailing = temp;
@@ -231,7 +259,12 @@ class TodoAndroid extends StateX<TodoPage> {
 
 ///
 enum DismissDialogAction {
+  ///
   cancel,
+
+  ///
   discard,
+
+  ///
   save,
 }

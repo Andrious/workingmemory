@@ -41,7 +41,7 @@ class WorkingMemory extends AppStatefulWidget {
   AppState createAppState() => AppState(
         controller: WorkingController(),
         switchUI: Prefs.getBool('switchUI'),
-        title: 'Working Memory',
+        title: 'Working Memory'.tr,
 //        home: TodosPage(key: pageKey),
         home: const TodosPage(),
         debugShowCheckedModeBanner: false,

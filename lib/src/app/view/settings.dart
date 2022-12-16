@@ -18,7 +18,7 @@
 
 import 'package:workingmemory/src/model.dart' show Settings;
 
-import 'package:workingmemory/src/view.dart';
+import 'package:workingmemory/src/view.dart' hide ColorPicker;
 
 import 'package:workingmemory/src/controller.dart';
 
@@ -40,7 +40,7 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
   void initState() {
     super.initState();
     _descending = Settings.getOrder();
-    _leftHanded = Settings.getLeftHanded();
+    _leftHanded = Settings.isLeftHanded();
     _con = Controller();
   }
 
@@ -89,22 +89,33 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
           ]),
           Row(children: [
             InkWell(
-                onTap: () {},
+                onTap: () => _theme.showNotifications(),
                 child: L10n.t(
                   'Notification Settings',
                 )),
           ]),
-          Row(
-            children: const [Text('')],
-          ),
+          Row(children: const [Text('')]),
           Row(children: [
             Expanded(
               child: InkWell(
-                  onTap: () {},
-                  child: L10n.t(
-                    'Notification behaviour popup settings and LED Colour',
-                    softWrap: true,
-                  )),
+                onTap: () => _theme.showSounds(),
+                child: L10n.t(
+                  'Notification Sounds',
+                  softWrap: true,
+                ),
+              ),
+            ),
+          ]),
+          Row(children: const [Text('')]),
+          Row(children: [
+            Expanded(
+              child: InkWell(
+                onTap: () => _theme.showLEDColour(),
+                child: L10n.t(
+                  'LED Colour',
+                  softWrap: true,
+                ),
+              ),
             ),
           ]),
           Row(
@@ -158,6 +169,7 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
   }
 
   List<Widget> _interfacePreference() {
+    final darkMode = _theme.isDarkMode;
     final List<Widget> interface = [
       Row(children: [
         Expanded(
@@ -189,7 +201,7 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
       Row(children: [
         Expanded(
           child: L10n.t(
-            'Switch around dialogue buttons',
+            'Left-handed user',
           ),
         ),
         Checkbox(
@@ -198,7 +210,7 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
         ),
       ]),
       ListTile(
-        leading: _theme.isDarkMode!
+        leading: darkMode
             ? Image.asset(
                 'assets/images/moon.png',
                 height: 30,
@@ -211,12 +223,12 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
               ),
         title: L10n.t('Dark Mode'),
         trailing: Switch(
-          value: _theme.isDarkMode!,
+          value: darkMode,
           onChanged: (val) {
-            _theme.isDarkMode = val;
             if (val) {
               App.themeData = _theme.setDarkMode();
             } else {
+              _theme.isDarkMode = false;
               App.setThemeData();
             }
             setState(() {});
@@ -279,10 +291,11 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
 
   // ignore: avoid_positional_boolean_parameters
   void switchButton(bool? value) {
-    Settings.setLeftHanded(value!);
-    setState(() {
-      _leftHanded = value;
-    });
+    if (value != null) {
+      Settings.setLeftHanded(value);
+      setState(() => _leftHanded = value);
+      _con.setState(() {});
+    }
   }
 
   // A custom error routine if you want.
@@ -290,14 +303,6 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
   void onError(FlutterErrorDetails details) {
     super.onError(details);
   }
-}
-
-/// Supply the settings widget to a Drawer widget
-class SettingsDrawer extends StatelessWidget {
-  ///
-  const SettingsDrawer({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) => const Drawer(child: SettingsWidget());
 }
 
 /// Locale iOS Spinner

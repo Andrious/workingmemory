@@ -5,12 +5,12 @@ Map<String, String> ruRU = {
   'Sorted Order of Items': 'Отсортированный порядок элементов',
   'Check so the items are in descending order with the most recent items listed first':
       'Убедитесь, что элементы расположены в порядке убывания, а самые последние элементы перечислены первыми.',
-  'Switch around dialogue buttons': 'Переключение диалоговых кнопок',
+  'Left-handed user': 'Левша',
   'Dark Mode': 'Темный режим',
   'NOTIFICATIONS PREFERENCES': 'НАСТРОЙКИ УВЕДОМЛЕНИЙ',
   'Notification Settings': 'Настройки уведомлений',
-  'Notification behaviour popup settings and LED Colour':
-      'Настройки всплывающих окон поведения уведомлений и цвет светодиода',
+  'Notification Sounds': 'Звуки уведомлений',
+  'LED Color': 'Цвет светодиода',
   'RECORD PREFERENCES': 'ЗАПИСАТЬ ПРЕДПОЧТЕНИЯ',
   'Item Record Preferences': 'Настройки записи товара',
   'How certain records are further handled':

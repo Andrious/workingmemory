@@ -204,7 +204,7 @@ class FireBaseDB {
     // infinite loop if instantiated in constructor.
     id ??= fbKey; //WorkingController().uid;
 
-    if (id == null || id.trim().isEmpty) {
+    if (id == 'dummy' || id.trim().isEmpty) {
       id = null;
     } else {
       id = id.trim();
@@ -443,8 +443,8 @@ class FireBaseDB {
   set addedListener(void Function(DatabaseEvent event) func) =>
       _db.addedListener = func;
 
-  ///
-  Future<bool> isOnline() => _db.isOnline();
+  ///                                                 // Doesn't work on kIsWeb
+  Future<bool> isOnline() => Future.value(App.isOnline); //_db.isOnline();
 
   ///
   static Future<void>? goOnline() => _db.goOnline();
@@ -486,7 +486,7 @@ class FireBaseDB {
 
   ///
   Future<void> removeAnonymous() async {
-    await initAsync();
+//    await initAsync();
     if (_anonymousUser == null) {
       _anonymousUser = userRef;
       _anonymousDeviceRef = yourDevicesRef;

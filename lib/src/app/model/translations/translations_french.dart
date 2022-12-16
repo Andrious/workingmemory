@@ -5,12 +5,12 @@ Map<String, String> frFR = {
   'Sorted Order of Items': 'Ordre trié des éléments',
   'Check so the items are in descending order with the most recent items listed first':
       "Vérifiez que les éléments sont dans l'ordre décroissant avec les éléments les plus récents répertoriés en premier",
-  'Switch around dialogue buttons': 'Basculer les boutons de dialogue',
+  'Left-handed user': 'Utilisateur gaucher',
   'Dark Mode': 'Mode sombre',
   'NOTIFICATIONS PREFERENCES': 'PRÉFÉRENCES DE NOTIFICATIONS',
   'Notification Settings': 'Paramètres de notification',
-  'Notification behaviour popup settings and LED Colour':
-      'Paramètres contextuels de comportement de notification et couleur de la LED',
+  'Notification Sounds': 'Notifications sonores',
+  'LED Color': 'Couleur des DEL',
   'RECORD PREFERENCES': "PRÉFÉRENCES D'ENREGISTREMENT",
   'Item Record Preferences': "Préférences d'enregistrement d'article",
   'How certain records are further handled':

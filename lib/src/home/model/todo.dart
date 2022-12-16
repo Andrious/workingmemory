@@ -51,18 +51,15 @@ class ToDo extends SQLiteDB {
     ///
     final init = await super.init();
 
-    if (init) {
-      //
-      _keyFld = await keyField(TABLE_NAME);
+    _keyFld = await keyField(TABLE_NAME);
 
-      _selectNotDeleted =
-          'SELECT $_keyFld, * FROM $TABLE_NAME" + " WHERE deleted = 0';
+    _selectNotDeleted =
+        'SELECT $_keyFld, * FROM $TABLE_NAME" + " WHERE deleted = 0';
 
-      _selectDeleted =
-          'SELECT $_keyFld, * FROM $TABLE_NAME" + " WHERE deleted = 1';
+    _selectDeleted =
+        'SELECT $_keyFld, * FROM $TABLE_NAME" + " WHERE deleted = 1';
 
-      _selectAll = 'SELECT $_keyFld, * FROM $TABLE_NAME';
-    }
+    _selectAll = 'SELECT $_keyFld, * FROM $TABLE_NAME';
     return init;
   }
 

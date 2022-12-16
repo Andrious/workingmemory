@@ -19,15 +19,20 @@
 
 import 'package:workingmemory/src/view.dart';
 
+///
 class IconItems extends StatelessWidget {
+  ///
   const IconItems(
-      {Key? key,
-      required this.icon,
-      required this.onTap,
-      required this.icons})
+      {Key? key, required this.icon, required this.onTap, required this.icons})
       : super(key: key);
+
+  ///
   final String icon;
+
+  ///
   final ValueChanged<String> onTap;
+
+  ///
   final Map icons;
 
   @override
@@ -49,7 +54,8 @@ class IconItems extends StatelessWidget {
               childAspectRatio:
                   (orientation == Orientation.portrait) ? 1.0 : 1.2,
               children: icons.where((dynamic icon) {
-                return IconData(int.tryParse(icon)!, fontFamily: 'MaterialIcons')
+                return IconData(int.tryParse(icon)!,
+                            fontFamily: 'MaterialIcons')
                         .fontFamily !=
                     null;
               }).map((dynamic icon) {

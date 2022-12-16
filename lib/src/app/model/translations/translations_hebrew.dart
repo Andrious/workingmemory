@@ -5,12 +5,12 @@ Map<String, String> heIL = {
   'Sorted Order of Items': 'סדר ממוין של פריטים',
   'Check so the items are in descending order with the most recent items listed first':
       'סמן כך שהפריטים יהיו בסדר יורד כשהפריטים העדכניים ביותר מופיעים תחילה',
-  'Switch around dialogue buttons': 'החלף כפתורי דיאלוג',
+  'Left-handed user': 'משתמש שמאלי',
   'Dark Mode': 'מצב כהה',
   'NOTIFICATIONS PREFERENCES': 'העדפות הודעות',
   'Notification Settings': 'הגדרות התראות',
-  'Notification behaviour popup settings and LED Colour':
-      'הגדרות קופצות של התנהגות הודעות וצבע LED',
+  'Notification Sounds': 'צלילי הודעה',
+  'LED Color': 'צבע LED',
   'RECORD PREFERENCES': 'הקלט העדפות',
   'Item Record Preferences': 'העדפות רשומת פריט',
   'How certain records are further handled':

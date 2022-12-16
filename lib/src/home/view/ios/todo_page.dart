@@ -212,7 +212,7 @@ class TodoiOS extends StateX<TodoPage> {
     );
 
     // Switch the buttons around when indicated.
-    if (Settings.getLeftHanded()) {
+    if (Settings.isLeftHanded()) {
       temp = _trailing;
       _trailing = null;
       _leading = temp;
@@ -259,7 +259,7 @@ class TodoiOS extends StateX<TodoPage> {
     }
 
     // Switch the buttons around when indicated.
-    if (Settings.getLeftHanded()) {
+    if (Settings.isLeftHanded()) {
       temp = leading;
       leading = trailing;
       trailing = temp;

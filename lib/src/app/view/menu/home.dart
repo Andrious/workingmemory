@@ -24,58 +24,85 @@ import 'package:workingmemory/src/view.dart';
 import 'package:workingmemory/src/controller.dart' show Controller;
 
 ///
-class WorkMenu extends Menu {
+//class WorkMenu extends Menu {
+class WorkMenu extends AppMenu<String> {
   ///
-  WorkMenu() : super() {
+  WorkMenu({super.key})
+      : _con = Controller(),
+        super(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          position: PopupMenuPosition.under,
+        ) {
     //
-    _con = Controller();
-
     if (_con.app.loggedIn) {
+      //
       if (_con.app.isAnonymous) {
-        tailItems = [
-          PopupMenuItem(value: 'SignIn', child: L10n.t('Sign in...')),
-        ];
+        tailItems.add(
+          PopupMenuItem<String>(
+            key: const Key('SignIn'),
+            value: 'SignIn',
+            child: L10n.t('Sign in...'),
+          ),
+        );
       } else {
-        tailItems = [
-          PopupMenuItem(value: 'Logout', child: L10n.t('Logout')),
-        ];
+        tailItems.add(
+          PopupMenuItem<String>(
+            key: const Key('SignIn'),
+            value: 'Logout',
+            child: L10n.t('Logout'),
+          ),
+        );
       }
     } else {
-      tailItems = [
-        PopupMenuItem(value: 'SignIn', child: L10n.t('Sign in...')),
-      ];
+      tailItems.add(
+        PopupMenuItem<String>(
+          key: const Key('SignIn'),
+          value: 'SignIn',
+          child: L10n.t('Sign in...'),
+        ),
+      );
     }
   }
-  late Controller _con;
+  final Controller _con;
+
+  /// The last menu option
+  final tailItems = <PopupMenuItem<String>>[];
 
   @override
-  List<PopupMenuItem<dynamic>> menuItems() => [
-        PopupMenuItem(
+  List<PopupMenuEntry<String>> get menuItems => [
+        PopupMenuItem<String>(
             key: const Key('resyncMenuItem'),
             value: 'Resync',
             child: L10n.t('Resync')),
-        PopupMenuItem(
+        PopupMenuItem<String>(
             key: const Key('localeMenuItem'),
             value: 'interface',
-            child: Text('${L10n.s('Interface:')} $interface')),
-        PopupMenuItem(
+            child: Text(
+                '${L10n.s('Interface:')} ${App.useMaterial ? 'Material' : 'Cupertino'}')),
+        PopupMenuItem<String>(
             key: const Key('localeMenuItem'),
             value: 'Locale',
             child: Text('${'Locale:'.tr} ${App.locale?.toLanguageTag()}')),
         if (App.useMaterial)
-          PopupMenuItem(
+          PopupMenuItem<String>(
             key: const Key('colorMenuItem'),
             value: 'color',
             child: L10n.t('Colour Theme'),
           ),
+        if (tailItems.isNotEmpty) const PopupMenuDivider(),
+        if (tailItems.isNotEmpty) tailItems.last,
+        const PopupMenuDivider(),
+        PopupMenuItem<String>(
+          key: const Key('About'),
+          value: 'About',
+          child: L10n.t('About'),
+        ),
       ];
 
-  /// Supply what the interface
-  String get interface => App.useMaterial ? 'Material' : 'Cupertino';
-
   @override
-  Future<void> onSelected(dynamic menuItem) async {
-    switch (menuItem) {
+  Future<void> selected(String value) async {
+    switch (value) {
       case 'Resync':
         _con.reSync();
         break;
@@ -103,32 +130,46 @@ class WorkMenu extends Menu {
 
         final initialItem = locales.indexOf(App.locale!);
 
+        int spinIndex = initialItem;
+
         final spinner = ISOSpinner(
           initialItem: initialItem,
           supportedLocales: locales,
           onSelectedItemChanged: (int index) async {
-            // Retrieve the available locales.
-            final locale = L10n.getLocale(index);
-            if (locale != null) {
-              App.locale = locale;
-              App.setState(() {});
-            }
+            spinIndex = index;
           },
         );
 
         await DialogBox(
           title: 'Current Language'.tr,
           body: [spinner],
-          press01: () {
-            spinner.onSelectedItemChanged(initialItem);
+//          press01: () {},
+          press02: () {
+            // Retrieve the available locales.
+            final locale = L10n.getLocale(spinIndex);
+            if (locale != null) {
+              Prefs.setString('locale', locale.toLanguageTag());
+              App.locale = locale;
+              App.setState(() {});
+            }
           },
-          press02: () {},
-          switchButtons: Settings.getLeftHanded(),
+          switchButtons: Settings.isLeftHanded(),
         ).show();
 
         break;
       case 'color':
         await showColorPicker();
+        break;
+      case 'About':
+        showAboutDialog(
+          context: context!,
+          applicationName: L10n.s(App.state?.title ?? ''),
+          applicationVersion:
+              'version: ${App.version} build: ${App.buildNumber}',
+          // applicationIcon: _applicationIcon,
+          // applicationLegalese: _applicationLegalese,
+          // children: _children,
+        );
         break;
       case 'Logout':
         _con.logOut();

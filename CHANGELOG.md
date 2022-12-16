@@ -1,5 +1,12 @@
 
 
+## 1.10.0
+ December 15, 2022
+- AppMenu<String>
+- if (init && !kIsWeb) {
+- Draggable Floating button
+- todos_page rewrite
+
 ## 1.9.0
  February 02, 2022
 - Upgraded code

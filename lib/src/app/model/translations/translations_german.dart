@@ -5,12 +5,12 @@ Map<String, String> deDE = {
   'Sorted Order of Items': 'Sortierte Reihenfolge der Artikel',
   'Check so the items are in descending order with the most recent items listed first':
       'Überprüfen Sie, ob die Elemente in absteigender Reihenfolge mit den neuesten Elementen zuerst aufgeführt sind',
-  'Switch around dialogue buttons': 'Dialogschaltflächen umschalten',
+  'Left-handed user': 'Linkshänder',
   'Dark Mode': 'Dunkler Modus',
   'NOTIFICATIONS PREFERENCES': 'PRÄFERENZEN FÜR BENACHRICHTIGUNGEN',
   'Notification Settings': 'Benachrichtigungseinstellungen',
-  'Notification behaviour popup settings and LED Colour':
-      'Popup-Einstellungen für Benachrichtigungsverhalten und LED-Farbe',
+  'Notification Sounds': 'Benachrichtigungstöne',
+  'LED Color': 'LED-Farbe',
   'RECORD PREFERENCES': 'PRÄFERENZEN AUFZEICHNEN',
   'Item Record Preferences': 'Voreinstellungen für Artikeldatensätze',
   'How certain records are further handled':

@@ -1,13 +1,10 @@
 # Good to keep this file with the code.
 #.gitignore
 
-<<<<<<< HEAD
-=======
 ## Github Action Workflow for Continuous Integration Testing
 # https://medium.com/mobile-development-group/github-actions-for-flutter-cf02923d7b5d
 # .github
 
->>>>>>> b6749ba (1.9.0)
 # Ignore except for application packages
 #pubspec.lock
 
@@ -22,7 +19,7 @@ out/
 .dart_tool/
 .pub-cache/
 # Ignore API documentation directory created by dartdoc:
-doc/api/
+/doc/api/
 
 # Android Studio
 /*.iml
@@ -42,10 +39,6 @@ lcov.info
 *.js.deps
 *.js.map
 
-# Explicitly include the example app
-!example/**
-example/.*
-example/ios/Flutter/flutter_export_environment.sh
 
 ### Eclipse ###
 *.pydevproject
@@ -66,7 +59,16 @@ example/ios/Flutter/flutter_export_environment.sh
 
 
 # Miscellaneous
-#*.lock
+/tmp/
+*.tmp
+*.bak
+*.swp
+*.lnk
+*.txt
+*~.nib
+.classpath
+.settings/
+.loadpath
 *.class
 *.log
 *.pyc
@@ -105,9 +107,8 @@ unused.txt
 
 # Android related
 google-services.json
-/android/
-!/android/app/build.gradle
-!/android/build.gradle
+#/android/   # .gitignore in the android/
+
 
 # iOS/XCode related
 GoogleService-Info.plist
@@ -135,43 +136,4 @@ flutter_assets/
 ServiceDefinitions.json
 GeneratedPluginRegistrant.*
 Info.plist
-<<<<<<< HEAD
-**/ios/Flutter/.last_build_id
 
-# Exceptions to above rules.
-!**/ios/**/default.mode1v3
-!**/ios/**/default.mode2v3
-!**/ios/**/default.pbxuser
-!**/ios/**/default.perspectivev3
-!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
-
-# flutter_local_notifications
--keep class com.dexterous.** { *; }
-
-##---------------Begin: proguard configuration for Gson  ----------
-# Gson uses generic type information stored in a class file when working with fields. Proguard
-# removes such information by default, so configure it to keep all of it.
--keepattributes Signature
-
-# For using GSON @Expose annotation
--keepattributes *Annotation*
-
-# Gson specific classes
--dontwarn sun.misc.**
-#-keep class com.google.gson.stream.** { *; }
-
-# Prevent proguard from stripping interface information from TypeAdapter, TypeAdapterFactory,
-# JsonSerializer, JsonDeserializer instances (so they can be used in @JsonAdapter)
--keep class * implements com.google.gson.TypeAdapter
--keep class * implements com.google.gson.TypeAdapterFactory
--keep class * implements com.google.gson.JsonSerializer
--keep class * implements com.google.gson.JsonDeserializer
-
-# Prevent R8 from leaving Data object members always null
--keepclassmembers,allowobfuscation class * {
-  @com.google.gson.annotations.SerializedName <fields>;
-}
-##---------------End:   proguard configuration for Gson  ----------
-=======
-
->>>>>>> b6749ba (1.9.0)

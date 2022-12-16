@@ -15,9 +15,9 @@
 ///
 ///          Created  15 Nov 2018
 
-import 'package:auth/auth.dart';
-
-import 'package:workingmemory/src/app/controller/working_memory_app.dart';
+// import 'package:auth/auth.dart';
+//
+// import 'package:workingmemory/src/app/controller/working_memory_app.dart';
 
 import 'package:workingmemory/src/model.dart' show OnLoginListener;
 

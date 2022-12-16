@@ -44,25 +44,37 @@ class Model {
     _tToDo = ToDo();
     _iconDB = IconFavourites();
     bool init = await _fbDB.initAsync();
-    if (init) {
+    if (init && !kIsWeb) {
+      // No database on the Web
+      // Initialize the database
       init = await _tToDo.initAsync();
     }
     if (init) {
       if (!App.hotReload) {
+        // firebase records
         await _fbDB.records();
         init = await _cloud.initAsync();
       }
     }
-    if (init) {
+    if (init && !kIsWeb) {
       // Synchronize any records from other devices.
-      init = await _cloud.sync();
+      // Nothing to sync, don't return false.
+      await _cloud.sync();
     }
     return init;
   }
 
   ///
-  Future<List<Map<String, dynamic>>> list() =>
-      _tToDo.notDeleted(ordered: itemsOrdered());
+  Future<List<Map<String, dynamic>>> list() async {
+    List<Map<String, dynamic>> recs = [];
+    if (kIsWeb) {
+      final Map<String, dynamic> map = await _fbDB.records();
+      recs.add(map);
+    } else {
+      recs = await _tToDo.notDeleted(ordered: itemsOrdered());
+    }
+    return recs;
+  }
 
   ///
   Future<List<Map<String, dynamic>>> listAll() => _tToDo.list();
@@ -120,16 +132,31 @@ class Model {
   ///
   Future<bool> save(Map<String, dynamic> data) async {
     //
-    final Map<String, dynamic> newRec = validRec(data);
+    Map<String, dynamic> newRec;
+    bool save;
+    bool newFireRec;
 
-    bool save = newRec.isNotEmpty;
+    if (kIsWeb) {
+      //
+      save = true;
+      newRec = data;
+      newFireRec = newRec[fbKeyField] == null;
+      if (newFireRec) {
+        newRec[fbKeyField] = null;
+      }
+    } else {
+      //
+      newRec = validRec(data);
 
-    final newFireRec = newRec[fbKeyField] == null;
+      save = newRec.isNotEmpty;
 
-    //   await _tToDo.runTxn(() async {
-    //  Save to SQLite
-    if (save && !kIsWeb) {
-      save = await saveRec(newRec);
+      newFireRec = newRec[fbKeyField] == null;
+
+      //   await _tToDo.runTxn(() async {
+      //  Save to SQLite
+      if (save) {
+        save = await saveRec(newRec);
+      }
     }
     // Save to Firebase
     if (save) {
@@ -210,10 +237,6 @@ class Model {
     final String item = newRec['Item'];
 
     if (item.isEmpty) {
-      return {};
-    }
-
-    if (newRec['DateTime'] is! DateTime) {
       return {};
     }
 

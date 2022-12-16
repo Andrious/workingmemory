@@ -29,47 +29,59 @@ class DefaultFirebaseOptions {
         return ios;
       case TargetPlatform.macOS:
         throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - you can reconfigure this by running the FlutterFire CLI again.'
-              .tr,
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
+      case TargetPlatform.windows:
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for windows - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
+      case TargetPlatform.linux:
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for linux - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
         );
       default:
         throw UnsupportedError(
-          'DefaultFirebaseOptions are not supported for this platform.'.tr,
+          'DefaultFirebaseOptions are not supported for this platform.',
         );
     }
   }
 
   ///
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCK0iKD0DkUPULoJi-PuSHX7bnClSnal4k',
-    appId: '1:11004453277:web:82ca5030488df92cbbcf74',
-    messagingSenderId: '11004453277',
-    projectId: 'todomvc-697c6',
-    authDomain: 'todomvc-697c6.firebaseapp.com',
-    databaseURL: 'https://todomvc-697c6.firebaseio.com',
-    storageBucket: 'todomvc-697c6.appspot.com',
+    apiKey: 'AIzaSyBB9Q11SwhI5UFJDFHaaDaltMdY8YqhsyQ',
+    appId: '1:761477102089:web:7e236a942206010c6e16d8',
+    messagingSenderId: '761477102089',
+    projectId: 'working-memory-823375',
+    authDomain: 'working-memory-823375.firebaseapp.com',
+    databaseURL: 'https://working-memory-823375.firebaseio.com',
+    storageBucket: 'working-memory-823375.appspot.com',
   );
 
   ///
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBnKcUFhX8ofhOdFQ0UzM6GhVrznv5RJ38',
-    appId: '1:11004453277:android:99ce93b08ea008aebbcf74',
-    messagingSenderId: '11004453277',
-    projectId: 'todomvc-697c6',
-    databaseURL: 'https://todomvc-697c6.firebaseio.com',
-    storageBucket: 'todomvc-697c6.appspot.com',
+    apiKey: 'AIzaSyBpSv3EJpHCvQj4Qkur1X-Y3ooZWFo5i1E',
+    appId: '1:761477102089:android:ecbfc1109769ee45',
+    messagingSenderId: '761477102089',
+    projectId: 'working-memory-823375',
+    databaseURL: 'https://working-memory-823375.firebaseio.com',
+    storageBucket: 'working-memory-823375.appspot.com',
   );
 
   ///
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCTFwgqTkRTtu1wEg8gi6YGBy7ZB-naqqc',
-    appId: '1:11004453277:ios:0a2b3c0c479abeefbbcf74',
-    messagingSenderId: '11004453277',
-    projectId: 'todomvc-697c6',
-    databaseURL: 'https://todomvc-697c6.firebaseio.com',
-    storageBucket: 'todomvc-697c6.appspot.com',
+    apiKey: 'AIzaSyAxg26pnBaTr3_Ng4zRghXoUUyBgMCpKWA',
+    appId: '1:761477102089:ios:ecbfc1109769ee45',
+    messagingSenderId: '761477102089',
+    projectId: 'working-memory-823375',
+    databaseURL: 'https://working-memory-823375.firebaseio.com',
+    storageBucket: 'working-memory-823375.appspot.com',
+    androidClientId:
+        '761477102089-13mh6shgvlvl0nhbucv0aurqqbsk85eh.apps.googleusercontent.com',
     iosClientId:
-        '11004453277-l1f9gv9mviemhbv483cqtuo4t818pai5.apps.googleusercontent.com',
+        '761477102089-e8hvkadoe046lk17ke57i25ld4ff1sf5.apps.googleusercontent.com',
     iosBundleId: 'com.andrioussolutions.workingmemory',
   );
 }

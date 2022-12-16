@@ -19,14 +19,15 @@
 import 'dart:async' show Future;
 
 import 'package:flutter/foundation.dart'
-    show FlutterErrorDetails, FlutterExceptionHandler;
+    show FlutterErrorDetails, FlutterExceptionHandler, kIsWeb;
 
 import 'package:fluttery_framework/controller.dart'; // as c;
 
 import 'package:workingmemory/src/model.dart'
     show CloudDB, DefaultFirebaseOptions, FireBaseDB, RemoteConfig;
 
-import 'package:workingmemory/src/view.dart' show ReportErrorHandler, showBox;
+import 'package:workingmemory/src/view.dart'
+    show ReportErrorHandler, Prefs, showBox;
 
 import 'package:workingmemory/src/view.dart' as v;
 
@@ -35,7 +36,7 @@ import 'package:workingmemory/src/controller.dart'
 
 import 'package:package_info_plus/package_info_plus.dart' show PackageInfo;
 
-import 'package:auth/auth.dart' show Auth;
+import 'package:auth/auth.dart' show Auth, User;
 
 import 'package:firebase_core/firebase_core.dart' show Firebase;
 
@@ -54,21 +55,25 @@ Future<void> runApp(
   // Allow for FirebaseCrashlytics.instance
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (Firebase.apps.isEmpty) {
-    // Allow for FirebaseCrashlytics.instance
-    await Firebase
-        .initializeApp(); //(options: DefaultFirebaseOptions.currentPlatform);
+  if (!kIsWeb) {
+    //
+    if (Firebase.apps.isEmpty) {
+      // Allow for FirebaseCrashlytics.instance
+      await Firebase
+          .initializeApp(); //(options: DefaultFirebaseOptions.currentPlatform);
+    }
+
+    // Supply Firebase Crashlytics
+    final FirebaseCrashlytics crash = FirebaseCrashlytics.instance;
+
+    handler ??= crash.recordFlutterError;
+
+    report ??= crash.recordError;
+
+    // If true, then crash reporting data is sent to Firebase.
+    // Send if in Production
+    await crash.setCrashlyticsCollectionEnabled(!App.inDebugger);
   }
-
-  // Supply Firebase Crashlytics
-  final FirebaseCrashlytics crash = FirebaseCrashlytics.instance;
-
-  handler ??= crash.recordFlutterError;
-
-  report ??= crash.recordError;
-
-  // If true, then crash reporting data is sent to Firebase.
-  await crash.setCrashlyticsCollectionEnabled(false);
 
   v.runApp(
     app,
@@ -88,29 +93,45 @@ class WorkingController extends AppController {
 
   @override
   Future<bool> initAsync() async {
-    await super.initAsync();
-    // Set this app's theme.
-    final _theme = ThemeController();
-    await _theme.initAsync();
+    bool init;
+    init = await super.initAsync();
 
-    // Firebase remote configuration.
-    _remoteConfig = RemoteConfig(key: 'rij;vwf553676-tgh2pc;jblrgncwjfc2cgncc');
-//    await _remoteConfig.initAsync();
-    // Provide the sign in and the loading database info.
-    _auth = Auth(
-      listener: _logInUser,
-      firebaseOptions: DefaultFirebaseOptions.currentPlatform,
-    );
-
-    // Removed from constructor to prevent a stack overflow.
-    // Must be initialized before signIn();
-    _con = Controller();
-    if (!App.hotReload) {
-      await signIn();
+    if (init) {
+      // Set this app's theme.
+      final _theme = ThemeController();
+      init = await _theme.initAsync();
     }
-    await _con.initAsync();
 
-    return true;
+    if (init) {
+      // Firebase remote configuration.
+      _remoteConfig =
+          RemoteConfig(key: 'rij;vwf553676-tgh2pc;jblrgncwjfc2cgncc');
+      // await _remoteConfig.initAsync();
+    }
+
+    if (init) {
+      // Provide the sign in and the loading database info.
+      _auth = Auth(
+        listener: _logInUser,
+        firebaseOptions: DefaultFirebaseOptions.currentPlatform,
+      );
+      init = await _auth.initAsync();
+    }
+
+    if (init) {
+      // Removed from constructor to prevent a stack overflow.
+      // Must be initialized before signIn();
+      _con = Controller();
+      if (!App.hotReload) {
+        init = await signIn();
+      }
+    }
+
+    if (init) {
+      init = await _con.initAsync();
+    }
+
+    return init;
   }
 
   late Controller _con;
@@ -122,9 +143,14 @@ class WorkingController extends AppController {
   late RemoteConfig _remoteConfig;
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    FireBaseDB.didChangeAppLifecycleState(state);
-    CloudDB.didChangeAppLifecycleState(state);
+  void initState() {
+    super.initState();
+    if (_auth.isAnonymous && _auth.uid.isNotEmpty) {
+      final uid = Prefs.getString('fbUid');
+      if (uid.isEmpty) {
+        Prefs.setString('fbUid', _auth.uid);
+      }
+    }
   }
 
   @override
@@ -137,6 +163,12 @@ class WorkingController extends AppController {
       _this = null;
       super.dispose();
     }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    FireBaseDB.didChangeAppLifecycleState(state);
+    CloudDB.didChangeAppLifecycleState(state);
   }
 
   ///
@@ -153,7 +185,9 @@ class WorkingController extends AppController {
     if (user != null) {
       userStamp();
     }
-    FirebaseCrashlytics.instance.setUserIdentifier(_auth.displayName);
+    if (!kIsWeb) {
+      FirebaseCrashlytics.instance.setUserIdentifier(_auth.displayName);
+    }
   }
 
   /// 'disconnect' from Firebase
@@ -162,6 +196,23 @@ class WorkingController extends AppController {
   /// Sign in the user to Firebase
   Future<bool> signIn() async {
     _loggedIn = await signInSilently();
+    if (!_loggedIn) {
+      if (kIsWeb) {
+        // var uid = Prefs.getString('fbUid');
+        // if (uid.isEmpty && App.inDebugger) {
+        //   // A hack. Prefs doesn't work when debugging web.
+        //   uid = 'h9Jh3FYddfOPs08qF4XHK29dYqx1';
+        // }
+        // if (uid.isEmpty) {
+        //   // record the current Firebase uid
+        //   _auth.addListener(signInAnonymousUser);
+        // } else {
+        //   _auth.uid = uid;
+        //   _loggedIn = true;
+        // }
+        signInAnonymousUser();
+      }
+    }
     if (!_loggedIn) {
       _loggedIn = await signInAnonymously();
     }
@@ -177,6 +228,30 @@ class WorkingController extends AppController {
 
   ///
   Future<bool> signInSilently() => _auth.signInSilently();
+
+  ///
+  void signInAnonymousUser([User? user]) {
+    //
+    if (user == null) {
+      _auth.addListener(signInAnonymousUser);
+    }
+
+    final uid = Prefs.getString('fbUid');
+
+    if (uid.isEmpty) {
+      if (user != null) {
+        if (_auth.isAnonymous && user.uid.isNotEmpty) {
+          final uid = Prefs.getString('fbUid');
+          if (uid.isEmpty) {
+            Prefs.setString('fbUid', user.uid);
+          }
+        }
+      }
+    } else {
+      _auth.uid = uid;
+      _loggedIn = true;
+    }
+  }
 
   ///
   Future<bool> signInWithFacebook() async {
@@ -258,8 +333,12 @@ class WorkingController extends AppController {
     await signOut();
     final bool signIn = await _auth.signInWithGoogle();
     if (!signIn) {
-      final Exception? ex = _auth.getError();
-      await showBox(text: ex.toString(), context: (_con.state?.context)!);
+      final ex = _auth.getError();
+      if (ex != null) {
+        // Record the error
+        await App.errorHandler?.reportError(ex, StackTrace.empty);
+        await showBox(text: ex.toString(), context: (_con.state?.context)!);
+      }
     }
     await rebuild();
     return signIn;
@@ -280,7 +359,13 @@ class WorkingController extends AppController {
   }
 
   ///
-  String get uid => _auth.uid;
+  String get uid {
+    // if (_auth.uid.trim().isEmpty && App.inDebugger) {
+    //   // A hack. Prefs doesn't work when debugging web.
+    //   _auth.uid = 'h9Jh3FYddfOPs08qF4XHK29dYqx1';
+    // }
+    return _auth.uid;
+  }
 
   ///
   String get email => _auth.email;

@@ -68,10 +68,16 @@ class CloudDB {
   static const String _dbName = 'sync';
 
   ///
-  Future<bool> initAsync() {
+  Future<bool> initAsync() async {
+    bool init;
 //    _fbDB.changedListener = changedListener;
 //    _fbDB.addedListener = syncRecListener;
-    return _offlineSync.open();
+    init = kIsWeb;
+
+    if (!init) {
+      init = await _offlineSync.open();
+    }
+    return init;
   }
 
   ///
@@ -114,7 +120,8 @@ class CloudDB {
   /// Perform a synchronization of any records specified as 'new' or 'changed'
   /// since the last time this function was run.
   Future<bool> sync() async {
-    bool synced = false;
+    // Nothing synced should return true anyway.
+    bool synced = true;
     // Don't call this function again while it's running.
     if (_syncing) {
       return synced;
@@ -122,10 +129,13 @@ class CloudDB {
     _syncing = true;
     try {
       // Do 'offline' first
-      synced = await offlineSync();
-      synced = await _dataSync.sync(this);
+      // Nothing to sync, don't return false.
+      await offlineSync();
+      // Nothing to sync. Don't return false.
+      await _dataSync.sync(this);
     } catch (ex) {
-      synced = false;
+      // // Only return false if there is an error.
+      // synced = false;
       App.catchError(ex);
     }
     _syncing = false;
@@ -349,7 +359,7 @@ class DataSync {
   ///
   factory DataSync() => _this ??= DataSync._();
   DataSync._() {
-    _installNum = App.installNum!;
+    _installNum = App.installNum ?? '1234';
     _appCon = WorkingController();
     _fireDB = FireBaseDB();
     _con = Controller();

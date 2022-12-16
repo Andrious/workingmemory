@@ -11,12 +11,18 @@ if (flutterRoot == null) {
     throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
 }
 
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
-    throw new GradleException("versionName not found. Define flutter.versionName in the local.properties file.")
+    flutterVersionName = '1.0'
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 def keystorePropertiesFile = rootProject.file("key.properties")
@@ -24,17 +30,22 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
+    compileSdkVersion 33 //flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
 
-    // Fix flutter_twitter this way: https://github.com/flutter/flutter/issues/46881#issuecomment-565174872
-    compileSdkVersion 29
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
 
     defaultConfig {
         applicationId "com.andrioussolutions.workingmemory"
-        minSdkVersion 19
-        targetSdkVersion 29
-        versionCode 1
+        // You can update the following values to match your application needs.
+        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
+        minSdkVersion 19 //flutter.minSdkVersion
+        targetSdkVersion 33 //flutter.targetSdkVersion
+        versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
 
@@ -46,14 +57,15 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
+
     buildTypes {
         release {
             signingConfig signingConfigs.release
             minifyEnabled true
             shrinkResources true
             debuggable false
-            useProguard true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            useProguard true
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         debug {
@@ -69,15 +81,18 @@ flutter {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:30.5.0')
 
-    // Add the Firebase Crashlytics SDK.
-    implementation 'com.google.firebase:firebase-crashlytics:17.1.0'
-
+    // Declare the dependencies for the desired Firebase products without specifying versions
+    // For example, declare the dependencies for Firebase Authentication
+    implementation 'com.google.firebase:firebase-auth'
     // Recommended: Add the Google Analytics SDK.
-    implementation 'com.google.firebase:firebase-analytics:17.4.3'
+    implementation 'com.google.firebase:firebase-analytics'
+    // Add the Firebase Crashlytics SDK.
+    implementation 'com.google.firebase:firebase-crashlytics'
+    // The latest version of the Facebook Login SDK
+    implementation 'com.facebook.android:facebook-login:latest.release'
 }
 
 // ADD THIS AT THE BOTTOM

@@ -18,6 +18,7 @@
 import 'dart:async' show Future;
 
 import 'package:auth/auth.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:intl/intl.dart' show DateFormat;
 
@@ -27,6 +28,7 @@ import 'package:workingmemory/src/view.dart'
     show
         App,
         AppLifecycleState,
+        Colors,
         DataFields,
         FormState,
         MaterialPageRoute,
@@ -83,7 +85,13 @@ class Controller extends StateXController {
     final bool init = await _model.initAsync();
 //    final List<Map<String, dynamic>> records = await data.query();
 //    unawaited(setAlarms(records));
-    await data.query();
+    if (init) {
+      if (kIsWeb) {
+        // There is no database.
+      } else {
+        await data.query();
+      }
+    }
     _favIcons = await _model.listIcons();
     return init;
   }
@@ -371,6 +379,9 @@ class ToDoEdit extends DataFields {
   DateTime? dateTime;
 
   ///
+  int notifyColor = Colors.blue.value;
+
+  ///
   bool? saveNeeded;
 
   ///
@@ -388,11 +399,13 @@ class ToDoEdit extends DataFields {
 
     if (hasName) {
       _item = todo?['Item'];
-      dateTime = DateTime.tryParse(todo?['DateTime']);
       icon = todo?['Icon'];
+      dateTime = DateTime.tryParse(todo?['DateTime']);
+      notifyColor = todo?['LEDColor'] == 0 ? notifyColor : todo?['LEDColor'];
     } else {
       _item = ' ';
       icon = con.defaultIcon;
+      notifyColor = Colors.blue.value;
     }
 
     if (controller == null) {
@@ -418,8 +431,9 @@ class ToDoEdit extends DataFields {
     bool save = con.data.saveForm();
     final rec = {
       'Item': controller?.text.trim(),
-      'DateTime': dateTime,
       'Icon': icon,
+      'DateTime': dateTime,
+      'LEDColor': notifyColor,
     };
     if (save && !con.sameRec(newRec: rec, oldRec: todo)) {
       save = await saveRec(
@@ -441,13 +455,17 @@ class ToDoEdit extends DataFields {
     //
     rec['TimeZone'] = Prefs.getString('timezone');
 
-    final int id = await con.setNotification(rec);
+    bool save = false;
+    int id = -1;
 
-    bool save = id > -1;
+    if (!kIsWeb) {
+      id = await con.setNotification(rec);
+      save = id > -1;
+    }
 
-    if (save) {
+    if (kIsWeb || save) {
       save = await _model.save(rec);
-      if (!save) {
+      if (!save && !kIsWeb) {
         con.cancelNotification(id);
       }
     }

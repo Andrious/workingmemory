@@ -33,3 +33,9 @@ export 'package:workingmemory/src/home/view/ios/settings/notification_settings.d
 
 ///
 export 'package:workingmemory/src/home/view/icon_items.dart';
+
+///
+export 'package:workingmemory/src/home/view/utils/Aligned_ListTile.dart';
+
+///
+export 'package:workingmemory/src/home/view/utils/draggable_fab.dart';

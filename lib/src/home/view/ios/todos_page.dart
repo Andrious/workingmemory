@@ -109,7 +109,7 @@ class TodosiOS extends StateX<TodosPage> {
       child: L10n.t('New'),
     );
 
-    if (Settings.getLeftHanded()) {
+    if (Settings.isLeftHanded()) {
       final temp = _leading;
       _leading = _trailing;
       _trailing = temp;
@@ -127,7 +127,7 @@ class MemoryList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> _items = parent.con.data.items;
-    final bool leftHanded = Settings.getLeftHanded();
+    final bool leftHanded = Settings.isLeftHanded();
     return SafeArea(
       child: parent.con.data.items.isEmpty
           ? const SizedBox()
@@ -135,8 +135,8 @@ class MemoryList extends StatelessWidget {
               shrinkWrap: true,
               semanticChildCount: _items.length,
               slivers: <Widget>[
-                const CupertinoSliverNavigationBar(
-                  largeTitle: Text('Working Memory'),
+                CupertinoSliverNavigationBar(
+                  largeTitle: Text('Working Memory'.tr),
                 ),
                 SliverSafeArea(
                   sliver: SliverList(
@@ -154,13 +154,13 @@ class MemoryList extends StatelessWidget {
                             Controller().data.delete(_items[index]);
                             final String action =
                                 (direction == DismissDirection.endToStart)
-                                    ? 'deleted'
-                                    : 'archived';
+                                    ? 'deleted'.tr
+                                    : 'archived'.tr;
                             ScaffoldMessenger.maybeOf(context)?.showSnackBar(
                               SnackBar(
-                                content: Text('You $action an item.'),
+                                content: Text('You $action an item.'.tr),
                                 action: SnackBarAction(
-                                  label: 'UNDO',
+                                  label: 'UNDO'.tr,
                                   onPressed: () {
                                     Controller().data.undo(_items[index]);
                                   },

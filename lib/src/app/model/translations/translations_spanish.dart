@@ -5,12 +5,12 @@ Map<String, String> esAR = {
   'Sorted Order of Items': 'Orden ordenado de artículos',
   'Check so the items are in descending order with the most recent items listed first':
       'Verifique que los elementos estén en orden descendente con los elementos más recientes enumerados primero',
-  'Switch around dialogue buttons': 'Cambiar los botones de diálogo',
+  'Left-handed user': 'Usuario zurdo',
   'Dark Mode': 'Modo oscuro',
   'NOTIFICATIONS PREFERENCES': 'PREFERENCIAS DE NOTIFICACIONES',
   'Notification Settings': 'Configuración de las notificaciones',
-  'Notification behaviour popup settings and LED Colour':
-      'Ajustes emergentes de comportamiento de notificación y color de LED',
+  'Notification Sounds': 'Sonidos de notificación',
+  'LED Color': 'Color LED',
   'RECORD PREFERENCES': 'PREFERENCIAS DE REGISTRO',
   'Item Record Preferences': 'Preferencias de registro de artículos',
   'How certain records are further handled':

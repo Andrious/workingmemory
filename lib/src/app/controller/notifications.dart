@@ -342,7 +342,7 @@ class _SecondScreenState extends State<SecondScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Second Screen with payload: ${_payload ?? ''}'),
+        title: Text('Second Screen with payload: $_payload'),
       ),
       body: Center(
         child: ElevatedButton(

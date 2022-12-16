@@ -5,33 +5,10 @@ publish_to: none
 version: 1.9.0
 
 environment:
-  sdk: ">=2.17.1 <3.0.0"
-  flutter: ">=1.17.0"
+  sdk: ">=2.18.0 <3.0.0"
+#  flutter: ">=1.17.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
-
-#  # https://pub.dev/packages/mvc_application
-#  mvc_application: #^6.0.0
-#    path: ../../../packages/mvc_application
-##    git:
-##      url: git://github.com/AndriousSolutions/mvc_application.git
-
-  # https://pub.dev/packages/flutter_local_notifications/
-  flutter_local_notifications: ^12.0.0
-
-  # https://pub.dev/packages/fluttery_framework
-  fluttery_framework: ^1.0.0
-#    path: ../../../packages/fluttery_framework
-
-  # https://pub.dev/packages/remote_config
-  remote_config: #^1.0.0
-    path: ../../../packages/remote_config
-
-  # https://pub.dev/packages/dbutils
-  dbutils: #^2.0.0
-    path: ../../../packages/dbutils
 
   # Facebook entry in AndroidManifest.xml
   # https://pub.dev/packages/auth
@@ -43,20 +20,50 @@ dependencies:
   # https://pub.dev/packages/cupertino_icons
   cupertino_icons: ^1.0.0
 
-  # https://pub.dev/packages/flutter_cupertino_localizations
-  flutter_cupertino_localizations: ^1.0.0
+  # https://pub.dev/packages/dbutils
+  dbutils: #^2.0.0
+    path: ../../../packages/dbutils
+
+  flutter:
+    sdk: flutter
 
   # https://pub.dev/packages/font_awesome_flutter
   font_awesome_flutter: ^9.0.0
+
+  # https://pub.dev/packages/flutter_cupertino_localizations
+  flutter_cupertino_localizations: ^1.0.0
+
+  # https://pub.dev/packages/flutter_colorpicker
+  flutter_colorpicker:
+    git:
+      url: https://github.com/AndriousSolutions/flutter_colorpicker
 
   # https://pub.dev/packages/firebase_crashlytics
   # Missing iOS Integration.
   firebase_crashlytics: any #^2.0.0 # ^0.2.0
 
+  # https://pub.dev/packages/flutter_local_notifications/
+  flutter_local_notifications: ^12.0.0
+
+  # https://pub.dev/packages/flutter_ringtone_player
+  flutter_ringtone_player: ^3.0.0
+
+  # https://pub.dev/packages/flutter_system_ringtones
+  flutter_system_ringtones: ^0.0.6
+
+  # https://pub.dev/packages/fluttery_framework
+  fluttery_framework: #^1.0.0
+    path: ../../../packages/fluttery_framework
+
+  # https://pub.dev/packages/remote_config
+  remote_config: #^1.0.0
+    path: ../../../packages/remote_config
+
   # https://pub.dev/packages/rxdart
 #  Used by the class FlutterNotifications
   rxdart: ^0.27.3
 
+  # https://pub.dev/packages/l10n_translator
   l10n_translator: ^4.0.0
 
 dev_dependencies:

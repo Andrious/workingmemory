@@ -22,8 +22,9 @@ import 'package:workingmemory/src/view.dart';
 
 //TODO: Write an article on this. 'Store concept.'
 // ignore: avoid_classes_with_only_static_members
+///
 class Settings {
-  //
+  ///
   static bool get(String? setting) {
     if (setting == null || setting.trim().isEmpty) {
       return false;
@@ -31,6 +32,7 @@ class Settings {
     return Prefs.getBool(setting, false);
   }
 
+  ///
   // ignore: avoid_positional_boolean_parameters
   static Future<bool> set(String? setting, bool value) {
     if (setting == null || setting.trim().isEmpty) {
@@ -39,29 +41,38 @@ class Settings {
     return Prefs.setBool(setting, value);
   }
 
+  ///
   static bool getOrder() {
     return Prefs.getBool('order_of_items', false);
   }
 
+  ///
   // ignore: avoid_positional_boolean_parameters
   static Future<bool> setOrder(bool value) {
     return Prefs.setBool('order_of_items', value);
   }
 
-  static bool getLeftHanded() {
-    return Prefs.getBool('left_handed', false);
-  }
+  ///
+  static bool isLeftHanded() =>
+      _isLeftHanded ??= Prefs.getBool('left_handed', false);
 
+  ///
   // ignore: avoid_positional_boolean_parameters
-  static Future<bool> setLeftHanded(bool value) {
+  static Future<bool> setLeftHanded(bool? value) {
+    _isLeftHanded = value;
     return Prefs.setBool('left_handed', value);
   }
 
+  /// Store the 'current' setting.
+  static bool? _isLeftHanded;
+
+  ///
   static StatelessWidget tapText(String text, VoidCallback onTap,
       {TextStyle? style}) {
     return AppSettings.tapText(text, onTap, style: style);
   }
 
+  ///
   static Widget aboutTile(BuildContext context) {
     return SingleChildScrollView(
       child: SafeArea(
@@ -118,6 +129,7 @@ class Settings {
     );
   }
 
+  ///
   static List<Widget> aboutBoxChildren(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
     final TextStyle? aboutTextStyle = themeData.textTheme.bodyText1;
