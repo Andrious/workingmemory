@@ -1,144 +1,204 @@
-///
-/// Copyright (C) 2018 Andrious Solutions
-///
-/// Licensed under the Apache License, Version 2.0 (the "License");
-/// you may not use this file except in compliance with the License.
-/// You may obtain a copy of the License at
-///
-/// http://www.apache.org/licenses/LICENSE-2.0
-///
-/// Unless required by applicable law or agreed to in writing, software
-/// distributed under the License is distributed on an "AS IS" BASIS,
-/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-/// See the License for the specific language governing permissions and
-/// limitations under the License.
-///
-///          Created  01 Mar 2020
+import 'package:workingmemory/src/controller.dart' show App, Controller;
 
-/// place: "/todos"
-
-import 'package:flutter/material.dart'
-    show
-        AppBar,
-        Border,
-        BorderSide,
-        BoxDecoration,
-        BuildContext,
-        Colors,
-        Container,
-        DismissDirection,
-        Dismissible,
-        EdgeInsets,
-        FloatingActionButton,
-        Icon,
-        IconData,
-        Icons,
-        ListTile,
-        ListView,
-        MaterialPageRoute,
-        Navigator,
-        ObjectKey,
-        Route,
-        RouteSettings,
-        SafeArea,
-        Scaffold,
-        SnackBar,
-        SnackBarAction,
-        Text,
-        Widget;
+import 'package:workingmemory/src/model.dart' hide Icon, Icons;
 
 import 'package:workingmemory/src/view.dart';
 
-import 'package:workingmemory/src/controller.dart' show App, Controller;
-
 /// MVC design pattern is the 'View' -- the build() in this State object.
-class TodosAndroid extends StateMVC<TodosPage> {
+class TodosAndroid extends StateX<TodosPage> {
+  ///
   TodosAndroid() : super(Controller()) {
-    _con = controller;
+    _con = controller as Controller;
   }
-  Controller _con;
-  WorkMenu _menu;
+
+  late Controller _con;
 
   @override
   Widget build(BuildContext context) {
-    // Rebuilt the menu if state changes.
-    _menu = WorkMenu();
+    final _editObj = _con.data;
+    final _items = _editObj.items;
+    final _leftHanded = Settings.isLeftHanded();
+    final offset = OffsetPrefs('AddOffset');
     return Scaffold(
-      drawer: const SettingsDrawer(),
-      appBar: AppBar(
-        title: I10n.t('My ToDos'),
-        actions: <Widget>[
-          _menu.show(this),
-        ],
+      drawer: Drawer(
+        elevation: 12,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const SettingsWidget(),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: editToDo,
-        child: const Icon(
-          Icons.add,
+      appBar:
+          _appBar(title: Text('Working Memory'.tr), leftHanded: _leftHanded),
+      floatingActionButton: DraggableFab(
+        onDragEnd: offset.set,
+        initPosition: offset.get(),
+        button: FloatingActionButton(
+          onPressed: editToDo,
+          child: const Icon(
+            Icons.add,
+          ),
         ),
       ),
+      floatingActionButtonLocation: _leftHanded
+          ? FloatingActionButtonLocation.startFloat
+          : FloatingActionButtonLocation.endFloat,
       body: SafeArea(
-        child: _con.data.items.isEmpty
-            ? Container()
-            : ListView.builder(
-                padding: const EdgeInsets.all(6),
-                itemCount: _con.data.items.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Dismissible(
-                    key: ObjectKey(_con.data.items[index]['rowid']),
-                    onDismissed: (DismissDirection direction) {
-                      _con.data.delete(_con.data.items[index]);
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                          content: I10n.t('You deleted an item.'),
-                          action: SnackBarAction(
-                              label: I10n.s('UNDO'),
-                              onPressed: () {
-                                _con.data.undo(_con.data.items[index]);
-                              })));
-                    },
-                    background: Container(
-                        color: Colors.red,
-                        child: const ListTile(
+        child: _items.isEmpty || _items[0].isEmpty
+            ? const SizedBox()
+            : Stack(
+                alignment: AlignmentDirectional.topCenter,
+                children: [
+                  const ScreenCircularProgressIndicator(),
+                  ListView.builder(
+                    padding: const EdgeInsets.all(6),
+                    itemCount: _items.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final icon = Icon(
+                        IconData(int.tryParse(_items[index]['Icon'])!,
+                            fontFamily: 'MaterialIcons'),
+                      );
+                      Widget? leading;
+                      Widget? trailing;
+                      if (_leftHanded) {
+                        trailing = icon;
+                      } else {
+                        leading = icon;
+                      }
+                      return Dismissible(
+                        key: ObjectKey(_items[index]['rowid']),
+                        onDismissed: (DismissDirection direction) {
+                          _editObj.delete(_items[index]);
+                          ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+                            SnackBar(
+                              content: Text('You deleted an item.'.tr),
+                              action: SnackBarAction(
+                                  label: 'UNDO'.tr,
+                                  onPressed: () {
+                                    _editObj.undo(_items[index]);
+                                  }),
+                            ),
+                          );
+                        },
+                        background: Container(
+                          color: Colors.red,
+                          child: const ListTile(
                             leading: Icon(Icons.delete,
                                 color: Colors.white, size: 36),
                             trailing: Icon(Icons.delete,
-                                color: Colors.white, size: 36))),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          border: Border(
+                                color: Colors.white, size: 36),
+                          ),
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border(
                               bottom: BorderSide(
-                                  color: App.themeData.dividerColor))),
-                      child: ListTile(
-                        leading: Icon(IconData(
-                            int.tryParse(_con.data.items[index]['Icon']),
-                            fontFamily: 'MaterialIcons')),
-                        title: Text(_con.data.items[index]['Item']),
-                        subtitle: Text(_con.data.dateFormat.format(
-                            DateTime.tryParse(
-                                _con.data.items[index]['DateTime']))),
-                        onTap: () => editToDo(_con.data.items[index]),
-                      ),
-                    ),
-                  );
-                },
+                                  color: App.themeData!.dividerColor),
+                            ),
+                          ),
+                          child: ListTile(
+                            leading: leading,
+                            title: Align(
+                              alignment: _leftHanded
+                                  ? Alignment.center
+                                  : Alignment.centerLeft,
+                              child: Text(_items[index]['Item']),
+                            ),
+                            subtitle: Align(
+                              alignment: _leftHanded
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                              child: Text(
+                                _editObj.dateFormat.format(DateTime.tryParse(
+                                    _items[index]['DateTime'])!),
+                              ),
+                            ),
+                            trailing: trailing,
+                            onTap: () {
+                              editToDo(_items[index]);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
       ),
     );
   }
 
-  Future<void> editToDo([Map<String, dynamic> todo]) async {
+  /// Determine the order of AppBar items
+  AppBar _appBar({Widget? title, bool? leftHanded}) {
+    //
+    leftHanded = leftHanded ?? false;
+
+    final settingsButton = WorkMenu().popupMenuButton;
+
+    List<Widget>? actions;
+
+    // Switch the buttons around when indicated.
+    if (leftHanded) {
+      if (title == null) {
+        title = settingsButton;
+      } else {
+        title = Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [settingsButton, title],
+        );
+      }
+    } else {
+      actions = [settingsButton];
+    }
+    return AppBar(
+      title: title,
+      actions: actions,
+    );
+  }
+
+  ///
+  Future<void> editToDo([Map<String, dynamic>? todo]) async {
     final Route<Map<String, dynamic>> route = MaterialPageRoute(
       settings: const RouteSettings(name: '/todos/todo'),
       builder: (BuildContext context) => TodoPage(todo: todo),
       fullscreenDialog: true,
     );
     await Navigator.of(context).push(route);
-    refresh();
+    // Refresh the previous screen
+    setState(() {});
   }
 
   // A custom error routine if you want.
   @override
-  void onError(FlutterErrorDetails details){
+  void onError(FlutterErrorDetails details) {
     super.onError(details);
+  }
+}
+
+/// Deals with the Add Button's offset
+class OffsetPrefs {
+  /// Must supply a Preference key
+  OffsetPrefs(String? key) {
+    if (key != null && key.isEmpty) {
+      _prefKey = null;
+    } else {
+      _prefKey = key;
+    }
+  }
+  String? _prefKey;
+
+  ///
+  Offset? get() {
+    Offset? position;
+    final offset = Prefs.getStringList(_prefKey);
+    if (offset.isNotEmpty && offset[0].isNum) {
+      position = Offset(double.parse(offset[0]), double.parse(offset[1]));
+    }
+    return position;
+  }
+
+  ///
+  void set(DraggableDetails details) {
+    final offset = <String>['${details.offset.dx}', '${details.offset.dy}'];
+    Prefs.setStringList(_prefKey, offset);
   }
 }

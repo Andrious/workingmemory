@@ -1,8 +1,12 @@
 # Good to keep this file with the code.
 #.gitignore
 
+## Github Action Workflow for Continuous Integration Testing
+# https://medium.com/mobile-development-group/github-actions-for-flutter-cf02923d7b5d
+# .github
+
 # Ignore except for application packages
-#pubspec.lock
+#/pubspec.lock
 
 # Flutter IDE files
 .packages
@@ -10,7 +14,7 @@
 .flutter-plugins-dependencies
 flutter_export_environment.sh
 .pub/
-out/
+/out/
 .gradle/
 .dart_tool/
 .pub-cache/
@@ -19,6 +23,9 @@ doc/api/
 
 # Android Studio
 /*.iml
+
+# Codecov
+lcov.info
 
 # Ignore App signing files
 *.jks
@@ -32,35 +39,24 @@ doc/api/
 *.js.deps
 *.js.map
 
-# Explicitly include the example app
-!example/**
-example/.*
-example/ios/Flutter/flutter_export_environment.sh
 
 ### Eclipse ###
 *.pydevproject
 .project
 .metadata
 
-/bin/**
-/tmp/**
-/tmp/**/*
-/*.tmp
-/*.bak
-/*.swp
-/*~.nib
-
-/.classpath
-/.settings/
-/.loadpath
-
-
 # Miscellaneous
-#*.lock
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+.classpath
+.settings/
+.loadpath
 *.class
 *.log
 *.pyc
-*.swp
 .DS_Store
 .atom/
 .buildlog/
@@ -71,16 +67,17 @@ example/ios/Flutter/flutter_export_environment.sh
 *.iml
 *.ipr
 *.iws
-.idea/
+/.idea/
+/gen/
 
 # Visual Studio Code related
-.vscode/
+/.vscode/
 
 # Flutter/Dart/Pub related
-build/
+/build/
 
 # Web related
-lib/generated_plugin_registrant.dart
+/lib/generated_plugin_registrant.dart
 
 # Symbolication related
 app.*.symbolscd
@@ -90,37 +87,26 @@ app.*.map.json
 mapping.txt
 seeds.txt
 unused.txt
-obfuscate/
+/obfuscate/
 
 # Android related
-#google-services.json
-**/android/**/gradle-wrapper.jar
-**/android/.gradle
-**/android/captures/
-**/android/gradlew
-**/android/gradlew.bat
-**/android/local.properties
-**/android/key.properties
-**/android/**/GeneratedPluginRegistrant.java
+google-services.json
 
 # iOS/XCode related
-#GoogleService-Info.plist
-**/ios/**/*.mode1v3
-**/ios/**/*.mode2v3
-**/ios/**/*.moved-aside
-**/ios/**/*.pbxuser
-**/ios/**/*.perspectivev3
-**/ios/**/*sync/
-**/ios/**/.sconsign.dblite
-**/ios/**/.tags*
-**/ios/**/.vagrant/
-**/ios/**/DerivedData/
-**/ios/**/Icon?
-**/ios/**/Pods/
-**/ios/**/.symlinks/
-**/ios/**/profile
-**/ios/**/xcuserdata
-**/ios/.generated/
+GoogleService-Info.plist
+
+# Linux related
+/linux/
+
+# macro related
+/macros/
+/macos/
+
+# Web related
+/web/
+
+# Windows related
+/windows/
 
 App.framework
 Flutter.framework
@@ -131,39 +117,4 @@ flutter_assets/
 ServiceDefinitions.json
 GeneratedPluginRegistrant.*
 Info.plist
-**/ios/Flutter/.last_build_id
 
-# Exceptions to above rules.
-!**/ios/**/default.mode1v3
-!**/ios/**/default.mode2v3
-!**/ios/**/default.pbxuser
-!**/ios/**/default.perspectivev3
-!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
-
-# flutter_local_notifications
--keep class com.dexterous.** { *; }
-
-##---------------Begin: proguard configuration for Gson  ----------
-# Gson uses generic type information stored in a class file when working with fields. Proguard
-# removes such information by default, so configure it to keep all of it.
--keepattributes Signature
-
-# For using GSON @Expose annotation
--keepattributes *Annotation*
-
-# Gson specific classes
--dontwarn sun.misc.**
-#-keep class com.google.gson.stream.** { *; }
-
-# Prevent proguard from stripping interface information from TypeAdapter, TypeAdapterFactory,
-# JsonSerializer, JsonDeserializer instances (so they can be used in @JsonAdapter)
--keep class * implements com.google.gson.TypeAdapter
--keep class * implements com.google.gson.TypeAdapterFactory
--keep class * implements com.google.gson.JsonSerializer
--keep class * implements com.google.gson.JsonDeserializer
-
-# Prevent R8 from leaving Data object members always null
--keepclassmembers,allowobfuscation class * {
-  @com.google.gson.annotations.SerializedName <fields>;
-}
-##---------------End:   proguard configuration for Gson  ----------

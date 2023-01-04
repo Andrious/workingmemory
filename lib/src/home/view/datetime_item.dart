@@ -22,9 +22,9 @@ import 'package:workingmemory/src/view.dart' show App, DTAndroid, DTiOS;
 
 class DateTimeItem extends StatelessWidget {
   // ignore: use_key_in_widget_constructors
-  const DateTimeItem({this.key, this.dateTime, @required this.onChanged});
-  @override
-  final Key key;
+  const DateTimeItem(
+      {Key? key, required this.dateTime, required this.onChanged})
+      : super(key: key);
   final DateTime dateTime;
   final ValueChanged<DateTime> onChanged;
 

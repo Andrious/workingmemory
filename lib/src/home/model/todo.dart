@@ -18,20 +18,24 @@
 
 import 'package:workingmemory/src/model.dart';
 
+///
 class ToDo extends SQLiteDB {
+  ///
   factory ToDo() => _this ??= ToDo._();
   ToDo._() {
     _cloud = CloudDB();
     // _fbDB = FireBaseDB();
   }
-  static ToDo _this;
-  CloudDB _cloud;
-  FireBaseDB _fbDB;
+  static ToDo? _this;
+  late CloudDB _cloud;
+  late FireBaseDB _fbDB;
 
-  String _selectAll, _selectNotDeleted, _selectDeleted;
+  late String _selectAll, _selectNotDeleted, _selectDeleted;
 
-  bool finished;
+  ///
+  bool? finished;
 
+  ///
   static const TABLE_NAME = 'working';
 
   @override
@@ -40,22 +44,20 @@ class ToDo extends SQLiteDB {
   @override
   int get version => 1;
 
-  String _keyFld;
+  String? _keyFld;
 
+  ///
   Future<bool> initAsync() async {
-    //
+    ///
     final init = await super.init();
 
     _keyFld = await keyField(TABLE_NAME);
 
-    _selectNotDeleted =
-        'SELECT $_keyFld, * FROM $TABLE_NAME" + " WHERE deleted = 0';
+    _selectNotDeleted = 'SELECT $_keyFld, * FROM $TABLE_NAME WHERE deleted = 0';
 
-    _selectDeleted =
-        'SELECT $_keyFld, * FROM $TABLE_NAME" + " WHERE deleted = 1';
+    _selectDeleted = 'SELECT $_keyFld, * FROM $TABLE_NAME WHERE deleted = 1';
 
     _selectAll = 'SELECT $_keyFld, * FROM $TABLE_NAME';
-
     return init;
   }
 
@@ -91,8 +93,10 @@ class ToDo extends SQLiteDB {
     return version;
   }
 
+  ///
   Future<List<Map<String, dynamic>>> list() => getTable(ToDo.TABLE_NAME);
 
+  ///
   Future<List<Map<String, dynamic>>> notDeleted({bool ordered = false}) {
     var select = _selectNotDeleted;
     if (ordered) {
@@ -101,6 +105,7 @@ class ToDo extends SQLiteDB {
     return rawQuery(select);
   }
 
+  ///
   Future<List<Map<String, dynamic>>> isDeleted({bool ordered = false}) {
     var select = _selectDeleted;
     if (ordered) {
@@ -109,6 +114,14 @@ class ToDo extends SQLiteDB {
     return rawQuery(select);
   }
 
-  Map<String, dynamic> newRecord([Map<String, dynamic> data]) =>
+  ///
+  Map<String, dynamic> newRecord(Map<String, dynamic> data) =>
       super.newRec(ToDo.TABLE_NAME, data);
+
+  ///
+  void dispose() {
+    _cloud.dispose();
+    disposed();
+    _this = null;
+  }
 }

@@ -17,10 +17,12 @@
 
 import 'package:workingmemory/src/model.dart';
 
+///
 class LocalSyncDB extends SQLiteDB {
+  ///
   factory LocalSyncDB() => _this ??= LocalSyncDB._();
   LocalSyncDB._() : super();
-  static LocalSyncDB _this;
+  static LocalSyncDB? _this;
 
   final String _table = 'sync';
 
@@ -32,6 +34,7 @@ class LocalSyncDB extends SQLiteDB {
   @override
   int get version => _version;
 
+  ///
   bool get isOpen => _open;
   bool _open = false;
 
@@ -52,6 +55,7 @@ class LocalSyncDB extends SQLiteDB {
     return super.onOpen(db);
   }
 
+  ///
   Future<int> getRowID(int recId) async {
     final List<Map<String, dynamic>> recs = await rawQuery(
         'SELECT id FROM $_table WHERE id = $recId ORDER BY id DESC LIMIT 1');
@@ -66,6 +70,7 @@ class LocalSyncDB extends SQLiteDB {
     return rowID;
   }
 
+  ///
   Future<int> update(Map<String, dynamic> recValues) async {
     //
     int result = 0;
@@ -82,7 +87,7 @@ class LocalSyncDB extends SQLiteDB {
       return result;
     }
 
-    final Map<String, dynamic> recs = await updateRec(_table, recValues);
+    final Map<String?, dynamic> recs = await updateRec(_table, recValues);
 
     if (recs.isEmpty) {
       result = 0;
@@ -92,10 +97,11 @@ class LocalSyncDB extends SQLiteDB {
     return result;
   }
 
+  ///
   Future<int> insert(Map<String, dynamic> recValues) async {
     int result;
 
-    final Map<String, dynamic> recs = await updateRec(_table, recValues);
+    final Map<String?, dynamic> recs = await updateRec(_table, recValues);
 
     if (recs.isEmpty) {
       result = 0;
@@ -105,7 +111,8 @@ class LocalSyncDB extends SQLiteDB {
     return result;
   }
 
-  Future<bool> deleteLocalSync(int id) async {
+  ///
+  Future<bool> deleteLocalSync(int? id) async {
     if (id == null || id < 1) {
       return false;
     }
@@ -114,4 +121,5 @@ class LocalSyncDB extends SQLiteDB {
   }
 }
 
+///
 class SQLHelper {}

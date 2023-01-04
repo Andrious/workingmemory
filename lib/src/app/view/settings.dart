@@ -18,35 +18,36 @@
 
 import 'package:workingmemory/src/model.dart' show Settings;
 
-import 'package:workingmemory/src/view.dart';
+import 'package:workingmemory/src/view.dart' hide ColorPicker;
 
 import 'package:workingmemory/src/controller.dart';
 
 /// The Settings widget
 class SettingsWidget extends StatefulWidget {
-  const SettingsWidget({Key key}) : super(key: key);
+  ///
+  const SettingsWidget({Key? key}) : super(key: key);
   @override
   _SettingsWidgetState createState() => _SettingsWidgetState();
 }
 
-class _SettingsWidgetState extends StateMVC<SettingsWidget> {
+class _SettingsWidgetState extends StateX<SettingsWidget> {
   _SettingsWidgetState() : super(ThemeController()) {
-    _theme = controller;
+    _theme = controller as ThemeController;
   }
-  ThemeController _theme;
+  late ThemeController _theme;
 
   @override
   void initState() {
     super.initState();
     _descending = Settings.getOrder();
-    _leftHanded = Settings.getLeftHanded();
+    _leftHanded = Settings.isLeftHanded();
     _con = Controller();
   }
 
-  bool _descending;
-  bool _leftHanded;
-  Controller _con;
-  bool _refresh;
+  late bool _descending;
+  late bool _leftHanded;
+  late Controller _con;
+  bool? _refresh;
 
   @override
   void dispose() {
@@ -69,9 +70,9 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
     ];
 
     if (App.useCupertino) {
+      final supportedLocales = L10n.supportedLocales;
       settings.add(Card(
-        child:
-            ISOSpinner(initialItem: I10n.supportedLocales.indexOf(App.locale)),
+        child: LocaleSpinner(),
       ));
     }
 
@@ -81,29 +82,40 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
           Row(children: [
             Expanded(
                 child: ListTile(
-              title: I10n.t(
+              title: L10n.t(
                 'NOTIFICATIONS PREFERENCES',
               ),
             ))
           ]),
           Row(children: [
             InkWell(
-                onTap: () {},
-                child: I10n.t(
+                onTap: () => _theme.showNotifications(),
+                child: L10n.t(
                   'Notification Settings',
                 )),
           ]),
-          Row(
-            children: const [Text('')],
-          ),
+          Row(children: const [Text('')]),
           Row(children: [
             Expanded(
               child: InkWell(
-                  onTap: () {},
-                  child: I10n.t(
-                    'Notification behaviour popup settings and LED Colour',
-                    softWrap: true,
-                  )),
+                onTap: () => _theme.showSounds(),
+                child: L10n.t(
+                  'Notification Sounds',
+                  softWrap: true,
+                ),
+              ),
+            ),
+          ]),
+          Row(children: const [Text('')]),
+          Row(children: [
+            Expanded(
+              child: InkWell(
+                onTap: () => _theme.showLEDColour(),
+                child: L10n.t(
+                  'LED Colour',
+                  softWrap: true,
+                ),
+              ),
             ),
           ]),
           Row(
@@ -116,7 +128,7 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
           Row(children: [
             Expanded(
                 child: ListTile(
-              title: I10n.t(
+              title: L10n.t(
                 'RECORD PREFERENCES',
               ),
             ))
@@ -124,7 +136,7 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
           Row(children: [
             InkWell(
                 onTap: () {},
-                child: I10n.t(
+                child: L10n.t(
                   'Item Record Preferences',
                 )),
           ]),
@@ -135,7 +147,7 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
             Expanded(
               child: InkWell(
                 onTap: () {},
-                child: Text('${I10n.s(
+                child: Text('${L10n.s(
                   'How certain records are further handled',
                 )}\n'),
               ),
@@ -145,7 +157,7 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
       ),
       Card(
         child: Settings.tapText(
-          I10n.s('About ToDo List'),
+          L10n.s('About Working Memory'),
           () {
             Settings.showAboutDialog(context);
           },
@@ -157,17 +169,18 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
   }
 
   List<Widget> _interfacePreference() {
+    final darkMode = _theme.isDarkMode;
     final List<Widget> interface = [
       Row(children: [
         Expanded(
             child: ListTile(
-          title: I10n.t('INTERFACE PREFERENCES'),
+          title: L10n.t('INTERFACE PREFERENCES'),
         ))
       ]),
       Row(children: [
         InkWell(
             onTap: () {},
-            child: I10n.t(
+            child: L10n.t(
               'Sorted Order of Items',
             )),
       ]),
@@ -176,7 +189,7 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
       ),
       Row(children: [
         Expanded(
-          child: I10n.t(
+          child: L10n.t(
             'Check so the items are in descending order with the most recent items listed first',
           ),
         ),
@@ -187,8 +200,8 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
       ]),
       Row(children: [
         Expanded(
-          child: I10n.t(
-            'Switch around dialogue buttons',
+          child: L10n.t(
+            'Left-handed user',
           ),
         ),
         Checkbox(
@@ -197,7 +210,7 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
         ),
       ]),
       ListTile(
-        leading: _theme.isDarkMode
+        leading: darkMode
             ? Image.asset(
                 'assets/images/moon.png',
                 height: 30,
@@ -208,17 +221,20 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
                 height: 30,
                 width: 26,
               ),
-        title: I10n.t('Dark Mode'),
+        title: L10n.t('Dark Mode'),
         trailing: Switch(
-          value: _theme.isDarkMode,
+          value: darkMode,
           onChanged: (val) {
-            _theme.isDarkMode = val;
             if (val) {
-              App.themeData = _theme.setDarkMode();
-            }else{
+              final theme = _theme.setDarkMode();
+              App.themeData = theme;
+              App.iOSTheme = theme;
+            } else {
+              _theme.isDarkMode = false;
               App.setThemeData();
             }
-            refresh();
+            setState(() {});
+            App.setState(() {});
           },
         ),
       ),
@@ -246,24 +262,18 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
                   }
                 }
                 Prefs.setBool('switchUI', switchUI);
-                App.refresh();
+//                App.refresh();
               },
               child: Text(
-                  '${I10n.s('Interface:')} ${App.useMaterial ? 'Material' : 'Cupertino'}\n'),
+                  '${L10n.s('Interface:')} ${App.useMaterial ? 'Material' : 'Cupertino'}\n'),
             ),
           ],
         ),
         Row(
           children: [
             InkWell(
-              onTap: () {
-                ColorPicker.showColorPicker(
-                    context: context,
-                    onColorChange: AppMenu.onColorChange,
-                    onChange: AppMenu.onChange,
-                    shrinkWrap: true);
-              },
-              child: Text('${I10n.s('Colour Theme')}\n'),
+              onTap: WorkMenu.showColorPicker,
+              child: Text('${L10n.s('Colour Theme')}\n'),
             ),
           ],
         )
@@ -273,8 +283,8 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
   }
 
   // ignore: avoid_positional_boolean_parameters
-  void orderItems(bool value) {
-    Settings.setOrder(value);
+  void orderItems(bool? value) {
+    Settings.setOrder(value!);
     setState(() {
       _descending = value;
     });
@@ -282,23 +292,35 @@ class _SettingsWidgetState extends StateMVC<SettingsWidget> {
   }
 
   // ignore: avoid_positional_boolean_parameters
-  void switchButton(bool value) {
-    Settings.setLeftHanded(value);
-    setState(() {
-      _leftHanded = value;
-    });
+  void switchButton(bool? value) {
+    if (value != null) {
+      Settings.setLeftHanded(value);
+      setState(() => _leftHanded = value);
+      _con.setState(() {});
+    }
   }
 
   // A custom error routine if you want.
   @override
-  void onError(FlutterErrorDetails details){
+  void onError(FlutterErrorDetails details) {
     super.onError(details);
   }
 }
 
-/// Supply the settings widget to a Drawer widget
-class SettingsDrawer extends StatelessWidget {
-  const SettingsDrawer({Key key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) => const Drawer(child: SettingsWidget());
+/// Locale iOS Spinner
+class LocaleSpinner extends ISOSpinner {
+  ///
+  LocaleSpinner({super.key})
+      : super(
+          initialItem: L10n.supportedLocales.indexOf(App.locale!),
+          supportedLocales: L10n.supportedLocales,
+          onSelectedItemChanged: (int index) async {
+            // Retrieve the available locales.
+            final locale = L10n.getLocale(index);
+            if (locale != null) {
+              App.locale = locale;
+              App.setState(() {});
+            }
+          },
+        );
 }

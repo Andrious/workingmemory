@@ -1,8 +1,30 @@
-*.iml
+/gradlew.bat
+/*.iml
+/key.properties
+/local.properties
+/gradlew
+
+/app/src/debug/
+#/app/src/main/
+/app/src/profile/
+google-services.json
+
+/gradle/
+gradle.properties
+
+gradle-wrapper.jar
+/.gradle
+/captures/
+
+
+# Never publicly share your keystore.
+# See https://flutter.dev/docs/deployment/android#reference-the-keystore-from-the-app
+**/*.keystore
+**/*.jks
+
 *.class
 .gradle
-/local.properties
-/key.properties
+
 /.idea/workspace.xml
 /.idea/libraries
 .DS_Store

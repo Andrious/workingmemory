@@ -13,9 +13,12 @@ import 'styles.dart';
 //
 // See https://github.com/flutter/flutter/projects/29 for more info.
 
+///
 class SettingsGroupHeader extends StatelessWidget {
-  const SettingsGroupHeader(this.title, {Key key}) : super(key: key);
+  ///
+  const SettingsGroupHeader(this.title, {Key? key}) : super(key: key);
 
+  ///
   final String title;
 
   @override
@@ -38,9 +41,12 @@ class SettingsGroupHeader extends StatelessWidget {
   }
 }
 
+///
 class SettingsGroupFooter extends StatelessWidget {
-  const SettingsGroupFooter(this.title, {Key key}) : super(key: key);
+  ///
+  const SettingsGroupFooter(this.title, {Key? key}) : super(key: key);
 
+  ///
   final String title;
 
   @override
@@ -63,30 +69,38 @@ class SettingsGroupFooter extends StatelessWidget {
   }
 }
 
+///
 class SettingsGroup extends StatelessWidget {
+  ///
   SettingsGroup({
-    Key key,
-    @required this.items,
+    Key? key,
+    this.items,
     this.header,
     this.footer,
   })  : assert(items != null),
-        assert(items.isNotEmpty),
+        assert(items!.isNotEmpty),
         super(key: key);
 
-  final List<SettingsItem> items;
-  final Widget header;
-  final Widget footer;
+  ///
+  final List<SettingsItem>? items;
+
+  ///
+  final Widget? header;
+
+  ///
+  final Widget? footer;
 
   @override
   Widget build(BuildContext context) {
-    final dividedItems = <Widget>[items[0]];
+    //
+    final dividedItems = <Widget>[items![0]];
 
-    for (int i = 1; i < items.length; i++) {
+    for (int i = 1; i < items!.length; i++) {
       dividedItems.add(Container(
         color: Styles.settingsLineation,
         height: 0.3,
       ));
-      dividedItems.add(items[i]);
+      dividedItems.add(items![i]);
     }
 
     return Padding(
@@ -96,7 +110,7 @@ class SettingsGroup extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (header != null) header,
+          if (header != null) header!,
           Container(
             decoration: const BoxDecoration(
               color: CupertinoColors.white,
@@ -116,7 +130,7 @@ class SettingsGroup extends StatelessWidget {
               children: dividedItems,
             ),
           ),
-          if (footer != null) footer,
+          if (footer != null) footer!,
         ],
       ),
     );

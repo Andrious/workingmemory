@@ -1,3 +1,21 @@
+
+## 1.11.0
+- Updated gradle (jcenter to mavenCentral, 23 min 33 sdk, etc.)
+- Sync process rewrite
+- mvc_application to fluttery_framework library
+- General rewrite to meet latest version of Flutter
+
+## 1.10.0
+ December 15, 2022
+- AppMenu<String>
+- if (init && !kIsWeb) {
+- Draggable Floating button
+- todos_page rewrite
+
+## 1.9.0
+ February 02, 2022
+- Upgraded code
+
 ## 1.8.0
  November 09, 2020
 - Enhanced 'Dark Mode' feature

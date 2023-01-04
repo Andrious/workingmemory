@@ -11,7 +11,9 @@ import 'package:workingmemory/src/view.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:rxdart/subjects.dart';
 
+///
 class FlutterNotifications {
+  ///
   factory FlutterNotifications(BuildContext context) =>
       _this ??= FlutterNotifications._(context);
 
@@ -27,7 +29,7 @@ class FlutterNotifications {
 
     _didReceiveLocalNotificationSubject.stream
         .listen((ReceivedNotification receivedNotification) async {
-      await showDialog(
+      await showDialog<void>(
         context: context,
         builder: (BuildContext context) => CupertinoAlertDialog(
           title: receivedNotification.title != null
@@ -66,7 +68,7 @@ class FlutterNotifications {
 
       final List<String> data = payload.split('\n');
 
-      String title;
+      String? title;
 
       if (data.length > 1) {
         title = data[0];
@@ -76,7 +78,7 @@ class FlutterNotifications {
 
       final String content = data[data.length - 1];
 
-      await showDialog(
+      await showDialog<void>(
         context: context,
         builder: (_) {
           return AlertDialog(
@@ -90,63 +92,77 @@ class FlutterNotifications {
     _flutterLocalNotificationsPlugin
         .getNotificationAppLaunchDetails()
         .then((value) {
-      _notificationAppLaunchDetails = value;
+      if (value != null) {
+        _notificationAppLaunchDetails = value;
+      }
     });
 
     const initializationSettingsAndroid =
         AndroidInitializationSettings('ic_launcher');
 
-    final initializationSettingsIOS = IOSInitializationSettings(
-        onDidReceiveLocalNotification:
-            (int id, String title, String body, String payload) async {
-      _didReceiveLocalNotificationSubject.add(ReceivedNotification(
-          id: id, title: title, body: body, payload: payload));
-    });
+    final initializationSettingsIOS = DarwinInitializationSettings(
+      onDidReceiveLocalNotification:
+          (int id, String? title, String? body, String? payload) async {
+        _didReceiveLocalNotificationSubject.add(
+          ReceivedNotification(
+            id: id,
+            title: title ?? '',
+            body: body ?? '',
+            payload: payload ?? '',
+          ),
+        );
+      },
+    );
 
     final initializationSettings = InitializationSettings(
         android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
 
-    _flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: (String payload) async {
-      _selectNotificationSubject.add(payload);
-    });
+    _flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      // onSelectNotification: (String payload) async {
+      //   _selectNotificationSubject.add(payload);
+      // },
+    );
   }
-  static FlutterNotifications _this;
-  FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
-  BehaviorSubject<ReceivedNotification> _didReceiveLocalNotificationSubject;
-  BehaviorSubject<String> _selectNotificationSubject;
-  NotificationAppLaunchDetails _notificationAppLaunchDetails;
+  static FlutterNotifications? _this;
+  late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
+  late BehaviorSubject<ReceivedNotification>
+      _didReceiveLocalNotificationSubject;
+  late BehaviorSubject<String> _selectNotificationSubject;
+  late NotificationAppLaunchDetails _notificationAppLaunchDetails;
 
   /// Supply a initAsync() function for the user.
   /// Initialize the plugin by requesting permissions.
-  Future<bool> initAsync() => requestPermissions();
+  Future<bool?>? initAsync() => requestPermissions();
 
   /// Initialize the plugin by requesting permissions. (iOS only)
-  Future<bool> requestPermissions() => _flutterLocalNotificationsPlugin
-      ?.resolvePlatformSpecificImplementation<
+  Future<bool?>? requestPermissions() => _flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
           IOSFlutterLocalNotificationsPlugin>()
       ?.requestPermissions(
-        alert: false,
         badge: true,
         sound: true,
       );
 
   /// Indicates if the app was launched via notification
   bool get didNotificationLaunchApp =>
-      _notificationAppLaunchDetails?.didNotificationLaunchApp;
+      _notificationAppLaunchDetails.didNotificationLaunchApp;
 
-  /// The payload of the notification that launched the app
-  String get payload => _notificationAppLaunchDetails?.payload;
+  // /// The payload of the notification that launched the app
+  // String get payload => _notificationAppLaunchDetails.payload;
 
   /// Schedules a notification that specifies a different icon, sound and vibration pattern
   Future<int> set(
     BuildContext context,
-    DateTime dateTime,
-    String timeZone,
-    String title,
-    String body, {
-    bool androidAllowWhileIdle,
-    UILocalNotificationDateInterpretation uiLocalNotificationDateInterpretation,
+    DateTime? dateTime,
+    String? timeZone,
+    String? title,
+    String? body, {
+    bool? ignorePastDue,
+    bool? saveTimeZone,
+    bool? androidAllowWhileIdle,
+    UILocalNotificationDateInterpretation?
+        uiLocalNotificationDateInterpretation,
   }) async {
     //
     if (dateTime == null ||
@@ -157,14 +173,19 @@ class FlutterNotifications {
       return -1;
     }
 
+    // If true, simply return in failure;
+    ignorePastDue ??= false;
+
     if (DateTime.now().isAfter(dateTime)) {
-      final now = DateTime.now();
-      final message =
-          '\n\n${I10n.s('That time has past:')}\n$dateTime\n\n${I10n.s('Current time:')}\n$now';
-      await MsgBox(context: context).show(
-        title: message,
-        msg: I10n.s('Please correct time.'),
-      );
+      if (!ignorePastDue) {
+        final now = DateTime.now();
+        final message =
+            '\n\n${'That time has past:'.tr}\n$dateTime\n\n${'Current time:'.tr}\n$now';
+        await MsgBox(context: context).show(
+          title: message,
+          msg: 'Please correct time.'.tr,
+        );
+      }
       return -1;
     }
 
@@ -175,9 +196,8 @@ class FlutterNotifications {
     vibrationPattern[3] = 2000;
 
     final androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'your other channel id',
-        'your other channel name',
-        'your other channel description',
+        'your other channel id', 'your other channel name',
+        channelDescription: 'your other channel description',
         icon: 'secondary_icon',
         sound: const RawResourceAndroidNotificationSound('slow_spring_board'),
         largeIcon: const DrawableResourceAndroidBitmap('sample_large_icon'),
@@ -189,7 +209,7 @@ class FlutterNotifications {
         ledOffMs: 500);
 
     const iOSPlatformChannelSpecifics =
-        IOSNotificationDetails(sound: 'slow_spring_board.aiff');
+        DarwinNotificationDetails(sound: 'slow_spring_board.aiff');
 
     final platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
@@ -206,7 +226,8 @@ class FlutterNotifications {
     uiLocalNotificationDateInterpretation ??=
         UILocalNotificationDateInterpretation.wallClockTime;
 
-    final location = await _getLocation(context, timeZone);
+    final location =
+        await _getLocation(context, timeZone, saveTimeZone: saveTimeZone);
 
     final scheduledDate = tz.TZDateTime.from(dateTime, location);
 
@@ -229,14 +250,17 @@ class FlutterNotifications {
     return id;
   }
 
-  Future<tz.Location> _getLocation(
-      BuildContext context, String userTimeZone) async {
-    final timeZone = TimeZone();
+  Future<tz.Location> _getLocation(BuildContext context, String? userTimeZone,
+      {bool? saveTimeZone}) async {
+    // Prompt the user to pick a Timezone if the device's and this one don't match.
+    saveTimeZone ??= false;
 
     // Retrieve the app's last used timezone.
     if (userTimeZone == null || userTimeZone.isEmpty) {
       userTimeZone = Prefs.getString('timezone');
     }
+
+    final timeZone = TimeZone();
 
     // The device's timezone.
     String timeZoneName = await timeZone.getTimeZoneName();
@@ -247,14 +271,18 @@ class FlutterNotifications {
       await Prefs.setString('timezone', timeZoneName);
     } else if (userTimeZone != timeZoneName) {
       //
-      final message =
-          "We're in a new timezone.\n\nWe are now in the timezone:\n$timeZoneName\n\nShall we stay in the timezone?:\n$userTimeZone";
-      final stay = await showBox(
-        context: context,
-        text: message,
-        button01: Option(text: 'Stay', result: true),
-        button02: Option(text: 'New', result: false),
-      );
+      var stay = saveTimeZone;
+
+      if (!stay) {
+        final message =
+            "${"We're in a new timezone.".tr}\n\n${'We are now in the timezone:'.tr}\n$timeZoneName\n\n${'Shall we stay in the timezone?:'.tr}\n$userTimeZone";
+        stay = await showBox(
+          context: context,
+          text: message,
+          button01: Option(text: 'Stay', result: true),
+          button02: Option(text: 'New', result: false),
+        );
+      }
       // Stay with your previously used timezone.
       if (stay) {
         timeZoneName = userTimeZone;
@@ -266,13 +294,14 @@ class FlutterNotifications {
   }
 
   /// Cancel a specific notification.
-  Future<void> cancel(int id) async {
+  Future<void> cancel(int? id) async {
     if (id != null && id > -1) {
       await _flutterLocalNotificationsPlugin.cancel(id);
     }
     return;
   }
 
+  ///
   @mustCallSuper
   void dispose() {
     _didReceiveLocalNotificationSubject.close();
@@ -280,26 +309,41 @@ class FlutterNotifications {
   }
 }
 
+///
 class ReceivedNotification {
+  ///
   ReceivedNotification({
-    @required this.id,
-    @required this.title,
-    @required this.body,
-    @required this.payload,
+    required this.id,
+    required this.title,
+    required this.body,
+    required this.payload,
   });
+
+  ///
   final int id;
+
+  ///
   final String title;
+
+  ///
   final String body;
+
+  ///
   final String payload;
 }
 
+///
 class SecondScreen extends StatefulWidget {
-  const SecondScreen(this.payload, {Key key}) : super(key: key);
+  ///
+  const SecondScreen(this.payload, {Key? key}) : super(key: key);
+
+  ///
   final String payload;
   @override
   State<StatefulWidget> createState() => _SecondScreenState();
 }
 
+///
 class _SecondScreenState extends State<SecondScreen> {
   @override
   void initState() {
@@ -307,16 +351,16 @@ class _SecondScreenState extends State<SecondScreen> {
     _payload = widget.payload;
   }
 
-  String _payload;
+  late String _payload;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Second Screen with payload: ${_payload ?? ''}'),
+        title: Text('Second Screen with payload: $_payload'),
       ),
       body: Center(
-        child: RaisedButton(
+        child: ElevatedButton(
           onPressed: () {
             Navigator.pop(context);
           },

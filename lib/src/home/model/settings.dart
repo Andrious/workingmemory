@@ -18,50 +18,61 @@
 
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
 import 'package:workingmemory/src/view.dart';
 
-import 'package:workingmemory/src/controller.dart' show App, AppSettings, Prefs;
-
 //TODO: Write an article on this. 'Store concept.'
+// ignore: avoid_classes_with_only_static_members
+///
 class Settings {
-  //
-  static bool get(String setting) {
+  ///
+  static bool get(String? setting) {
     if (setting == null || setting.trim().isEmpty) {
       return false;
     }
     return Prefs.getBool(setting, false);
   }
 
-  static Future<bool> set(String setting, bool value) {
+  ///
+  // ignore: avoid_positional_boolean_parameters
+  static Future<bool> set(String? setting, bool value) {
     if (setting == null || setting.trim().isEmpty) {
       return Future.value(false);
     }
     return Prefs.setBool(setting, value);
   }
 
+  ///
   static bool getOrder() {
     return Prefs.getBool('order_of_items', false);
   }
 
+  ///
+  // ignore: avoid_positional_boolean_parameters
   static Future<bool> setOrder(bool value) {
     return Prefs.setBool('order_of_items', value);
   }
 
-  static bool getLeftHanded() {
-    return Prefs.getBool('left_handed', false);
-  }
+  ///
+  static bool isLeftHanded() =>
+      _isLeftHanded ??= Prefs.getBool('left_handed', false);
 
-  static Future<bool> setLeftHanded(bool value) {
+  ///
+  // ignore: avoid_positional_boolean_parameters
+  static Future<bool> setLeftHanded(bool? value) {
+    _isLeftHanded = value;
     return Prefs.setBool('left_handed', value);
   }
 
+  /// Store the 'current' setting.
+  static bool? _isLeftHanded;
+
+  ///
   static StatelessWidget tapText(String text, VoidCallback onTap,
-      {TextStyle style}) {
+      {TextStyle? style}) {
     return AppSettings.tapText(text, onTap, style: style);
   }
 
+  ///
   static Widget aboutTile(BuildContext context) {
     return SingleChildScrollView(
       child: SafeArea(
@@ -77,18 +88,19 @@ class Settings {
     );
   }
 
+  ///
   static void showAboutDialog(BuildContext context) {
     //
     final ThemeData themeData = Theme.of(context);
-    final TextStyle aboutTextStyle = themeData.textTheme.bodyText1;
-    final TextStyle linkStyle =
-        themeData.textTheme.bodyText1.copyWith(color: themeData.accentColor);
+    final TextStyle? aboutTextStyle = themeData.textTheme.bodyText1;
+    final TextStyle linkStyle = themeData.textTheme.bodyText1!
+        .copyWith(color: themeData.colorScheme.secondary);
 
     AppSettings.showAbout(
       context: context,
       applicationVersion: 'Ver. ${App.version}',
       applicationIcon: const FlutterLogo(),
-      applicationLegalese: 'Andrious Solutions Ltd.\n© 2020',
+      applicationLegalese: 'Andrious Solutions Ltd.\n© 2022',
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(top: 24),
@@ -97,20 +109,17 @@ class Settings {
               children: <TextSpan>[
                 TextSpan(
                     style: aboutTextStyle,
-                    text: I10n.s(
-                        'This is an early-stage, open-source project demonstrating '
-                        'the use of the MVC design pattern with Flutter and produce '
-                        "a 'ToDo List' application that works in "
-                        'multiple platforms from a single codebase.')),
+                    text:
+                        "This is a 'ToDo List' app demonstrating how Flutter provides a solution to multiple platforms from a single codebase."
+                            .tr),
                 TextSpan(
                   style: aboutTextStyle,
-                  text:
-                      '\n\n${I10n.s('The source code is available on Github:')}',
+                  text: '\n\n${'The source code is available on Github:'.tr}\n',
                 ),
                 AppSettings.linkTextSpan(
                   style: linkStyle,
                   url: 'https://github.com/Andrious/workingmemory',
-                  text: '\nWorking Memory',
+                  text: 'Working Memory'.tr,
                 ),
               ],
             ),
@@ -120,11 +129,12 @@ class Settings {
     );
   }
 
+  ///
   static List<Widget> aboutBoxChildren(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
-    final TextStyle aboutTextStyle = themeData.textTheme.bodyText1;
-    final TextStyle linkStyle =
-        themeData.textTheme.bodyText1.copyWith(color: themeData.accentColor);
+    final TextStyle? aboutTextStyle = themeData.textTheme.bodyText1;
+    final TextStyle linkStyle = themeData.textTheme.bodyText1!
+        .copyWith(color: themeData.colorScheme.secondary);
     return [
       Padding(
         padding: const EdgeInsets.only(top: 24),

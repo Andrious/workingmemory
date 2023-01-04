@@ -26,12 +26,12 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 android {
 
     // Fix flutter_twitter this way: https://github.com/flutter/flutter/issues/46881#issuecomment-565174872
-    compileSdkVersion 29
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "com.andrioussolutions.workingmemory"
-        minSdkVersion 19
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 33
         versionCode 1
         versionName flutterVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -52,8 +52,8 @@ android {
             minifyEnabled true
             shrinkResources true
             debuggable false
-            useProguard true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            useProguard true
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         debug {

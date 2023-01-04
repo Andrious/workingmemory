@@ -75,7 +75,7 @@ class SettingsScreen extends StatelessWidget {
         label: 'Switch around dialog buttons',
         subtitle: 'Possibly preferred if left-handed.',
         content: CupertinoSwitch(
-          value: Settings.getLeftHanded(),
+          value: Settings.isLeftHanded(),
           onChanged: Settings.setLeftHanded,
         ),
       ),
@@ -100,9 +100,9 @@ class SettingsScreen extends StatelessWidget {
       item = SettingsItem(
           label: 'Sign In',
           onPress: () {
-            Navigator.of(con.state.context).push(
+            Navigator.of(con.state!.context).push(
               CupertinoPageRoute<void>(
-                builder: (context) => SignIn(),
+                builder: (context) => const SignIn(),
                 title: 'Preferred Categories',
               ),
             );

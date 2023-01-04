@@ -1,33 +1,15 @@
-///
-/// Copyright (C) 2018 Andrious Solutions
-///
-/// Licensed under the Apache License, Version 2.0 (the "License");
-/// you may not use this file except in compliance with the License.
-/// You may obtain a copy of the License at
-///
-/// http://www.apache.org/licenses/LICENSE-2.0
-///
-/// Unless required by applicable law or agreed to in writing, software
-/// distributed under the License is distributed on an "AS IS" BASIS,
-/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-/// See the License for the specific language governing permissions and
-/// limitations under the License.
-///
-///          Created  25 Aug 2018
-/// place: "/todos/todo"
-///
-
-import 'package:flutter/material.dart';
-
 import 'package:workingmemory/src/view.dart';
 
-import 'package:workingmemory/src/controller.dart';
-
+///
 class TodoPage extends StatefulWidget {
-  const TodoPage({Key key, this.todo, this.onPressed}) : super(key: key);
+  ///
+  const TodoPage({Key? key, this.todo, this.onPressed}) : super(key: key);
 
-  final Map<String, dynamic> todo;
-  final VoidCallback onPressed;
+  ///
+  final Map<String, dynamic>? todo;
+
+  ///
+  final VoidCallback? onPressed;
 
   @override
   // ignore: no_logic_in_create_state

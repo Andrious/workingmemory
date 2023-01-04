@@ -16,25 +16,27 @@
 ///          Created  22 Feb 2020
 ///
 ///
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:workingmemory/src/app/view/loading_screen.dart';
+import 'package:workingmemory/src/controller.dart';
 import 'package:workingmemory/src/view.dart';
 
-import 'package:workingmemory/src/controller.dart';
-
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+///
 class SignIn extends StatefulWidget {
-  const SignIn({Key key}) : super(key: key);
+  ///
+  const SignIn({Key? key}) : super(key: key);
   @override
   State createState() => _SignInState();
 }
 
-class _SignInState extends StateMVC<SignIn> {
+class _SignInState extends StateX<SignIn> {
   _SignInState() : super() {
     app = WorkingController();
+    spinner = WorkingSpinnerIndicator();
   }
-  WorkingController app;
-  Widget working = Container();
+  late WorkingController app;
+  late WorkingSpinnerIndicator spinner;
+  // Widget working = const SizedBox();
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +48,7 @@ class _SignInState extends StateMVC<SignIn> {
             padding: const EdgeInsets.only(top: 10, right: 40),
             child: GestureDetector(
               onTap: () async {
-                _working();
+                spinner.start();
                 final bool signIn = await app.signInWithFacebook();
                 if (signIn) {
                   Navigator.pop(context);
@@ -69,7 +71,7 @@ class _SignInState extends StateMVC<SignIn> {
             padding: const EdgeInsets.only(top: 10, right: 40),
             child: GestureDetector(
               onTap: () async {
-                _working();
+                spinner.start();
                 final bool signIn = await app.signInWithTwitter();
                 if (signIn) {
                   Navigator.pop(context);
@@ -92,7 +94,7 @@ class _SignInState extends StateMVC<SignIn> {
             padding: const EdgeInsets.only(top: 10, right: 40),
             child: GestureDetector(
               onTap: () async {
-                _working();
+                spinner.start();
                 final bool signIn = await app.signInEmailPassword(context);
                 if (signIn) {
                   Navigator.pop(context);
@@ -115,7 +117,7 @@ class _SignInState extends StateMVC<SignIn> {
             padding: const EdgeInsets.only(top: 10),
             child: GestureDetector(
               onTap: () async {
-                _working();
+                spinner.start();
                 final bool signIn = await app.signInWithGoogle();
                 if (signIn) {
                   Navigator.pop(context);
@@ -136,14 +138,14 @@ class _SignInState extends StateMVC<SignIn> {
           ),
         ],
       ),
-      working,
+      spinner,
     ]);
   }
 
-  void _working() {
-    working = App.useMaterial
-        ? const Center(child: CircularProgressIndicator())
-        : const Center(child: CupertinoActivityIndicator());
-    setState(() {});
-  }
+  // void _working() {
+  //   working = App.useMaterial
+  //       ? const Center(child: CircularProgressIndicator())
+  //       : const Center(child: CupertinoActivityIndicator());
+  //   setState(() {});
+  // }
 }

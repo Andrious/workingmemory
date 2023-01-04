@@ -20,10 +20,11 @@ import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 
+///
 class DTAndroid extends StatelessWidget {
-  DTAndroid({Key key, DateTime dateTime, @required this.onChanged})
-      : assert(onChanged != null),
-        date = DateTime(dateTime.year, dateTime.month, dateTime.day),
+  ///
+  DTAndroid({Key? key, required DateTime dateTime, required this.onChanged})
+      : date = DateTime(dateTime.year, dateTime.month, dateTime.day),
         time = TimeOfDay(hour: dateTime.hour, minute: dateTime.minute),
         super(key: key);
 
@@ -36,7 +37,7 @@ class DTAndroid extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     return DefaultTextStyle(
-        style: theme.textTheme.subtitle1,
+        style: theme.textTheme.subtitle1!,
         child: Row(children: <Widget>[
           Expanded(
               child: Container(
@@ -52,7 +53,7 @@ class DTAndroid extends StatelessWidget {
                               firstDate:
                                   date.subtract(const Duration(days: 30)),
                               lastDate: date.add(const Duration(days: 2555)))
-                          .then<void>((DateTime value) {
+                          .then<void>((value) {
                         if (value != null) {
                           onChanged(DateTime(value.year, value.month, value.day,
                               time.hour, time.minute));
@@ -76,7 +77,7 @@ class DTAndroid extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   showTimePicker(context: context, initialTime: time)
-                      .then<void>((TimeOfDay value) {
+                      .then<void>((value) {
                     if (value != null) {
                       onChanged(DateTime(date.year, date.month, date.day,
                           value.hour, value.minute));

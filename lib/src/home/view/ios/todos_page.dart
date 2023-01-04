@@ -16,69 +16,54 @@
 ///          Created  01 Mar 2020
 
 /// place: "/todos"
-
-//import 'package:flutter/cupertino.dart';
-
-//import 'package:flutter/material.dart';
-//    show
-//        BuildContext,
-//        Colors,
-//        Container,
-//        FlutterErrorDetails,
-//        Icon,
-//        Icons,
-//        ListTile,
-//        Material,
-//        MaterialType,
-//        SafeArea,
-//        Scaffold,
-//        SnackBar,
-//        SnackBarAction,
-//        Text,
-//        Widget;
+import 'package:workingmemory/src/controller.dart' show Controller;
 
 import 'package:workingmemory/src/model.dart' show Settings;
 
 import 'package:workingmemory/src/view.dart';
 
-import 'package:workingmemory/src/controller.dart' show Controller;
-
-class TodosiOS extends StateMVC<TodosPage> {
-  //
+///
+class TodosiOS extends StateX<TodosPage> {
+  ///
   TodosiOS() : super(Controller()) {
-    con = controller;
+    con = controller as Controller;
   }
-  Controller con;
 
-  Widget _leading;
-  Widget _trailing;
+  ///
+  late Controller con;
+
+  late Widget _leading;
+  late Widget _trailing;
 
   @override
   Widget build(BuildContext context) {
     // Supply the leading and trailing buttons.
     _supplyButtons();
     return CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(
-          leading: _leading,
-          trailing: _trailing,
+      navigationBar: CupertinoNavigationBar(
+        leading: _leading,
+        trailing: _trailing,
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(child: MemoryList(parent: this)),
+          ],
         ),
-        child: SafeArea(
-            top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(child: MemoryList(parent: this)),
-              ],
-            )));
+      ),
+    );
   }
 
+  ///
   Future<void> editToDo(BuildContext context,
-      [Map<String, dynamic> todo]) async {
-    await showCupertinoModalPopup(
+      [Map<String, dynamic>? todo]) async {
+    await showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => TodoPage(todo: todo),
     );
-    refresh();
+    setState(() {});
   }
 
   void _supplyButtons() {
@@ -86,24 +71,24 @@ class TodosiOS extends StateMVC<TodosPage> {
     _leading = CupertinoButton(
       padding: const EdgeInsets.all(10),
       onPressed: () async {
-        await showCupertinoModalPopup(
+        await showCupertinoModalPopup<void>(
           context: context,
           builder: (BuildContext context) => const SettingsWidget(),
         );
-        refresh();
+        setState(() {});
       },
-      child: I10n.t('Settings'),
+      child: L10n.t('Settings'),
     );
 
     _trailing = CupertinoButton(
       padding: const EdgeInsets.all(10),
       onPressed: () {
-        editToDo(con?.state?.context);
+        editToDo(con.state!.context);
       },
-      child: I10n.t('New'),
+      child: L10n.t('New'),
     );
 
-    if (Settings.getLeftHanded()) {
+    if (Settings.isLeftHanded()) {
       final temp = _leading;
       _leading = _trailing;
       _trailing = temp;
@@ -111,23 +96,26 @@ class TodosiOS extends StateMVC<TodosPage> {
   }
 }
 
+///
 class MemoryList extends StatelessWidget {
-  //
-  const MemoryList({this.parent, Key key}) : super(key: key);
+  ///
+  const MemoryList({required this.parent, Key? key}) : super(key: key);
+
+  ///
   final TodosiOS parent;
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> _items = parent.con.data.items;
-    final bool leftHanded = Settings.getLeftHanded();
+    final bool leftHanded = Settings.isLeftHanded();
     return SafeArea(
       child: parent.con.data.items.isEmpty
-          ? Container()
+          ? const SizedBox()
           : CustomScrollView(
-              shrinkWrap: true,
+//              shrinkWrap: true,
               semanticChildCount: _items.length,
               slivers: <Widget>[
-                const CupertinoSliverNavigationBar(
-                  largeTitle: Text('Working Memory'),
+                CupertinoSliverNavigationBar(
+                  largeTitle: Text('Working Memory'.tr),
                 ),
                 SliverSafeArea(
                   sliver: SliverList(
@@ -145,15 +133,19 @@ class MemoryList extends StatelessWidget {
                             Controller().data.delete(_items[index]);
                             final String action =
                                 (direction == DismissDirection.endToStart)
-                                    ? 'deleted'
-                                    : 'archived';
-                            Scaffold.of(context).showSnackBar(SnackBar(
-                                content: Text('You $action an item.'),
+                                    ? 'deleted'.tr
+                                    : 'archived'.tr;
+                            ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+                              SnackBar(
+                                content: Text('You $action an item.'.tr),
                                 action: SnackBarAction(
-                                    label: 'UNDO',
-                                    onPressed: () {
-                                      Controller().data.undo(_items[index]);
-                                    })));
+                                  label: 'UNDO'.tr,
+                                  onPressed: () {
+                                    Controller().data.undo(_items[index]);
+                                  },
+                                ),
+                              ),
+                            );
                           },
                           background: Container(
                               color: Colors.red,
@@ -168,20 +160,21 @@ class MemoryList extends StatelessWidget {
                             decoration: BoxDecoration(
                                 border: Border(
                                     bottom: BorderSide(
-                                        color: App.themeData.dividerColor))),
+                                        color: App.themeData!.dividerColor))),
                             child: Material(
-                                type: MaterialType.transparency,
-                                child: ListTile(
-                                  leading: Icon(IconData(
-                                      int.tryParse(_items[index]['Icon']),
-                                      fontFamily: 'MaterialIcons')),
-                                  title: Text(_items[index]['Item']),
-                                  subtitle: Text(parent.con.data.dateFormat
-                                      .format(DateTime.tryParse(
-                                          _items[index]['DateTime']))),
-                                  onTap: () =>
-                                      parent.editToDo(context, _items[index]),
-                                )),
+                              //                             type: MaterialType.transparency,
+                              child: ListTile(
+                                leading: Icon(IconData(
+                                    int.tryParse(_items[index]['Icon'])!,
+                                    fontFamily: 'MaterialIcons')),
+                                title: Text(_items[index]['Item']),
+                                subtitle: Text(parent.con.data.dateFormat
+                                    .format(DateTime.tryParse(
+                                        _items[index]['DateTime'])!)),
+                                onTap: () =>
+                                    parent.editToDo(context, _items[index]),
+                              ),
+                            ),
                           ),
                         );
                       },
