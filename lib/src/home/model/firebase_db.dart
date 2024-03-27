@@ -594,7 +594,9 @@ class FireBaseDB {
           // They will have different primary keys.
           rec['rowid'] = null;
 
-          switchOver = await con.save(rec);
+          final savedRec = await con.save(rec);
+
+          switchOver = savedRec.isNotEmpty;
 
           if (!switchOver) {
             break;

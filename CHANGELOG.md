@@ -1,5 +1,15 @@
 
+## 1.12.0
+ December 01, 2023
+- Updated Flutter and dependencies
+- Updated Translations
+- Made Time-zone aware
+- Updated Loading Screen
+- Updated Settings Screen
+- Allow the editing of icons, colors, and phone sounds
+
 ## 1.11.0
+ January 04, 2023
 - Updated gradle (jcenter to mavenCentral, 23 min 33 sdk, etc.)
 - Sync process rewrite
 - mvc_application to fluttery_framework library

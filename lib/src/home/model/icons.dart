@@ -21,6 +21,7 @@
 ///
 
 class Icons {
+  ///
   static Map<String, String> code = {
     '0xe84d': '3d_rotation',
     '0xeb3b': 'ac_unit',

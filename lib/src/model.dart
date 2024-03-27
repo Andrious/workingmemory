@@ -18,10 +18,10 @@
 ///           import 'package:workingmemory/model.dart';
 
 /// sql
-export 'package:dbutils/sqlite_db.dart' show SQLiteDB, Transaction;
+export 'package:dbutils/sqlite_db.dart';
 
 /// sql plugin
-export 'package:sqflite/sqflite.dart' show Database;
+//export 'package:sqflite/sqflite.dart' show Database;
 
 /// remote
 export 'package:remote_config/remote_config.dart'

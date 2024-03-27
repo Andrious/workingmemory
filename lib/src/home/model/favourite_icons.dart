@@ -55,6 +55,7 @@ class IconFavourites {
     if (icon == null) {
       icon = '';
     } else {
+      // Leave the 'AND' It works.
       icon = ' icon = "$icon" AND ';
     }
     final String select =
@@ -74,6 +75,21 @@ class IconFavourites {
     final rec = await _db.saveRec(TABLE_NAME, {'icon': icon});
 
     return rec.isNotEmpty;
+  }
+
+  /// Delete specified record.
+  Future<bool> deleteRec(String icon) async {
+    //
+    final icons = await retrieve(icon);
+
+    if (icons.isNotEmpty) {
+      return true;
+    }
+
+    final rec =
+        await _db.deleteRec(TABLE_NAME, where: 'icon = ?', whereArgs: [icon]);
+
+    return rec > 0;
   }
 
   /// Return favourite icons from Firebase

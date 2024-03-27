@@ -6,3 +6,6 @@ export 'package:workingmemory/src/app/controller/theme_controller.dart';
 
 ///
 export 'package:workingmemory/src/app/controller/working_memory_app.dart';
+
+///
+export 'package:workingmemory/src/app/controller/timezone.dart';

@@ -24,6 +24,7 @@ import 'package:workingmemory/src/model.dart' show OnLoginListener;
 ///
 class AppModel implements OnLoginListener {
   ///
+  @override
   void onLogin() {}
 //
 //

@@ -23,7 +23,8 @@ import 'package:flutter/material.dart';
 
 import 'package:workingmemory/src/model.dart' show Settings;
 
-import 'package:workingmemory/src/view.dart' show NotificationSettings, SignIn;
+import 'package:workingmemory/src/view.dart'
+    show L10nTranslate, NotificationSettings, SignIn;
 
 import 'package:workingmemory/src/controller.dart' show Controller;
 
@@ -31,11 +32,14 @@ import 'settings_group.dart';
 
 import 'settings_item.dart';
 
+///
 class SettingsScreen extends StatelessWidget {
-  //
+  ///
   SettingsScreen(Key key) : super(key: key);
 
-  final Controller con = Controller();
+  final Controller _con = Controller();
+
+  final List<String> _itemOrders = Settings.itemOrders;
 
   @override
   Widget build(BuildContext context) {
@@ -64,19 +68,36 @@ class SettingsScreen extends StatelessWidget {
     SettingsItem item;
     final List<SettingsItem> items = [
       SettingsItem(
-        label: 'Sorted Order of Items',
-        subtitle: 'Check for most recent listed first.',
-        content: CupertinoSwitch(
-          value: Settings.getOrder(),
-          onChanged: Settings.setOrder,
+        label: 'Order of Items'.tr,
+        subtitle: 'Most recent listed first.'.tr,
+        // content: CupertinoSwitch(
+        //   value: Settings.getOrder(),
+        //   onChanged: Settings.setOrder,
+        // ),
+        content: CupertinoPicker(
+          magnification: 1.22,
+          squeeze: 1.2,
+          useMagnifier: true,
+          itemExtent: 32,
+          // This is called when selected item is changed.
+          onSelectedItemChanged: (int value) {
+            Settings.itemsOrder = _itemOrders[value];
+          },
+          children: List<Widget>.generate(_itemOrders.length, (int index) {
+            return Center(
+              child: Text(
+                _itemOrders[index],
+              ),
+            );
+          }),
         ),
       ),
       SettingsItem(
         label: 'Switch around dialog buttons',
         subtitle: 'Possibly preferred if left-handed.',
         content: CupertinoSwitch(
-          value: Settings.isLeftHanded(),
-          onChanged: Settings.setLeftHanded,
+          value: Settings.leftSided,
+          onChanged: Settings.setLeftSidedPrefs,
         ),
       ),
       SettingsItem(
@@ -94,13 +115,13 @@ class SettingsScreen extends StatelessWidget {
       ),
     ];
 
-    if (!con.app.isAnonymous) {
-      item = SettingsItem(label: 'Log Out', onPress: con.logOut);
+    if (!_con.app.isAnonymous) {
+      item = SettingsItem(label: 'Log Out', onPress: _con.logOut);
     } else {
       item = SettingsItem(
           label: 'Sign In',
           onPress: () {
-            Navigator.of(con.state!.context).push(
+            Navigator.of(_con.state!.context).push(
               CupertinoPageRoute<void>(
                 builder: (context) => const SignIn(),
                 title: 'Preferred Categories',

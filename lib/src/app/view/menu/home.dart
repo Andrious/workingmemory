@@ -25,14 +25,14 @@ import 'package:workingmemory/src/controller.dart' show Controller;
 
 ///
 //class WorkMenu extends Menu {
-class WorkMenu extends AppMenu<String> {
+class WorkMenu extends AppPopupMenu {
   ///
   WorkMenu({super.key})
       : _con = Controller(),
         super(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          position: PopupMenuPosition.under,
+        // shape:
+        //     RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        // position: PopupMenuPosition.under,
         ) {
     //
     if (_con.app.loggedIn) {
@@ -69,17 +69,21 @@ class WorkMenu extends AppMenu<String> {
   /// The last menu option
   final tailItems = <PopupMenuItem<String>>[];
 
+  /// The selected Locale
+  Locale? _locale;
+
   @override
-  List<PopupMenuEntry<String>> get menuItems => [
+  List<PopupMenuEntry<String>> get menuEntries => [
         PopupMenuItem<String>(
             key: const Key('resyncMenuItem'),
             value: 'Resync',
             child: L10n.t('Resync')),
-        PopupMenuItem<String>(
-            key: const Key('localeMenuItem'),
-            value: 'interface',
-            child: Text(
-                '${L10n.s('Interface:')} ${App.useMaterial ? 'Material' : 'Cupertino'}')),
+        if (App.appState?.allowChangeUI ?? false)
+          PopupMenuItem<String>(
+              key: const Key('localeMenuItem'),
+              value: 'interface',
+              child: Text(
+                  '${L10n.s('Interface:')} ${App.useMaterial ? 'Material' : 'Cupertino'}')),
         PopupMenuItem<String>(
             key: const Key('localeMenuItem'),
             value: 'Locale',
@@ -101,6 +105,11 @@ class WorkMenu extends AppMenu<String> {
       ];
 
   @override
+  void onSelected(String value) {
+    selected(value);
+  }
+
+  /// Preforming Asynchronous operations
   Future<void> selected(String value) async {
     switch (value) {
       case 'Resync':
@@ -128,15 +137,29 @@ class WorkMenu extends AppMenu<String> {
         //
         final locales = App.supportedLocales!;
 
-        final initialItem = locales.indexOf(App.locale!);
+//        final initialItem = locales.indexOf(App.locale!);
 
-        int spinIndex = initialItem;
+//        var spinIndex = initialItem;
 
-        final spinner = ISOSpinner(
-          initialItem: initialItem,
-          supportedLocales: locales,
+        // final spinner = ISOSpinner(
+        //   initialItem: initialItem,
+        //   supportedLocales: locales,
+        //   onSelectedItemChanged: (int index) async {
+        //     spinIndex = index;
+        //   },
+        // );
+
+        final spinner = SpinnerCupertino<Locale>(
+          initValue: App.locale!,
+          values: locales,
+          itemBuilder: (BuildContext context, int index) => Text(
+            locales[index].countryCode == null
+                ? locales[index].languageCode
+                : '${locales[index].languageCode}-${locales[index].countryCode}',
+            style: const TextStyle(fontSize: 20),
+          ),
           onSelectedItemChanged: (int index) async {
-            spinIndex = index;
+            _locale = L10n.getLocale(index);
           },
         );
 
@@ -146,14 +169,14 @@ class WorkMenu extends AppMenu<String> {
 //          press01: () {},
           press02: () {
             // Retrieve the available locales.
-            final locale = L10n.getLocale(spinIndex);
-            if (locale != null) {
-              Prefs.setString('locale', locale.toLanguageTag());
-              App.locale = locale;
+//            final locale = L10n.getLocale(spinIndex);
+            if (_locale != null) {
+              Prefs.setString('locale', _locale!.toLanguageTag());
+              App.locale = _locale;
               App.setState(() {});
             }
           },
-          switchButtons: Settings.isLeftHanded(),
+          switchButtons: Settings.leftSided,
         ).show();
 
         break;
@@ -162,8 +185,8 @@ class WorkMenu extends AppMenu<String> {
         break;
       case 'About':
         showAboutDialog(
-          context: context!,
-          applicationName: L10n.s(App.state?.title ?? ''),
+          context: _con.lastContext!,
+          applicationName: L10n.s(App.appState?.title ?? ''),
           applicationVersion:
               'version: ${App.version} build: ${App.buildNumber}',
           // applicationIcon: _applicationIcon,
@@ -183,11 +206,10 @@ class WorkMenu extends AppMenu<String> {
 
   ///
   static Future<void> showColorPicker() async {
-    // Set the current colour
-    ColorPicker.color = Color(App.themeData!.primaryColor.value);
-
-    await ColorPicker.showColorPicker(
+    //
+    await ColorPicker.show(
       context: App.context!,
+      selectedColor: Color(App.themeData!.primaryColor.value),
       onColorChange: (Color value) {
         /// Implement to take in a color change.
       },

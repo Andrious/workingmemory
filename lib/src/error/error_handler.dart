@@ -19,7 +19,6 @@
 import 'dart:async' show Future, runZonedGuarded;
 import 'dart:isolate' show Isolate, RawReceivePort;
 
-import 'package:flutter/foundation.dart' show FlutterError, FlutterErrorDetails;
 import 'package:flutter/material.dart'
     show FlutterError, FlutterErrorDetails, Widget, runApp;
 

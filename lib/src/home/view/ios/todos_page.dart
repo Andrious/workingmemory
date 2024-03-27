@@ -25,7 +25,7 @@ import 'package:workingmemory/src/view.dart';
 ///
 class TodosiOS extends StateX<TodosPage> {
   ///
-  TodosiOS() : super(Controller()) {
+  TodosiOS() : super(controller: Controller()) {
     con = controller as Controller;
   }
 
@@ -35,8 +35,12 @@ class TodosiOS extends StateX<TodosPage> {
   late Widget _leading;
   late Widget _trailing;
 
+  // The iOS version
   @override
-  Widget build(BuildContext context) {
+  Widget buildiOS(BuildContext context) => buildAndroid(context);
+
+  @override
+  Widget buildAndroid(BuildContext context) {
     // Supply the leading and trailing buttons.
     _supplyButtons();
     return CupertinoPageScaffold(
@@ -69,7 +73,7 @@ class TodosiOS extends StateX<TodosPage> {
   void _supplyButtons() {
     //
     _leading = CupertinoButton(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
       onPressed: () async {
         await showCupertinoModalPopup<void>(
           context: context,
@@ -81,14 +85,14 @@ class TodosiOS extends StateX<TodosPage> {
     );
 
     _trailing = CupertinoButton(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
       onPressed: () {
         editToDo(con.state!.context);
       },
       child: L10n.t('New'),
     );
 
-    if (Settings.isLeftHanded()) {
+    if (Settings.leftSided) {
       final temp = _leading;
       _leading = _trailing;
       _trailing = temp;
@@ -99,90 +103,112 @@ class TodosiOS extends StateX<TodosPage> {
 ///
 class MemoryList extends StatelessWidget {
   ///
-  const MemoryList({required this.parent, Key? key}) : super(key: key);
+  const MemoryList({required this.parent, super.key});
 
   ///
   final TodosiOS parent;
+
   @override
   Widget build(BuildContext context) {
+    //
     final List<Map<String, dynamic>> _items = parent.con.data.items;
-    final bool leftHanded = Settings.isLeftHanded();
+    final bool itemsEmpty = parent.con.data.items.isEmpty;
+    final bool leftSided = Settings.leftSidedPrefs();
+
+    Widget? leading;
+    Widget? trailing;
+    final Widget sortArrow = Material(child: parent.widget.sortArrow);
+    if (leftSided) {
+      leading = sortArrow;
+    } else {
+      trailing = sortArrow;
+    }
+
     return SafeArea(
-      child: parent.con.data.items.isEmpty
-          ? const SizedBox()
-          : CustomScrollView(
+      child: CustomScrollView(
 //              shrinkWrap: true,
-              semanticChildCount: _items.length,
-              slivers: <Widget>[
-                CupertinoSliverNavigationBar(
-                  largeTitle: Text('Working Memory'.tr),
-                ),
-                SliverSafeArea(
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        if (index >= _items.length) {
-                          return null;
-                        }
-                        return Dismissible(
-                          key: ObjectKey(_items[index]['rowid']),
-                          direction: leftHanded
-                              ? DismissDirection.startToEnd
-                              : DismissDirection.endToStart,
-                          onDismissed: (DismissDirection direction) {
-                            Controller().data.delete(_items[index]);
-                            final String action =
-                                (direction == DismissDirection.endToStart)
-                                    ? 'deleted'.tr
-                                    : 'archived'.tr;
-                            ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-                              SnackBar(
-                                content: Text('You $action an item.'.tr),
-                                action: SnackBarAction(
-                                  label: 'UNDO'.tr,
-                                  onPressed: () {
-                                    Controller().data.undo(_items[index]);
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-                          background: Container(
-                              color: Colors.red,
-                              child: const Material(
-                                  type: MaterialType.transparency,
-                                  child: ListTile(
-                                      leading: Icon(Icons.delete,
-                                          color: Colors.white, size: 36),
-                                      trailing: Icon(Icons.delete,
-                                          color: Colors.white, size: 36)))),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(
-                                        color: App.themeData!.dividerColor))),
-                            child: Material(
-                              //                             type: MaterialType.transparency,
-                              child: ListTile(
-                                leading: Icon(IconData(
-                                    int.tryParse(_items[index]['Icon'])!,
-                                    fontFamily: 'MaterialIcons')),
-                                title: Text(_items[index]['Item']),
-                                subtitle: Text(parent.con.data.dateFormat
-                                    .format(DateTime.tryParse(
-                                        _items[index]['DateTime'])!)),
-                                onTap: () =>
-                                    parent.editToDo(context, _items[index]),
-                              ),
+        semanticChildCount: _items.length,
+        slivers: <Widget>[
+          CupertinoSliverNavigationBar(
+            largeTitle: Text('Working Memory'.tr),
+            leading: leading,
+            trailing: trailing,
+          ),
+          if (itemsEmpty) const SizedBox(),
+          if (!itemsEmpty)
+            SliverSafeArea(
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    if (index >= _items.length) {
+                      return null;
+                    }
+                    return Dismissible(
+                      key: ObjectKey(_items[index]['rowid']),
+                      direction: leftSided
+                          ? DismissDirection.startToEnd
+                          : DismissDirection.endToStart,
+                      onDismissed: (DismissDirection direction) {
+                        Controller().data.delete(_items[index]);
+                        final String action =
+                            (direction == DismissDirection.endToStart)
+                                ? 'deleted'.tr
+                                : 'archived'.tr;
+                        ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+                          SnackBar(
+                            content: Text('You $action an item.'.tr),
+                            action: SnackBarAction(
+                              label: 'UNDO'.tr,
+                              onPressed: () {
+                                Controller().data.undo(_items[index]);
+                              },
                             ),
                           ),
                         );
                       },
-                    ),
-                  ),
-                )
-              ],
+                      background: Container(
+                        color: Colors.red,
+                        child: const Material(
+                          type: MaterialType.transparency,
+                          child: ListTile(
+                            leading: Icon(Icons.delete,
+                                color: Colors.white, size: 36),
+                            trailing: Icon(Icons.delete,
+                                color: Colors.white, size: 36),
+                          ),
+                        ),
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom:
+                                BorderSide(color: App.themeData!.dividerColor),
+                          ),
+                        ),
+                        child: Material(
+                          //  type: MaterialType.transparency,
+                          child: ListTile(
+                            leading: Icon(IconData(
+                                int.tryParse(_items[index]['Icon'])!,
+                                fontFamily: 'MaterialIcons')),
+                            title: Text(_items[index]['Item']),
+                            subtitle: Text(
+                              parent.con.data.dateFormat.format(
+                                  DateTime.tryParse(
+                                      _items[index]['DateTime'])!),
+                            ),
+                            onTap: () =>
+                                parent.editToDo(context, _items[index]),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
+        ],
+      ),
     );
   }
 }

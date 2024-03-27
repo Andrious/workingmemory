@@ -46,7 +46,8 @@ lcov.info
 .metadata
 
 # Miscellaneous
-tmp/
+/tmp/
+*.txt
 *.tmp
 *.bak
 *.swp

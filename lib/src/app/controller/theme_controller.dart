@@ -23,9 +23,8 @@ import 'package:workingmemory/src/controller.dart'
 
 import 'package:workingmemory/src/model.dart';
 
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-
-import 'package:flutter_system_ringtones/flutter_system_ringtones.dart';
+import 'package:flutter_system_ringtones/flutter_system_ringtones.dart'
+    show Ringtone;
 
 /// The App's theme controller
 class ThemeController extends StateXController {
@@ -33,7 +32,7 @@ class ThemeController extends StateXController {
   factory ThemeController() => _this ??= ThemeController._();
   ThemeController._() {
     _darkMode = DarkMode();
-    _ledColor = LEDColor();
+    _sounds = PhoneSounds();
     _notifications = Notifications();
   }
   static ThemeController? _this;
@@ -42,7 +41,6 @@ class ThemeController extends StateXController {
   Future<bool> initAsync() async {
     App.themeData = setIfDarkMode();
     if (!kIsWeb) {
-      _sounds = _PhoneSounds();
       await _sounds.initAsync();
     }
     return true;
@@ -50,9 +48,9 @@ class ThemeController extends StateXController {
 
   // Determine the app's dark mode.
   late DarkMode _darkMode;
-  late _PhoneSounds _sounds;
-  late LEDColor _ledColor;
   late Notifications _notifications;
+
+  late PhoneSounds _sounds;
 
   /// Indicate if in 'dark mode' or not
   bool get isDarkMode => _darkMode.isDarkMode;
@@ -68,7 +66,13 @@ class ThemeController extends StateXController {
   ThemeData? setIfDarkMode() => _darkMode.setIfDarkMode();
 
   /// Supply the color wheel
-  void showLEDColour() => _ledColor.show(state!.context);
+  void showLEDColour() => LEDColor.show(
+        context: state!.context,
+        title: L10n.t('LED Colour'),
+        // titlePadding: const EdgeInsets.fromLTRB(12, 12, 12, 16),
+        // contentPadding: const EdgeInsets.all(8),
+        // displayThumbColor: false,
+      );
 
   /// Display Notifications Settings
   void showNotifications() => _notifications.show(state!.context);
@@ -77,17 +81,10 @@ class ThemeController extends StateXController {
   Notifications get notifySettings => _notifications;
 
   /// Notification Ringtones
-  List<Ringtone> get notifications => _sounds.notifications;
+  List<Ringtone> get notifications => _sounds.notifications ?? [];
 
   /// Display Notifications Sounds
   void showSounds() => _sounds.show(state!.context);
-
-  @override
-  void dispose() {
-    super.dispose();
-    // always nullify when disposed.
-    _this = null;
-  }
 }
 
 /// Determine the app's dark mode.
@@ -129,71 +126,6 @@ class DarkMode {
       data = setDarkMode();
     }
     return data;
-  }
-}
-
-/// Concerned with a ColorWheel
-class LEDColor {
-  /// context is required.
-  LEDColor({
-    Color? pickerColor,
-    ValueChanged<Color>? onColorChanged,
-    HSVColor? pickerHsvColor,
-    ValueChanged<HSVColor>? onHsvColorChanged,
-    PaletteType? paletteType,
-    bool? enableAlpha,
-    List<ColorLabelType>? labelTypes,
-    bool? colorIndicator,
-    bool? paletteSlider,
-    bool? displayThumbColor,
-    bool? portraitOnly,
-    double? colorPickerWidth,
-    double? pickerAreaHeightPercent,
-    BorderRadius? pickerAreaBorderRadius,
-    bool? hexInputBar,
-    ValueChanged<List<Color>>? onHistoryChanged,
-  }) {
-    _colorPicker = ColorPicker(
-      pickerColor:
-          pickerColor ?? Color(Prefs.getInt('LEDColor', Colors.blue.value)),
-      onColorChanged: onColorChanged ??
-          (Color color) async => Prefs.setInt('LEDColor', color.value),
-      pickerHsvColor: pickerHsvColor,
-      onHsvColorChanged: onHsvColorChanged,
-      paletteType: paletteType ?? PaletteType.hueWheel,
-      enableAlpha: enableAlpha ?? false,
-      labelTypes: labelTypes ?? const [],
-      colorIndicator: colorIndicator ?? false,
-      paletteSlider: paletteSlider ?? false,
-      displayThumbColor: displayThumbColor ?? false,
-      portraitOnly: portraitOnly ?? false,
-      colorPickerWidth: colorPickerWidth ?? 300,
-      pickerAreaHeightPercent: pickerAreaHeightPercent ?? 0.7,
-      pickerAreaBorderRadius: pickerAreaBorderRadius ??
-          const BorderRadius.only(
-            topLeft: Radius.circular(2),
-            topRight: Radius.circular(2),
-          ),
-      hexInputBar: hexInputBar ?? false,
-      hexInputController: null,
-      colorHistory: null,
-      onHistoryChanged: onHistoryChanged,
-    );
-  }
-
-  // Color wheel
-  late ColorPicker _colorPicker;
-
-  /// Display the LED Colour for the Notification
-  void show(BuildContext _context) {
-    showDialog<void>(
-      context: _context,
-      builder: (BuildContext context) => AlertDialog(
-        titlePadding: const EdgeInsets.all(0),
-        contentPadding: const EdgeInsets.all(0),
-        content: SingleChildScrollView(child: _colorPicker),
-      ),
-    );
   }
 }
 
@@ -252,7 +184,7 @@ class Notifications {
   /// Display the LED Colour for the Notification
   void show(BuildContext _context) {
     this._context = _context;
-    final leftHanded = Settings.isLeftHanded();
+    final leftHanded = Settings.leftSided;
     final controlAffinity = leftHanded
         ? ListTileControlAffinity.leading
         : ListTileControlAffinity.trailing;
@@ -348,86 +280,6 @@ class Notifications {
           if (useLED != _led) {
             useLED = _led;
           }
-          Navigator.of(_context).pop();
-        },
-        child: Text('Done'.tr),
-      );
-
-  ///
-  Widget get cancelButton => ElevatedButton(
-        onPressed: () => Navigator.of(_context).pop(),
-        child: Text('Cancel'.tr),
-      );
-}
-
-/// Notification Sounds
-class _PhoneSounds {
-  //
-  Future<bool> initAsync() async {
-    _notifications = await FlutterSystemRingtones.getNotificationSounds();
-    return true;
-  }
-
-  // Notification sounds.
-  List<Ringtone> get notifications => _notifications ??= [];
-  List<Ringtone>? _notifications;
-
-  late BuildContext _context;
-
-  /// Display the Notification Sounds
-  void show(BuildContext _context) {
-    this._context = _context;
-    final leftHanded = Settings.isLeftHanded();
-    final ringtones = notifications;
-    showDialog<void>(
-      context: _context,
-      builder: (BuildContext context) {
-        App.dependOnInheritedWidget(context);
-        return AlertDialog(
-          title: Text('NOTIFICATIONS SOUNDS'.tr),
-          titlePadding: const EdgeInsets.only(left: 10, top: 20),
-          contentPadding: const EdgeInsets.all(20),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          content: Container(
-            width: 100.w, // % of screen width
-            height: 80.h, // % of screen height
-            child: Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: ringtones.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return AListTile(
-                        title: Text(ringtones[index].title),
-                        subtitle: Text(ringtones[index].uri),
-                        onTap: () {
-                          // _flutterSystemRingtonesPlugin
-                          //     .playRingtone(ringtones[index]);
-                        },
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    if (leftHanded) doneButton else cancelButton,
-                    if (leftHanded) cancelButton else doneButton,
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  ///
-  Widget get doneButton => ElevatedButton(
-        onPressed: () {
           Navigator.of(_context).pop();
         },
         child: Text('Done'.tr),

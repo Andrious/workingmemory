@@ -28,10 +28,10 @@ import 'package:workingmemory/src/controller.dart' show Controller, theme;
 ///
 class TodoiOS extends StateX<TodoPage> {
   ///
-  TodoiOS() : super(Controller()) {
-    con = controller as Controller;
+  TodoiOS() : super(controller: Controller()) {
+    _con = controller as Controller;
   }
-  late Controller con;
+  late Controller _con;
   Widget? _leading;
   Widget? _trailing;
 
@@ -39,18 +39,22 @@ class TodoiOS extends StateX<TodoPage> {
   void initState() {
     super.initState();
 //    con.edit.addState(this);
-    con.data.init(widget.todo);
+    _con.data.init(widget.todo);
   }
 
+  // The iOS version
   @override
-  Widget build(BuildContext context) {
+  Widget buildAndroid(BuildContext context) => buildiOS(context);
+
+  @override
+  Widget buildiOS(BuildContext context) {
     _scaffoldButtons();
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-          middle: con.data.title, leading: _leading, trailing: _trailing),
+          middle: _con.data.title, leading: _leading, trailing: _trailing),
       child: Form(
           onWillPop: _onWillPop,
-          child: con.data.linkForm(
+          child: _con.data.linkForm(
             ListView(padding: const EdgeInsets.all(16), children: _listWidgets),
           )),
     );
@@ -58,7 +62,7 @@ class TodoiOS extends StateX<TodoPage> {
 
   Future<bool> _onWillPop() async {
     //
-    if (!con.data.hasChanged) {
+    if (!_con.data.hasChanged) {
       return true;
     }
 
@@ -110,7 +114,7 @@ class TodoiOS extends StateX<TodoPage> {
         padding: const EdgeInsets.only(top: 25),
         alignment: Alignment.bottomLeft,
         child: FormField<String>(
-            initialValue: con.data.item,
+            initialValue: _con.data.item,
             validator: (v) {
               if (v!.trim().isEmpty) {
                 return L10n.s('Cannot be empty.');
@@ -122,10 +126,10 @@ class TodoiOS extends StateX<TodoPage> {
 //            },
             builder: (FormFieldState<String> field) {
               // Retain a copy of the FormFieldState object.
-              con.data.addField(field);
+              _con.data.addField(field);
               return CupertinoTextField(
                 textInputAction: TextInputAction.done,
-                controller: con.data.controller,
+                controller: _con.data.controller,
                 onChanged: (value) {
                   field.didChange(value);
                 },
@@ -136,26 +140,27 @@ class TodoiOS extends StateX<TodoPage> {
               );
             }),
       ),
-      Column(crossAxisAlignment: CrossAxisAlignment.start,
+      Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
 //                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Center(
-                child: Icon(IconData(int.tryParse(con.data.icon!)!,
+                child: Icon(IconData(int.tryParse(_con.data.icon!)!,
                     fontFamily: 'MaterialIcons'))),
 //                    Text('From', style: theme.textTheme.caption),
             DTiOS(
-              dateTime: con.data.dateTime!,
+              dateTime: _con.data.dateTime!,
               onChanged: (DateTime value) {
                 setState(() {
-                  con.data.dateTime = value;
+                  _con.data.dateTime = value;
                 });
-                con.data.saveNeeded = true;
+                _con.data.saveNeeded = true;
               },
             )
           ]),
     ];
 
-    if (con.favIcons!.isNotEmpty) {
+    if (_con.favIcons!.isNotEmpty) {
       widgets.add(
         Container(
           height: 100,
@@ -165,12 +170,12 @@ class TodoiOS extends StateX<TodoPage> {
           ),
           child: IconItems(
               icons: {
-                for (var e in con.favIcons!) e.values.first: e.values.first
+                for (var e in _con.favIcons!) e.values.first: e.values.first
               },
-              icon: con.data.icon!,
+              icon: _con.data.icon!,
               onTap: (icon) {
-                con.setState(() {
-                  con.data.icon = icon;
+                _con.setState(() {
+                  _con.data.icon = icon;
                 });
               }),
         ),
@@ -181,11 +186,11 @@ class TodoiOS extends StateX<TodoPage> {
       Container(
         height: 600,
         child: IconItems(
-            icons: con.icons,
-            icon: con.data.icon!,
+            icons: _con.icons,
+            icon: _con.data.icon!,
             onTap: (icon) async {
-              await con.saveIcon(icon);
-              con.setState(() {});
+              await _con.saveIcon(icon);
+              _con.setState(() {});
             }),
       ),
     );
@@ -199,7 +204,7 @@ class TodoiOS extends StateX<TodoPage> {
       padding: const EdgeInsets.all(
           10), // https://github.com/flutter/flutter/issues/32701
       onPressed: () async {
-        final bool saved = await con.data.onPressed();
+        final bool saved = await _con.data.onPressed();
         if (saved) {
           if (widget.onPressed == null) {
             Navigator.pop(context);
@@ -212,7 +217,7 @@ class TodoiOS extends StateX<TodoPage> {
     );
 
     // Switch the buttons around when indicated.
-    if (Settings.isLeftHanded()) {
+    if (Settings.leftSidedPrefs()) {
       temp = _trailing;
       _trailing = null;
       _leading = temp;
@@ -259,7 +264,7 @@ class TodoiOS extends StateX<TodoPage> {
     }
 
     // Switch the buttons around when indicated.
-    if (Settings.isLeftHanded()) {
+    if (Settings.leftSidedPrefs()) {
       temp = leading;
       leading = trailing;
       trailing = temp;

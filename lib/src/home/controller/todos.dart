@@ -17,27 +17,11 @@
 import 'dart:async' show Future;
 
 import 'package:auth/auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart' show DateFormat;
+
 import 'package:workingmemory/src/controller.dart';
 import 'package:workingmemory/src/model.dart' as m;
-import 'package:workingmemory/src/view.dart'
-    show
-        App,
-        AppLifecycleState,
-        Colors,
-        ConnectivityListener,
-        ConnectivityResult,
-        DataFields,
-        FormState,
-        MaterialPageRoute,
-        Navigator,
-        Prefs,
-        SignIn,
-        Text,
-        TextEditingController,
-        ThemeData,
-        Widget;
+import 'package:workingmemory/src/view.dart';
 
 ///
 final ThemeData? theme = App.themeData;
@@ -120,14 +104,76 @@ class Controller extends StateXController with ConnectivityListener {
   List<Map<String, dynamic>>? get favIcons => _favIcons;
   List<Map<String, dynamic>>? _favIcons;
 
+  /// Those icons picked but not yet saved by the user.
+  final List<String> _pickedIcons = [];
+
   ///
   Map<String, String> get icons => _icons;
   late Map<String, String> _icons;
 
   ///
-  Future<bool> saveIcon(String icon) async {
-    data.icon = icon;
-    final bool save = await _model.saveIcon(icon);
+  Future<bool> saveIcon(String? icon) async {
+    bool save = icon != null;
+
+    if (save) {
+      //
+      data.icon = icon;
+
+      save = await _model.saveIcon(icon);
+
+      if (save) {
+        //
+        _pickedIcons.remove(icon);
+
+        if (_pickedIcons.isNotEmpty) {
+          //
+          // final icons = <Icon>[];
+          // for (final icon in _pickedIcons) {
+          //   icons.add(
+          //       Icon(IconData(int.parse(icon), fontFamily: 'MaterialIcons')));
+          // }
+          final saveIcons = await showBox(
+            context: state!.context,
+            text: 'Save these ${_pickedIcons.length} other icons?',
+            button01: Option(text: 'Yes', result: true),
+            button02: Option(text: 'No', result: false),
+          );
+
+          if (saveIcons) {
+            //
+            for (final icon in _pickedIcons) {
+              await _model.saveIcon(icon);
+            }
+          }
+        }
+      }
+      _favIcons = await _model.listIcons();
+    }
+    return save;
+  }
+
+  /// Merely picked and added to the list but not saved.
+  bool pickedIcon(String? icon) {
+    final picked = icon != null;
+    if (picked) {
+      data.icon = icon;
+      _pickedIcons.add(icon);
+      _favIcons?.add({'icon': icon});
+    }
+    return picked;
+  }
+
+  /// Save the list of picked icons.
+  Future<bool> savePickedIcons() async {
+    bool save = _pickedIcons.isNotEmpty;
+    if (save) {
+      for (final icon in _pickedIcons) {
+        final saved = await _model.saveIcon(icon);
+        if (!saved) {
+          save = false;
+        }
+      }
+    }
     _favIcons = await _model.listIcons();
     return save;
   }
@@ -180,7 +226,8 @@ class Controller extends StateXController with ConnectivityListener {
   }
 
   ///
-  Future<bool> save(Map<String, dynamic> data) => _model.save(data);
+  Future<Map<String, dynamic>> save(Map<String, dynamic> rec) async =>
+      _model.save(rec);
 
   /// Save just to the local database and not to Firebase
   Future<bool> saveRec(Map<String, dynamic> data) => _model.saveRec(data);
@@ -253,9 +300,9 @@ class Controller extends StateXController with ConnectivityListener {
   /// Set local records as updated so to sync with other devices.
   Future<bool> syncOtherDevices() => _model.syncOtherDevices();
 
-  ///
-  // ignore: avoid_positional_boolean_parameters
-  bool itemsOrdered([bool? ordered]) => _model.itemsOrdered(ordered);
+  // ///
+  // // ignore: avoid_positional_boolean_parameters
+  // bool itemsOrdered([bool? ordered]) => _model.itemsOrdered(ordered);
 
   ///
   Future<void> setAlarms(List<Map<String, dynamic>> list) async {
@@ -467,28 +514,41 @@ class ToDoEdit extends DataFields {
       'LEDColor': notifyColor,
     };
     if (save && !con.sameRec(newRec: rec, oldRec: todo)) {
-      save = await saveRec(rec, todo);
+      save = await saveRec(rec);
       await query();
     }
     return save;
   }
 
   ///
-  Future<bool> saveRec(
-          Map<String, dynamic> diffRec, Map<String, dynamic>? oldRec) =>
-      save(con.newRec(diffRec, oldRec));
+  Future<bool> saveRec(Map<String, dynamic> diffRec) =>
+      save(con.newRec(diffRec, todo));
 
   @override
   Future<bool> save(Map<String, dynamic> rec) async {
     //
     rec['TimeZone'] = Prefs.getString('timezone');
 
-    var save = await con.save(rec);
+    final savedRec = await con.save(rec);
 
-    if (save && !kIsWeb) {
-      final id = await con.setNotification(rec);
-      save = id > -1;
+    var save = savedRec.isNotEmpty;
+
+    if (save) {
+      // Important to update the 'interface' record
+      if (todo == null) {
+        todo = Map.from(savedRec);
+      } else {
+        todo?.addAll(savedRec);
+      }
+
+      if (!kIsWeb) {
+        //
+        final id = await con.setNotification(rec);
+
+        save = id > -1;
+      }
     }
+
     return save;
   }
 

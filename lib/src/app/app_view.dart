@@ -1,5 +1,14 @@
 ///
+export 'package:workingmemory/src/app/view/fav_icons.dart';
+
+///
+export 'package:workingmemory/src/app/view/led_color.dart';
+
+///
 export 'package:workingmemory/src/app/view/loading_screen.dart';
+
+///
+export 'package:workingmemory/src/app/view/phone_sounds.dart';
 
 ///
 export 'package:workingmemory/src/app/view/menu/color_picker.dart';

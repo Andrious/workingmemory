@@ -34,9 +34,12 @@ class Model {
   late CloudDB _cloud;
   late FireBaseDB _fbDB;
   late IconFavourites _iconDB;
+  late Settings _settings;
 
   ///
   static const dbKeyField = 'rowid';
+
+  ///
   static const fbKeyField = 'KeyFld';
 
   ///flutter doctor -v
@@ -46,6 +49,8 @@ class Model {
     _cloud = CloudDB();
     _tToDo = ToDo();
     _iconDB = IconFavourites();
+    _settings = Settings();
+    await _settings.initAsync();
 
     bool init = await _fbDB.initAsync();
     // No database on the Web
@@ -82,7 +87,7 @@ class Model {
       final Map<String, dynamic> map = await _fbDB.records();
       recs.add(map);
     } else {
-      recs = await _tToDo.notDeleted(ordered: itemsOrdered());
+      recs = await _tToDo.notDeleted(orderBy: itemsOrderPrefs());
     }
     return recs;
   }
@@ -130,47 +135,62 @@ class Model {
   }
 
   ///
-  Future<bool> saveIcon(String icon) async {
+  Future<bool> saveIcon(String? icon) async {
     bool save;
+    if (icon == null) {
+      save = false;
+    }
     if (kIsWeb) {
-      save = await _iconDB.saveRef(icon);
+      save = await _iconDB.saveRef(icon!);
     } else {
-      save = await _iconDB.saveRec(icon);
+      save = await _iconDB.saveRec(icon!);
+    }
+    return save;
+  }
+
+  /// Delete the favourite icon
+  Future<bool> deleteIcon(String? icon) async {
+    bool save;
+    if (icon == null) {
+      save = false;
+    }
+    if (kIsWeb) {
+      save = await _iconDB.saveRef(icon!);
+    } else {
+      save = await _iconDB.deleteRec(icon!);
     }
     return save;
   }
 
   /// Save record to local database and Firebase and other devices.
-  Future<bool> save(Map<String, dynamic> data) async {
+  Future<Map<String, dynamic>> save(Map<String, dynamic> rec) async {
     //
-    Map<String, dynamic> newRec;
     bool save;
-    bool newFireRec;
 
     // There is no 'local' database
     if (kIsWeb) {
       //
       save = true;
 
-      newRec = data;
-
-      newFireRec = newRec[fbKeyField] == null;
-
-      if (newFireRec) {
-        newRec[fbKeyField] = null;
+      if (rec[fbKeyField] == null) {
+        rec[fbKeyField] = null;
       }
     } else {
       //
-      newRec = validRec(data);
+      rec = validRec(rec);
 
-      save = await saveToDB(newRec);
+      save = rec.isNotEmpty;
+
+      if (save) {
+        save = await saveToDB(rec);
+      }
     }
 
     if (save) {
       // Save to Firebase and update SQLite
-      await saveToFB(newRec);
+      await saveToFB(rec);
     }
-    return save;
+    return rec;
   }
 
   /// Save record to local database and Firebase and other devices.
@@ -362,7 +382,8 @@ class Model {
   ///
   Future<bool> unDelete(Map<String, dynamic> data) async {
     data['deleted'] = 0;
-    return save(data);
+    final savedRec = await save(data);
+    return savedRec.isNotEmpty;
   }
 
   ///
@@ -380,7 +401,9 @@ class Model {
 
     rec[0]['deleted'] = 1;
 
-    final bool delete = await save(rec[0]);
+    final savedRec = await save(rec[0]);
+
+    final bool delete = savedRec.isNotEmpty;
 
     return delete;
   }
@@ -401,6 +424,7 @@ class Model {
   ///
   void dispose() {
     if (!App.hotReload) {
+      _settings.dispose();
       _fbDB.dispose();
       _cloud.dispose();
       _tToDo.disposed();
@@ -533,11 +557,12 @@ class Model {
   // }
 
   ///
-  bool itemsOrdered([bool? ordered]) {
+  // ignore: avoid_positional_boolean_parameters
+  String itemsOrderPrefs([String? ordered]) {
     if (ordered == null) {
-      ordered = Settings.getOrder();
+      ordered = Settings.itemsOrder;
     } else {
-      Settings.setOrder(ordered);
+      Settings.setItemsOrderPrefs(ordered);
     }
     return ordered;
   }

@@ -11,99 +11,78 @@ import 'package:flutter_material_color_picker/flutter_material_color_picker.dart
 ///
 class ColorPicker {
   ///
-  static Color get color => _color;
-
-  ///
-  static set color(Color? color) {
-    if (color != null) {
-      _color = color;
-    }
-  }
-
-  static Color _color = Colors.red;
-
-  ///
-  static ColorSwatch<int?> get colorSwatch => _colorSwatch;
-
-  ///
-  static set colorSwatch(ColorSwatch<int?> swatch) {
-    _color = swatch;
-    _colorSwatch = swatch;
-  }
-
-  static ColorSwatch<int?> _colorSwatch = Colors.red;
-
-  ///
-  static bool allowShades = false;
-
-  ///
-  static double get circleSize => _circleSize;
-
-  ///
-  static set circleSize(double size) {
-    if (size > 1.0) {
-      _circleSize = size;
-    }
-  }
-
-  static double _circleSize = 60;
-
-  ///
-  static IconData iconSelected = Icons.check;
-
-  // ignore: avoid_setters_without_getters
-  static set onColorChange(ValueChanged<Color> func) => _onColorChange = func;
-  static ValueChanged<Color>? _onColorChange;
-
-  // ignore: avoid_setters_without_getters
-  static set onChange(ValueChanged<ColorSwatch<int?>> func) => _onChange = func;
-  static ValueChanged<ColorSwatch<int?>>? _onChange;
-
-  ///
-  static List<ColorSwatch<int?>> get colors => Colors.primaries;
-
-//  static Text title = const Text('Colour Theme');
-
-  ///
-  static Future<ColorSwatch<int>?> showColorPicker({
+  static Future<ColorSwatch<int>?> show({
     required BuildContext context,
+    Color? selectedColor,
+    ColorSwatch<int?>? colorSwatch,
     ValueChanged<Color>? onColorChange,
     ValueChanged<ColorSwatch<int?>>? onChange,
-    bool shrinkWrap = false,
+    List<MaterialColor>? colors,
+    bool? shrinkWrap,
+    ScrollPhysics? physics,
+    bool? allowShades,
+    bool? onlyShadeSelection,
+    double? circleSize,
+    double? spacing,
+    IconData? iconSelected,
+    VoidCallback? onBack,
+    double? elevation,
+    Widget? title,
+    EdgeInsetsGeometry? titlePadding,
+    TextStyle? titleTextStyle,
+    EdgeInsetsGeometry? contentPadding,
+    Color? backgroundColor,
+    String? semanticLabel,
+    EdgeInsets? insetPadding,
+    Clip? clipBehavior,
+    ShapeBorder? shape,
+    AlignmentGeometry? alignment,
   }) {
     return showDialog<ColorSwatch<int>>(
       context: context,
-      builder: (BuildContext context) => SimpleDialog(children: <Widget>[
-        MaterialColorPicker(
-          selectedColor: _color,
-          onColorChange: (Color color) {
-            _color = color;
-            if (onColorChange != null) {
-              onColorChange(color);
-            }
-            if (_onColorChange != null) {
-              _onColorChange!(color);
-            }
-            Navigator.pop(context, color);
-          },
-          onMainColorChange: (ColorSwatch<dynamic>? color) {
-            _color = color!;
-            _colorSwatch = color as ColorSwatch<int?>;
-            if (onChange != null) {
-              onChange(color);
-            }
-            if (_onChange != null) {
-              _onChange!(color);
-            }
-            Navigator.pop(context, color);
-          },
-          colors: colors,
-          allowShades: allowShades, // default true
-          iconSelected: iconSelected,
-          circleSize: circleSize,
-          shrinkWrap: shrinkWrap,
-        ),
-      ]),
+      builder: (BuildContext context) => SimpleDialog(
+          title: title,
+          titlePadding:
+              titlePadding ?? const EdgeInsets.fromLTRB(24, 24, 24, 0),
+          titleTextStyle: titleTextStyle,
+          contentPadding:
+              contentPadding ?? const EdgeInsets.fromLTRB(0, 12, 0, 16),
+          backgroundColor: backgroundColor,
+          elevation: elevation,
+          semanticLabel: semanticLabel,
+          insetPadding: insetPadding ??
+              const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+          clipBehavior: clipBehavior ?? Clip.none,
+          shape: shape,
+          alignment: alignment,
+          children: <Widget>[
+            MaterialColorPicker(
+              selectedColor: selectedColor ?? const Color(0xffff0000),
+              onColorChange: (Color color) {
+                selectedColor = color;
+                if (onColorChange != null) {
+                  onColorChange(color);
+                }
+                Navigator.pop(context, color);
+              },
+              onMainColorChange: (ColorSwatch<dynamic>? color) {
+                selectedColor = color!;
+                colorSwatch = color as ColorSwatch<int?>;
+                if (onChange != null) {
+                  onChange(color);
+                }
+                Navigator.pop(context, color);
+              },
+              colors: colors ?? Colors.primaries,
+              allowShades: allowShades ?? false,
+              shrinkWrap: shrinkWrap ?? true,
+              circleSize: circleSize ?? 60,
+              spacing: spacing ?? 9,
+              iconSelected: iconSelected ?? Icons.check,
+              onBack: onBack,
+              elevation: elevation,
+            ),
+          ]),
     );
   }
 

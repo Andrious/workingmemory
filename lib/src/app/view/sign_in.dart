@@ -39,7 +39,7 @@ class _SignInState extends StateX<SignIn> {
   // Widget working = const SizedBox();
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildIn(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Row(
         mainAxisAlignment: MainAxisAlignment.center,

@@ -8,6 +8,66 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:761477102089:android:b3e4df40871d7779",
+        "android_client_info": {
+          "package_name": "com.andrioussolutions.authenticationapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "761477102089-13mh6shgvlvl0nhbucv0aurqqbsk85eh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.andrioussolutions.authenticationapp",
+            "certificate_hash": "5cfeab9eb6414dd2672b5316452844bdf01d8d96"
+          }
+        },
+        {
+          "client_id": "761477102089-nvjf1gpjr89mkvhld3kukp831r0ep1qi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.andrioussolutions.authenticationapp",
+            "certificate_hash": "05689dec41e538861feb41e124622eb70f9b898a"
+          }
+        },
+        {
+          "client_id": "761477102089-pi78pbl68rfshfk8lblrpd5ap1vv1dl6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.andrioussolutions.authenticationapp",
+            "certificate_hash": "38251b3b1151a3502191872d0741f46b6e8c3e03"
+          }
+        },
+        {
+          "client_id": "761477102089-bm79fr25ibhc3sebbn0mguj48fk9r73p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpSv3EJpHCvQj4Qkur1X-Y3ooZWFo5i1E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "761477102089-bm79fr25ibhc3sebbn0mguj48fk9r73p.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "761477102089-aagj9gv953797r2gmpj9fvh5p8b2uc98.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.andrioussolutions.authenticationApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:761477102089:android:ecbfc1109769ee45",
         "android_client_info": {
           "package_name": "com.andrioussolutions.workingmemory"
@@ -15,50 +75,19 @@
       },
       "oauth_client": [
         {
-          "client_id": "761477102089-bm79fr25ibhc3sebbn0mguj48fk9r73p.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBpSv3EJpHCvQj4Qkur1X-Y3ooZWFo5i1E"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:761477102089:android:105a59b023d9135b",
-        "android_client_info": {
-          "package_name": "com.gtfp.workingmemory"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "761477102089-v1srtagaqiaubte91hbdg337f9vjpclg.apps.googleusercontent.com",
+          "client_id": "761477102089-3tt35g31tg9246igb9qdecob4t2ulllg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.gtfp.workingmemory",
-            "certificate_hash": "0bca4fe57862d7406c20407958ab752dd4d33375"
+            "package_name": "com.andrioussolutions.workingmemory",
+            "certificate_hash": "38251b3b1151a3502191872d0741f46b6e8c3e03"
           }
         },
         {
-          "client_id": "761477102089-qihk55871jg3ck3pqbff5c3jgeut2jk9.apps.googleusercontent.com",
+          "client_id": "761477102089-sa9ou53ji0lhlclto26bvjqogd8d0292.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.gtfp.workingmemory",
-            "certificate_hash": "f3a63ead2d7bcd4d5e2d5fa7d3e92b1d6161f4ed"
+            "package_name": "com.andrioussolutions.workingmemory",
+            "certificate_hash": "b1f334caa55d8fb715d0577baeb1415708f60d74"
           }
         },
         {
@@ -72,27 +101,20 @@
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 2,
           "other_platform_oauth_client": [
             {
               "client_id": "761477102089-bm79fr25ibhc3sebbn0mguj48fk9r73p.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "761477102089-e8hvkadoe046lk17ke57i25ld4ff1sf5.apps.googleusercontent.com",
+              "client_id": "761477102089-aagj9gv953797r2gmpj9fvh5p8b2uc98.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.andrioussolutions.workingmemory"
+                "bundle_id": "com.andrioussolutions.authenticationApp"
               }
             }
           ]
-        },
-        "ads_service": {
-          "status": 2
         }
       }
     }

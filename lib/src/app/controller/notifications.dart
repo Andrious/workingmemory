@@ -6,6 +6,8 @@ import 'dart:ui';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:timezone/timezone.dart' as tz;
 
+import 'package:workingmemory/src/controller.dart';
+
 import 'package:workingmemory/src/view.dart';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';

@@ -1,37 +1,7 @@
-buildscript {
-    ext.kotlin_version = '1.7.20'
-    repositories {
-        // Add Google's Maven repository (if it's not there already).
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-		  // Otherwise, Default FirebaseApp is not initialized in this process
-//          classpath 'com.android.tools.build:gradle:4.0.2'
-        classpath 'com.android.tools.build:gradle:7.1.3'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        // Google Services Gradle plugin
-          classpath 'com.google.gms:google-services:4.3.14'
-          // Firebase Crashlytics
-          classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.2'
-    }
-
-//    configurations.all {
-//       resolutionStrategy {
-//          force 'com.android.support:support-v4:27.1.0'
-//       }
-//    }
-}
-
 allprojects {
     repositories {
         google()
         mavenCentral()
-    }
-
-    tasks.withType(JavaCompile) {
-        options.compilerArgs << "-Xlint:deprecation,unchecked"
     }
 }
 
@@ -43,6 +13,6 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-task clean(type: Delete) {
+tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

@@ -5,9 +5,10 @@ import 'package:workingmemory/src/view.dart';
 ///
 ///
 ///
-class AListTile extends StatefulWidget {
+class AlignListTile extends StatelessWidget {
+  //} StatefulWidget {
   ///
-  const AListTile({
+  const AlignListTile({
     super.key,
     this.title,
     this.subtitle,
@@ -35,36 +36,39 @@ class AListTile extends StatefulWidget {
   /// The color for the tile's [Material] when it has the input focus.
   final bool? autofocus;
 
-  @override
-  State<StatefulWidget> createState() => _AListTileState();
-}
-
-class _AListTileState extends State<AListTile> {
+//   @override
+//   State<StatefulWidget> createState() => _AListTileState();
+// }
+//
+// class _AListTileState extends State<AListTile> {
   @override
   Widget build(BuildContext context) {
     Widget? leading;
     Widget? trailing;
-    final _leftHanded = Settings.isLeftHanded();
+    final _leftHanded = Settings.leftSided;
 
     if (_leftHanded) {
-      leading = widget.box;
+      leading = box; //widget.box;
     } else {
-      trailing = widget.box;
+      trailing = box; //widget.box;
     }
     return ListTile(
       leading: leading,
       title: Align(
         alignment: _leftHanded ? Alignment.center : Alignment.centerLeft,
-        child: widget.title ?? const Text(''),
+        child: title ?? const Text(''), // widget.title ?? const Text(''),
       ),
-      subtitle: Align(
-        alignment: _leftHanded ? Alignment.centerRight : Alignment.centerLeft,
-        child: widget.subtitle ?? const Text(''),
-      ),
+      subtitle: subtitle == null // widget.subtitle == null
+          ? null
+          : Align(
+              alignment:
+                  _leftHanded ? Alignment.centerRight : Alignment.centerLeft,
+              child: subtitle, //widget.subtitle,
+            ),
       trailing: trailing,
-      onTap: widget.onTap,
-      selected: widget.selected ?? false,
-      autofocus: widget.autofocus ?? false,
+      onTap: onTap, // widget.onTap,
+      selected: selected ?? false, // widget.selected ?? false,
+      autofocus: autofocus ?? false, // widget.autofocus ?? false,
     );
   }
 }

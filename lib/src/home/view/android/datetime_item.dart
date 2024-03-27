@@ -28,8 +28,11 @@ class DTAndroid extends StatelessWidget {
         time = TimeOfDay(hour: dateTime.hour, minute: dateTime.minute),
         super(key: key);
 
+  ///
   final DateTime date;
+  ///
   final TimeOfDay time;
+  ///
   final ValueChanged<DateTime> onChanged;
 
   @override

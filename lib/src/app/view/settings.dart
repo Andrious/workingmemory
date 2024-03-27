@@ -31,7 +31,7 @@ class SettingsWidget extends StatefulWidget {
 }
 
 class _SettingsWidgetState extends StateX<SettingsWidget> {
-  _SettingsWidgetState() : super(ThemeController()) {
+  _SettingsWidgetState() : super(controller: ThemeController()) {
     _theme = controller as ThemeController;
   }
   late ThemeController _theme;
@@ -39,30 +39,55 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
   @override
   void initState() {
     super.initState();
-    _descending = Settings.getOrder();
-    _leftHanded = Settings.isLeftHanded();
+    _itemsOrder = Settings.itemsOrder;
+    _leftSided = Settings.leftSided ? 'Left' : 'Right';
+    _showSortArrow = Settings.showBottomBar;
+    _leadingIcon = Settings.leadingIcon;
+    _leadingDrawer = Settings.leadingDrawer;
+    _portraitOnly = Settings.portraitOnly;
+    _wasPortrait = _portraitOnly;
+
     _con = Controller();
   }
 
-  late bool _descending;
-  late bool _leftHanded;
+  late String _itemsOrder;
+  late String _leftSided;
+  late bool _showSortArrow;
+  late bool _leadingIcon;
+  late bool _leadingDrawer;
+  late bool _portraitOnly;
+  late bool _wasPortrait;
+
   late Controller _con;
   bool? _refresh;
 
   @override
   void dispose() {
-    super.dispose();
-    if (_refresh == true) {
+    //
+    if (_refresh ?? false) {
+      //
       _con.requery();
+
+      // Set in portrait or not
+      if (_wasPortrait) {
+        if (!_portraitOnly) {
+          Settings.setPortraitOnly(_portraitOnly);
+        }
+      } else if (_portraitOnly) {
+        Settings.setPortraitOnly(_portraitOnly);
+      }
     }
+    super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => ListView(
-        children: _cardSettings(),
+  Widget buildIn(BuildContext context) => ListView(
+        physics: App.useCupertino ? null : const NeverScrollableScrollPhysics(),
+        children: _settingsList(),
       );
 
-  List<Widget> _cardSettings() {
+  List<Widget> _settingsList() {
+    //
     final List<Widget> settings = [
       Card(
         child: Column(children: _interfacePreference()),
@@ -83,7 +108,7 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
             Expanded(
                 child: ListTile(
               title: L10n.t(
-                'NOTIFICATIONS PREFERENCES',
+                'NOTIFICATIONS PREFERENCES'.tr,
               ),
             ))
           ]),
@@ -91,36 +116,36 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
             InkWell(
                 onTap: () => _theme.showNotifications(),
                 child: L10n.t(
-                  'Notification Settings',
+                  'Notification Settings'.tr,
                 )),
           ]),
-          Row(children: const [Text('')]),
-          Row(children: [
-            Expanded(
-              child: InkWell(
+          const Row(children: [Text('')]),
+          if (!kIsWeb)
+            InkWell(
                 onTap: () => _theme.showSounds(),
-                child: L10n.t(
-                  'Notification Sounds',
-                  softWrap: true,
+                child: Row(children: [
+                  L10n.t(
+                    'Notification Sounds'.tr,
+                    softWrap: true,
+                  ),
+                ])),
+          if (!kIsWeb) const Row(children: [Text('')]),
+          if (!kIsWeb)
+            Row(children: [
+              Expanded(
+                child: InkWell(
+                  onTap: () => _theme.showLEDColour(),
+                  child: L10n.t(
+                    'LED Colour'.tr,
+                    softWrap: true,
+                  ),
                 ),
               ),
+            ]),
+          if (!kIsWeb)
+            const Row(
+              children: [Text('')],
             ),
-          ]),
-          Row(children: const [Text('')]),
-          Row(children: [
-            Expanded(
-              child: InkWell(
-                onTap: () => _theme.showLEDColour(),
-                child: L10n.t(
-                  'LED Colour',
-                  softWrap: true,
-                ),
-              ),
-            ),
-          ]),
-          Row(
-            children: const [Text('')],
-          ),
         ]),
       ),
       Card(
@@ -129,7 +154,7 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
             Expanded(
                 child: ListTile(
               title: L10n.t(
-                'RECORD PREFERENCES',
+                'RECORD PREFERENCES'.tr,
               ),
             ))
           ]),
@@ -137,18 +162,18 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
             InkWell(
                 onTap: () {},
                 child: L10n.t(
-                  'Item Record Preferences',
+                  'Item Record Preferences'.tr,
                 )),
           ]),
-          Row(
-            children: const [Text('')],
+          const Row(
+            children: [Text('')],
           ),
           Row(children: [
             Expanded(
               child: InkWell(
                 onTap: () {},
                 child: Text('${L10n.s(
-                  'How certain records are further handled',
+                  'How certain records are further handled'.tr,
                 )}\n'),
               ),
             ),
@@ -164,12 +189,10 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
         ),
       ),
     ]);
-
     return settings;
   }
 
   List<Widget> _interfacePreference() {
-    final darkMode = _theme.isDarkMode;
     final List<Widget> interface = [
       Row(children: [
         Expanded(
@@ -177,67 +200,12 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
           title: L10n.t('INTERFACE PREFERENCES'),
         ))
       ]),
-      Row(children: [
-        InkWell(
-            onTap: () {},
-            child: L10n.t(
-              'Sorted Order of Items',
-            )),
-      ]),
-      Row(
-        children: const [Text('')],
-      ),
-      Row(children: [
-        Expanded(
-          child: L10n.t(
-            'Check so the items are in descending order with the most recent items listed first',
-          ),
-        ),
-        Checkbox(
-          value: _descending,
-          onChanged: orderItems,
-        ),
-      ]),
-      Row(children: [
-        Expanded(
-          child: L10n.t(
-            'Left-handed user',
-          ),
-        ),
-        Checkbox(
-          value: _leftHanded,
-          onChanged: switchButton,
-        ),
-      ]),
-      ListTile(
-        leading: darkMode
-            ? Image.asset(
-                'assets/images/moon.png',
-                height: 30,
-                width: 26,
-              )
-            : Image.asset(
-                'assets/images/sunny.png',
-                height: 30,
-                width: 26,
-              ),
-        title: L10n.t('Dark Mode'),
-        trailing: Switch(
-          value: darkMode,
-          onChanged: (val) {
-            if (val) {
-              final theme = _theme.setDarkMode();
-              App.themeData = theme;
-              App.iOSTheme = theme;
-            } else {
-              _theme.isDarkMode = false;
-              App.setThemeData();
-            }
-            setState(() {});
-            App.setState(() {});
-          },
-        ),
-      ),
+      itemsOrder(),
+      alignLeftOrRight(),
+      itemIconListTile(),
+      drawerListTile(),
+      portraitListTile(),
+      darkModeListTile(),
     ];
 
     if (App.useCupertino) {
@@ -282,22 +250,197 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
     return interface;
   }
 
-  // ignore: avoid_positional_boolean_parameters
-  void orderItems(bool? value) {
-    Settings.setOrder(value!);
-    setState(() {
-      _descending = value;
-    });
+  void orderItems(String? value) {
+    Settings.itemsOrder = value;
+    setState(() => _itemsOrder = Settings.itemsOrder);
     _refresh = true;
   }
 
   // ignore: avoid_positional_boolean_parameters
-  void switchButton(bool? value) {
-    if (value != null) {
-      Settings.setLeftHanded(value);
-      setState(() => _leftHanded = value);
-      _con.setState(() {});
-    }
+  void leftSided(String value) {
+//    if (value != null) {
+    _leftSided = value;
+    Settings.leftSided = value == 'Left';
+    setState(() {});
+    _con.setState(() {});
+//    }
+  }
+
+  ///
+  Widget itemsOrder() => Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            // Row(children: [
+            //   L10n.t('Order:'),
+            // ]),
+            Flexible(child: L10n.t('Order')),
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              Flexible(
+                child: CupertinoSegmentedControl<String>(
+                  groupValue: _itemsOrder,
+                  onValueChanged: orderItems,
+                  children: const {
+                    'ascending': Text(' Ascending '),
+                    'descending': Text('Descending'),
+                  },
+                ),
+              ),
+              Flexible(
+                child: Checkbox(
+                  value: _showSortArrow,
+                  onChanged: (bool? value) {
+                    if (value != null) {
+                      Settings.showBottomBar = value;
+                      _showSortArrow = value;
+                      setState(() {});
+                      _con.setState(() {});
+                    }
+                  },
+                ),
+              ),
+            ]),
+          ]);
+
+  ///
+  Widget alignLeftOrRight() =>
+      Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+        L10n.t(
+          'Interface sided:',
+        ),
+        CupertinoSegmentedControl<String>(
+//          padding: const EdgeInsets.symmetric(horizontal: 12),
+          // This represents a currently selected segmented control.
+          groupValue: _leftSided,
+          onValueChanged: leftSided,
+          children: {
+            'Left': L10n.t('  Left  '),
+            'Right': L10n.t('  Right '),
+          },
+        ),
+        const SizedBox(width: 30),
+      ]);
+  // Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+  //   L10n.t(
+  //     '$_leftSided side:',
+  //   ),
+  //   Row(children: [
+  //     Radio<String>(
+  //       value: 'Left',
+  //       groupValue: _leftSided,
+  //       onChanged: leftSided,
+  //     ),
+  //     Radio<String>(
+  //       value: 'Right',
+  //       groupValue: _leftSided,
+  //       onChanged: leftSided,
+  //     ),
+  //   ]),
+  //   const SizedBox(width: 30),
+  // ]);
+
+  Widget itemIconListTile() => ListTile(
+        leading: _leadingIcon
+            ? const Icon(
+                Icons.view_list_sharp,
+              )
+            : Transform.scale(
+                scaleX: -1,
+                child: const Icon(
+                  Icons.view_list_sharp,
+                ),
+              ),
+        title: L10n.t(
+          'Leading Icon',
+        ),
+        trailing: Switch(
+          value: _leadingIcon,
+          onChanged: (value) {
+            _leadingIcon = value;
+            Settings.leadingIcon = value;
+            _refresh = true;
+            setState(() {});
+          },
+        ),
+      );
+
+  Widget drawerListTile() => ListTile(
+        leading: _leadingDrawer
+            ? const Icon(
+                Icons.view_sidebar,
+              )
+            : Transform.scale(
+                scaleX: -1,
+                child: const Icon(
+                  Icons.view_sidebar,
+                ),
+              ),
+        title: L10n.t(
+          'Leading Drawer',
+        ),
+        trailing: Switch(
+          value: _leadingDrawer,
+          onChanged: (value) {
+            _leadingDrawer = value;
+            Settings.leadingDrawer = value;
+            _refresh = true;
+            setState(() {});
+          },
+        ),
+      );
+
+  Widget portraitListTile() => ListTile(
+        leading: _portraitOnly
+            ? const Icon(
+                Icons.crop_portrait,
+              )
+            : const Icon(
+                Icons.crop_landscape,
+              ),
+        title: L10n.t(
+          'Portrait Only',
+        ),
+        trailing: Switch(
+          value: _portraitOnly,
+          onChanged: (value) {
+            _portraitOnly = value;
+            _refresh = true;
+            setState(() {});
+          },
+        ),
+      );
+
+  Widget darkModeListTile() {
+    final darkMode = _theme.isDarkMode;
+    return ListTile(
+      leading: darkMode
+          ? Image.asset(
+              'assets/images/moon.png',
+              height: 30,
+              width: 26,
+            )
+          : Image.asset(
+              'assets/images/sunny.png',
+              height: 30,
+              width: 26,
+            ),
+      title: L10n.t('Dark Mode'),
+      trailing: Switch(
+        value: darkMode,
+        onChanged: (val) {
+          if (val) {
+            final theme = _theme.setDarkMode();
+            App.themeData = theme;
+            App.iOSThemeData = theme;
+          } else {
+            _theme.isDarkMode = false;
+            App.setThemeData();
+          }
+          setState(() {});
+          App.setState(() {});
+        },
+      ),
+    );
   }
 
   // A custom error routine if you want.
@@ -307,13 +450,37 @@ class _SettingsWidgetState extends StateX<SettingsWidget> {
   }
 }
 
+// /// Locale iOS Spinner
+// class LocaleSpinner extends ISOSpinner {
+//   ///
+//   LocaleSpinner({super.key})
+//       : super(
+//           initialItem: L10n.supportedLocales.indexOf(App.locale!),
+//           supportedLocales: L10n.supportedLocales,
+//           onSelectedItemChanged: (int index) async {
+//             // Retrieve the available locales.
+//             final locale = L10n.getLocale(index);
+//             if (locale != null) {
+//               App.locale = locale;
+//               App.setState(() {});
+//             }
+//           },
+//         );
+// }
+
 /// Locale iOS Spinner
-class LocaleSpinner extends ISOSpinner {
+class LocaleSpinner extends SpinnerCupertino<Locale> {
   ///
   LocaleSpinner({super.key})
       : super(
-          initialItem: L10n.supportedLocales.indexOf(App.locale!),
-          supportedLocales: L10n.supportedLocales,
+          initValue: App.locale!,
+          values: L10n.supportedLocales,
+          itemBuilder: (BuildContext context, int index) => Text(
+            L10n.supportedLocales[index].countryCode == null
+                ? L10n.supportedLocales[index].languageCode
+                : '${L10n.supportedLocales[index].languageCode}-${L10n.supportedLocales[index].countryCode}',
+            style: const TextStyle(fontSize: 20),
+          ),
           onSelectedItemChanged: (int index) async {
             // Retrieve the available locales.
             final locale = L10n.getLocale(index);

@@ -27,7 +27,7 @@ import 'package:workingmemory/src/controller.dart';
 ///
 class TodoAndroid extends StateX<TodoPage> {
   ///
-  TodoAndroid() : super(Controller()) {
+  TodoAndroid() : super(controller: Controller()) {
     _con = controller as Controller;
   }
   late Controller _con;
@@ -43,9 +43,14 @@ class TodoAndroid extends StateX<TodoPage> {
   late OffsetPrefs _offset;
   late BuildContext _scaffoldContext;
 
+  // The iOS version
   @override
-  Widget build(BuildContext context) {
-    final _leftHanded = Settings.isLeftHanded();
+  Widget buildiOS(BuildContext context) => buildAndroid(context);
+
+  // The Android version
+  @override
+  Widget buildAndroid(BuildContext context) {
+    final _leftHanded = Settings.leftSidedPrefs();
     return Scaffold(
       appBar: _appBar(title: _con.data.title, leftHanded: _leftHanded),
       body: Form(
@@ -70,10 +75,9 @@ class TodoAndroid extends StateX<TodoPage> {
         initPosition: _offset.get(),
         button: FloatingActionButton(
           onPressed: () async {
-            ScreenCircularProgressIndicator.start();
             final bool save = await _con.data.onPressed();
-            ScreenCircularProgressIndicator.stop();
             if (save) {
+              await _con.saveIcon(_con.data.icon);
               Navigator.of(_scaffoldContext, rootNavigator: true).pop();
             } else {
               ScaffoldMessenger.maybeOf(_scaffoldContext)?.showSnackBar(
@@ -92,8 +96,8 @@ class TodoAndroid extends StateX<TodoPage> {
       return true;
     }
 
-    final TextStyle dialogTextStyle = theme!.textTheme.subtitle1!
-        .copyWith(color: theme!.textTheme.caption!.color);
+    final TextStyle dialogTextStyle = theme!.textTheme.titleMedium!
+        .copyWith(color: theme!.textTheme.bodySmall!.color);
 
     return await showDialog<bool>(
           context: context,
@@ -148,24 +152,29 @@ class TodoAndroid extends StateX<TodoPage> {
       ]),
     ];
 
-    if (_con.favIcons!.isNotEmpty && _con.favIcons!.first.isNotEmpty) {
+    final _favIcons = _con.favIcons!;
+
+    if (_favIcons.isNotEmpty && _favIcons.first.isNotEmpty) {
       widgets.add(
-        Container(
-          height: 100,
-          decoration: BoxDecoration(
-            border: Border.all(width: 4),
-            borderRadius: const BorderRadius.all(Radius.circular(8)),
+        InkWell(
+          onLongPress: _editFavIcons,
+          child: Container(
+            height: 100,
+            decoration: BoxDecoration(
+              border: Border.all(width: 4),
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+            ),
+            child: IconItems(
+                icons: {
+                  for (var e in _favIcons) e.values.first: e.values.first
+                },
+                icon: _con.data.icon!,
+                onTap: (icon) {
+                  setState(() {
+                    _con.data.icon = icon;
+                  });
+                }),
           ),
-          child: IconItems(
-              icons: {
-                for (var e in _con.favIcons!) e.values.first: e.values.first
-              },
-              icon: _con.data.icon!,
-              onTap: (icon) {
-                setState(() {
-                  _con.data.icon = icon;
-                });
-              }),
         ),
       );
     }
@@ -181,7 +190,8 @@ class TodoAndroid extends StateX<TodoPage> {
               icons: _con.icons,
               icon: _con.data.icon!,
               onTap: (icon) async {
-                await _con.saveIcon(icon);
+//                await _con.saveIcon(icon);
+                _con.pickedIcon(icon);
                 setState(() {});
               },
             ),
@@ -198,11 +208,11 @@ class TodoAndroid extends StateX<TodoPage> {
 
     final settingsButton = ElevatedButton(
       onPressed: () {
-        final notifyColor = LEDColor(
-          pickerColor: Color(_con.data.notifyColor),
+        LEDColor.show(
+          context: context,
+          color: Color(_con.data.notifyColor),
           onColorChanged: (Color color) => _con.data.notifyColor = color.value,
         );
-        notifyColor.show(context);
       },
       child: const Icon(Icons.settings),
     );
@@ -250,12 +260,25 @@ class TodoAndroid extends StateX<TodoPage> {
     );
 
     // Switch the buttons around when indicated.
-    if (Settings.isLeftHanded()) {
+    if (Settings.leftSidedPrefs()) {
       temp = leading;
       leading = trailing;
       trailing = temp;
     }
     return [leading, trailing];
+  }
+
+  // Open a screen for you to manage your favourite icons.
+  Future<void> _editFavIcons() async {
+    //
+    final Route<Map<String, dynamic>> route = MaterialPageRoute(
+      settings: const RouteSettings(name: '/todo/favs'),
+      builder: (BuildContext context) => const FavIcons(),
+      fullscreenDialog: true,
+    );
+    await Navigator.of(context).push(route);
+    // Refresh the previous screen
+    setState(() {});
   }
 }
 

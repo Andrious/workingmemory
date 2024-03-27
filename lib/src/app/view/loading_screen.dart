@@ -75,20 +75,31 @@ class _LoadingScreenState extends State<LoadingScreen>
   }
 }
 
+///
 class WorkingSpinnerIndicator extends StatefulWidget {
+  ///
   WorkingSpinnerIndicator({super.key, this.spinning});
-  //
+
+  ///
   final bool? spinning;
 
   final List<_WorkingSpinIndicator?> _state = [];
 
+  ///
   void start() => spin(true);
 
+  ///
   void stop() => spin(false);
 
+  ///
   // ignore: avoid_positional_boolean_parameters
-  void spin([bool? work]) => _state[0]?._spin(work);
+  void spin([bool? work]) {
+    if (_state.isNotEmpty) {
+      _state[0]?._spin(work);
+    }
+  }
 
+  ///
   bool get working => _state.isNotEmpty && _state[0]!.spinning;
   set working(bool? work) => spin(work);
 
@@ -141,15 +152,21 @@ class _WorkingSpinIndicator extends State<WorkingSpinnerIndicator> {
   }
 }
 
+///
 class ScreenCircularProgressIndicator extends StatelessWidget {
+  ///
   const ScreenCircularProgressIndicator({super.key});
-  //
+
+  ///
   static final spinner = WorkingSpinnerIndicator();
 
+  ///
   static void start() => spinner.start();
 
+  ///
   static void stop() => spinner.stop();
 
+  ///
   // ignore: avoid_positional_boolean_parameters
   static void spin([bool? work]) => spinner.spin(work);
 

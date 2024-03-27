@@ -97,9 +97,11 @@ class ToDo extends SQLiteDB {
   Future<List<Map<String, dynamic>>> list() => getTable(ToDo.TABLE_NAME);
 
   ///
-  Future<List<Map<String, dynamic>>> notDeleted({bool ordered = false}) {
+  Future<List<Map<String, dynamic>>> notDeleted({String? orderBy}) {
     var select = _selectNotDeleted;
-    if (ordered) {
+    if (orderBy == 'descending') {
+      select = '$select order by datetime(DateTime) desc';
+    } else if (orderBy == 'ascending') {
       select = '$select order by datetime(DateTime)';
     }
     return rawQuery(select);

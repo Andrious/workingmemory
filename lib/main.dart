@@ -20,18 +20,14 @@ import 'package:workingmemory/src/controller.dart';
 
 import 'package:workingmemory/src/model.dart';
 
-import 'package:workingmemory/src/view.dart' hide runApp;
+import 'package:workingmemory/src/view.dart';
 
 void main() => runApp(WorkingMemory());
 
 ///
 class WorkingMemory extends AppStatefulWidget {
   ///
-  WorkingMemory({Key? key})
-      : super(
-          key: key,
-          errorScreen: const ErrorWidgetDisplay(stackTrace: true).builder,
-        );
+  WorkingMemory({Key? key}) : super(key: key);
 
   ///
   static final Key pageKey = UniqueKey();
@@ -42,8 +38,8 @@ class WorkingMemory extends AppStatefulWidget {
         controller: WorkingController(),
         switchUI: Prefs.getBool('switchUI'),
         title: 'Working Memory'.tr,
-        home: const TodosPage(),
         debugShowCheckedModeBanner: false,
+        debugPaintSizeEnabled: false,
         localizationsDelegates: [
           L10n.delegate,
           GlobalWidgetsLocalizations.delegate,
@@ -93,5 +89,6 @@ class WorkingMemory extends AppStatefulWidget {
         inTheme: () => ThemeController().setIfDarkMode(),
         // Example of possibly handling an error while starting up.
         inAsyncError: (details) => false,
+        home: const TodosPage(),
       );
 }

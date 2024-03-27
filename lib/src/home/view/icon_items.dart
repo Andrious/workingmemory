@@ -39,41 +39,37 @@ class IconItems extends StatelessWidget {
   Widget build(BuildContext context) {
     final icons = this.icons.keys;
     final Orientation orientation = MediaQuery.of(context).orientation;
-    return Column(
-      children: <Widget>[
-        Expanded(
-          child: SafeArea(
-            top: false,
-            bottom: false,
-            child: GridView.count(
-              crossAxisCount: (orientation == Orientation.portrait) ? 10 : 20,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-              physics: const ClampingScrollPhysics(),
-              padding: const EdgeInsets.all(4),
-              childAspectRatio:
-                  (orientation == Orientation.portrait) ? 1.0 : 1.2,
-              children: icons.where((dynamic icon) {
-                return IconData(int.tryParse(icon)!,
-                            fontFamily: 'MaterialIcons')
-                        .fontFamily !=
-                    null;
-              }).map((dynamic icon) {
-                return GestureDetector(
-                  onTap: () {
-                    onTap(icon);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(2),
-                    child: Icon(IconData(int.tryParse(icon)!,
-                        fontFamily: 'MaterialIcons')),
-                  ),
-                );
-              }).toList(),
+    // return Column(
+    //   children: <Widget>[
+    // Expanded(
+    // child:
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: GridView.count(
+        crossAxisCount: (orientation == Orientation.portrait) ? 10 : 20,
+        mainAxisSpacing: 4,
+        crossAxisSpacing: 4,
+        physics: const ClampingScrollPhysics(),
+        padding: const EdgeInsets.all(4),
+        childAspectRatio: (orientation == Orientation.portrait) ? 1.0 : 1.2,
+        children: icons.where((dynamic icon) {
+          return IconData(int.parse(icon), fontFamily: 'MaterialIcons')
+                  .fontFamily !=
+              null;
+        }).map((dynamic icon) {
+          return GestureDetector(
+            onTap: () {
+              onTap(icon);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(2),
+              child:
+                  Icon(IconData(int.parse(icon), fontFamily: 'MaterialIcons')),
             ),
-          ),
-        ),
-      ],
+          );
+        }).toList(),
+      ),
     );
   }
 }

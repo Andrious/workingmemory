@@ -18,61 +18,28 @@
 import 'dart:async' show Future;
 
 import 'package:auth/auth.dart' show Auth, GoogleListener, User;
+
 import 'package:firebase_core/firebase_core.dart' show Firebase;
+
 import 'package:firebase_crashlytics/firebase_crashlytics.dart'
     show FirebaseCrashlytics;
-import 'package:flutter/foundation.dart'
-    show FlutterErrorDetails, FlutterExceptionHandler, kIsWeb;
+
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 import 'package:fluttery_framework/controller.dart'; // as c;
+
 import 'package:package_info_plus/package_info_plus.dart' show PackageInfo;
+
 import 'package:workingmemory/src/controller.dart'
     show AppController, Controller, ThemeController;
+
 import 'package:workingmemory/src/model.dart'
     show CloudDB, DefaultFirebaseOptions, FireBaseDB, RemoteConfig;
+
 import 'package:workingmemory/src/view.dart'
-    show Prefs, ReportErrorHandler, showBox;
+    show AppErrorHandler, Prefs, showBox;
+
 import 'package:workingmemory/src/view.dart' as v;
-
-// ignore: avoid_void_async
-///
-Future<void> runApp(
-  Widget app, {
-  FlutterExceptionHandler? handler,
-  ErrorWidgetBuilder? builder,
-  ReportErrorHandler? report,
-  bool allowNewHandlers = false,
-}) async {
-  // Allow for FirebaseCrashlytics.instance
-  WidgetsFlutterBinding.ensureInitialized();
-
-  if (!kIsWeb) {
-    //
-    if (Firebase.apps.isEmpty) {
-      // Allow for FirebaseCrashlytics.instance
-      await Firebase
-          .initializeApp(); //(options: DefaultFirebaseOptions.currentPlatform);
-    }
-
-    // Supply Firebase Crashlytics
-    final FirebaseCrashlytics crash = FirebaseCrashlytics.instance;
-
-    handler ??= crash.recordFlutterError;
-
-    report ??= crash.recordError;
-
-    // If true, then crash reporting data is sent to Firebase.
-    // Send if in Production
-    await crash.setCrashlyticsCollectionEnabled(!App.inDebugger);
-  }
-
-  v.runApp(
-    app,
-    errorHandler: handler,
-    errorScreen: builder,
-    errorReport: report,
-    allowNewHandlers: allowNewHandlers,
-  );
-}
 
 /// The Controller for the Application as a whole.
 class WorkingController extends AppController {
@@ -87,6 +54,11 @@ class WorkingController extends AppController {
     init = await super.initAsync();
 
     if (init) {
+      // Set up the Error handling
+      init = await _setErrorHandler();
+    }
+
+    if (init) {
       // Set this app's theme.
       final _theme = ThemeController();
       init = await _theme.initAsync();
@@ -96,7 +68,7 @@ class WorkingController extends AppController {
       // Firebase remote configuration.
       _remoteConfig =
           RemoteConfig(key: 'rij;vwf553676-tgh2pc;jblrgncwjfc2cgncc');
-      // await _remoteConfig.initAsync();
+      await _remoteConfig.initAsync();
     }
 
     if (init) {
@@ -159,6 +131,38 @@ class WorkingController extends AppController {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     FireBaseDB.didChangeAppLifecycleState(state);
     CloudDB.didChangeAppLifecycleState(state);
+  }
+
+  /// Define the error handling
+  Future<bool> _setErrorHandler() async {
+    //
+    if (!kIsWeb) {
+      //
+      if (Firebase.apps.isEmpty) {
+        // Allow for FirebaseCrashlytics.instance
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      }
+
+      // Supply Firebase Crashlytics
+      final FirebaseCrashlytics crash = FirebaseCrashlytics.instance;
+
+      final handler = crash.recordFlutterError;
+
+      final report = crash.recordError;
+
+      AppErrorHandler(
+        handler: handler,
+        report: report,
+        allowNewErrorHandlers: false,
+      );
+
+      // If true, then crash reporting data is sent to Firebase.
+      // Send if in Production
+      await crash.setCrashlyticsCollectionEnabled(!App.inDebugMode);
+    }
+    return true;
   }
 
   ///
@@ -375,12 +379,6 @@ class WorkingController extends AppController {
 
   ///
   String get tokenId => _auth.idToken;
-
-  /// Override if you like to customize error handling.
-  @override
-  void onError(FlutterErrorDetails details) {
-    super.onError(details);
-  }
 
   ///
   bool get hasError => _error != null;
