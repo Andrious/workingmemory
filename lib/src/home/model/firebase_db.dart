@@ -24,10 +24,10 @@ import 'package:dbutils/firebase_db.dart' as f;
 
 import 'package:flutter/widgets.dart' show AppLifecycleState;
 
-import 'package:workingmemory/src/controller.dart'
+import '/src/controller.dart'
     show App, Controller, DeviceInfo, WorkingController;
 
-import 'package:workingmemory/src/model.dart';
+import '/src/model.dart';
 
 ///
 class FireBaseDB {

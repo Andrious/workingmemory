@@ -18,7 +18,7 @@
 
 import 'dart:async';
 
-import 'package:workingmemory/src/view.dart';
+import '/src/view.dart';
 
 import 'package:auto_orientation/auto_orientation.dart';
 
@@ -39,7 +39,7 @@ class Settings {
     return true;
   }
 
-  /// Save settings
+  ///
   void dispose() {}
 
   ///
@@ -254,8 +254,8 @@ class Settings {
   static void showAboutDialog(BuildContext context) {
     //
     final ThemeData themeData = Theme.of(context);
-    final TextStyle? aboutTextStyle = themeData.textTheme.bodyText1;
-    final TextStyle linkStyle = themeData.textTheme.bodyText1!
+    final TextStyle? aboutTextStyle = themeData.textTheme.bodyMedium;
+    final TextStyle linkStyle = themeData.textTheme.bodyMedium!
         .copyWith(color: themeData.colorScheme.secondary);
 
     AppSettings.showAbout(
@@ -294,8 +294,8 @@ class Settings {
   ///
   static List<Widget> aboutBoxChildren(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
-    final TextStyle? aboutTextStyle = themeData.textTheme.bodyText1;
-    final TextStyle linkStyle = themeData.textTheme.bodyText1!
+    final TextStyle? aboutTextStyle = themeData.textTheme.bodyMedium;
+    final TextStyle linkStyle = themeData.textTheme.bodyMedium!
         .copyWith(color: themeData.colorScheme.secondary);
     return [
       Padding(

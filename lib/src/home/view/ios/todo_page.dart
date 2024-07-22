@@ -19,11 +19,11 @@
 
 import 'dart:async' show Future;
 
-import 'package:workingmemory/src/model.dart' hide Icon;
+import '/src/model.dart' hide Icon;
 
-import 'package:workingmemory/src/view.dart';
+import '/src/view.dart';
 
-import 'package:workingmemory/src/controller.dart' show Controller, theme;
+import '/src/controller.dart' show Controller, theme;
 
 ///
 class TodoiOS extends StateX<TodoPage> {
@@ -66,8 +66,8 @@ class TodoiOS extends StateX<TodoPage> {
       return true;
     }
 
-    final TextStyle dialogTextStyle = theme!.textTheme.subtitle1!
-        .copyWith(color: theme!.textTheme.caption!.color);
+    final TextStyle dialogTextStyle = theme!.textTheme.titleSmall!
+        .copyWith(color: theme!.textTheme.labelMedium!.color);
 
     bool willPop;
 

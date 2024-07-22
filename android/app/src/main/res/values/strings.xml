@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Working Memory</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="enter_your_todo">Enter your item.</string>
+    <string name="save">Save</string>
+    <string name="new_item">New Item</string>
+    <string name="edit_item">Edit</string>
+    <string name="ok">OK</string>
+    <string name="edit">Edit</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+
+    <string name="facebook_app_id">148151165709299</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="snooze">Snooze</string>
+    <string name="delete">Delete</string>
+
+    <string name="five_min">5m</string>
+    <string name="ten_min">10m</string>
+    <string name="fifthteen_min">15m</string>
+    <string name="zero_min">0m</string>
+    <string name="twenty_min">20m</string>
+    <string name="thirty_min">30m</string>
+    <string name="forty_min">40m</string>
+    <string name="sixty_min">60m</string>
+
+    <string name="secs_off">Seconds Off</string>
+    <string name="secs_on">Seconds On</string>
+
+
+    <string name="inline_preferences">In-line preferences</string>
+    <string name="title_checkbox_preference">Checkbox preference</string>
+    <string name="summary_checkbox_preference">This is a checkbox</string>
+
+
+    <string name="interface_preferences">interface preferences</string>
+
+    <string name="order_list">Sorted Order of Items</string>
+    <string name="summary_order_list">Check so the items are in descending order with the most recent items listed first</string>
+
+    <string name="wallpaper_list">List Items on Wallpaper</string>
+    <string name="summary_wallpaper_list">Check so the items are listed on your phone\'s wallpaper</string>
+
+    <string name="left_handed">Switch around dialog buttons</string>
+    <string name="summary_left_handed">Possibly preferred by left-handed people.</string>
+
+
+    <string name="notification_preferences">Notification Preferences</string>
+
+    <string name="notification_settings">Notification Settings</string>
+    <string name="summary_notification_preferences">Notification behaviour, popup settings and LED Colour</string>
+
+    <string name="popup_notify">Use Popup Notification?</string>
+    <string name="summary_popup_notify">Show a popup window in addition to notification on the status bar.</string>
+
+    <string name="vib_notify">Vibrate On for Notification?</string>
+    <string name="summary_vib_notify">Accompany the Notification with a vibration.</string>
+
+    <string name="clear_notify">Clear Notification with Popup</string>
+    <string name="summary_clear_notify">Check to clear the accompanying notification when an item\'s popup message is only closed and not edited.</string>
+
+    <string name="use_LED">Use LED for Notification</string>
+    <string name="summary_use_LED">Check to use the phones LED during item notification.</string>
+
+    <string name="no_LED">Your phone does not use LED Notification.\r\nHence, this option is disabled.</string>
+
+    <string name="colour_preference">LED Colour Preference</string>
+    <string name="summary_colour_preference">Setting the LED colour used during notification</string>
+
+    <string name="notification_sound">Notification Sound Settings</string>
+    <string name="summary_notification_sound">Select the notification sound</string>
+
+    <string name="advance_mins">Advanced Minutes for New Items</string>
+    <string name="summary_advance_mins">Number of minutes advanced with a new item.</string>
+
+    <string name="dialog_based_preferences">Dialog-based preferences</string>
+    <string name="preference_attributes">Preference attributes</string>
+
+    <string name="title_switch_preference">Switch preference</string>
+    <string name="summary_switch_preference">This is a switch</string>
+    <string name="summary_switch_preference_yes_no">This is a switch with custom text</string>
+
+    <string name="title_yesno_preference">Yes or no preference</string>
+    <string name="summary_yesno_preference">An example that uses a yes/no dialog</string>
+    <string name="dialog_title_yesno_preference">Do you like bananas?</string>
+
+    <string name="title_fragment_preference">Fragment preference</string>
+    <string name="summary_fragment_preference">Shows another fragment of preferences</string>
+
+    <string name="records_preferences">Record Preferences</string>
+    <string name="record_handing">Item Record Preferences</string>
+    <string name="summary_record_handling">How certain records are further handled (eg. deleted, past due, etc.).</string>
+
+    <string name="remove_pastdue">Remove Past Due</string>
+    <string name="summary_remove_pastdue">Click to delete all items now past due.</string>
+
+    <string name="remove_deleted">Remove Deleted Items</string>
+    <string name="summary_remove_deleted">Click to permanently remove deleted items.</string>
+
+    <string name="show_deleted">Show Deleted Items</string>
+    <string name="summary_show_deleted">Check to display any deleted items with an overstrike.</string>
+
+    <string name="data_online">Data Online</string>
+    <string name="summary_data_online">Data will be online</string>
+
+    <string name="sync_data">Sync Data...</string>
+    <string name="summary_sync_data">Sync your data with your other devices using your Google Drive.</string>
+
+    <string name="export_records">Export Records...</string>
+    <string name="summary_export_records">Export records to a file.</string>
+
+    <string name="import_records">Import Records...</string>
+    <string name="summary_import_records">Click to attempt to import records from a file.</string>
+
+    <string name="title_intent_preference">Intent preference</string>
+    <string name="summary_intent_preference">Launches an Activity from an Intent</string>
+
+    <string name="title_my_preference">My preference</string>
+    <string name="summary_my_preference">This is a custom counter preference</string>
+
+    <string name="title_advanced_toggle_preference">Haunted preference</string>
+    <string name="summary_on_advanced_toggle_preference">I\'m on! :)</string>
+    <string name="summary_off_advanced_toggle_preference">I\'m off! :(</string>
+
+    <string name="export_data">This will export the data to the file,\nDo you wish to continue?</string>
+
+    <string name="time_hint">Date and Time</string>
+
+    <string name="clockface">Clock Dial</string>
+
+    <string name="settings">Settings</string>
+    <string name="login">Sign in...</string>
+    <string name="logout">Sign out</string>
+
+    <string name="errors">Errors</string>
+    <string name="throwError">Throw Error</string>
+    <string name="sync">Sync Data...</string>
+    <string name="syncDelete">Delete Sync</string>
+    <string name="exportData">Export Data...</string>
+    <string name="legal">Legal Notices</string>
+    <string name="help">Help</string>
+    <string name="about">About</string>
+
+    <string name="crash_dialog_text">Error!</string>
+
+    <string name="firebase_status_fmt">Firebase User: %s</string>
+    <string name="google_status_fmt">Google User: %s</string>
+    <string name="facebook_status_fmt">Facebook User: %s</string>
+
+    <string name="desc_firebase_lockup">Firebase logo and name</string>
+    <string name="google_title_text">Google Sign In</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="signed_out">Signed Out</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="loading">Loading…</string>
+
+</resources>

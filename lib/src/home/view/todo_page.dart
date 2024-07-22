@@ -1,4 +1,5 @@
-import 'package:workingmemory/src/view.dart';
+//
+import '/src/view.dart';
 
 ///
 class TodoPage extends StatefulWidget {

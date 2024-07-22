@@ -1,2 +1,2 @@
 ///
-export 'package:workingmemory/src/home/controller/todos.dart';
+export '/src/home/controller/todos.dart';

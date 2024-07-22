@@ -6,11 +6,11 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 
 import 'package:flutter_draggable_gridview/flutter_draggable_gridview.dart';
 
-import 'package:workingmemory/src/controller.dart';
+import '/src/controller.dart';
 
-import 'package:workingmemory/src/model.dart' hide Icon, Icons;
+import '/src/model.dart' hide Icon, Icons;
 
-import 'package:workingmemory/src/view.dart' hide ColorPicker;
+import '/src/view.dart' hide ColorPicker;
 
 /// Edit and arrange your favourite icons.
 class FavIcons extends StatefulWidget {

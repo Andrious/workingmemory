@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#000000</color>
+    <color name="bold_color">#f4f9f5</color>
+    <color name="logo_color">#f00e02</color>
+    <color name="white">#ffffff</color>
+    <color name="rowBottomRed">#f47564</color>
+    <color name="rowTopGrey">#70686c</color>
+    <color name="loginbackground">#1d98d4</color>
+    <color name="neverforget">#2780ba</color>
+    <color name="gmail">#34495e</color>
+    <color name="restlogin">#1d98d4</color>
+    <color name="hintcolor">#e2e2e2</color>
+    <color name="btnbakgrnd">#00A5C5</color>
+
+    <color name="RSSOrange">#FF7400</color>
+
+    <color name="colorAccent">#FFA000</color>
+
+    <color name="grey_100">#F5F5F5</color>
+    <color name="grey_300">#E0E0E0</color>
+</resources>

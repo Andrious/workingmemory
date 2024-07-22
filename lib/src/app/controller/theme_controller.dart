@@ -16,12 +16,11 @@
 ///          Created  07 Jun 2020
 ///
 
-import 'package:workingmemory/src/view.dart' hide ColorPicker;
+import '/src/view.dart' hide ColorPicker;
 
-import 'package:workingmemory/src/controller.dart'
-    show App, StateXController, Prefs;
+import '/src/controller.dart' show App, StateXController, Prefs;
 
-import 'package:workingmemory/src/model.dart';
+import '/src/model.dart';
 
 import 'package:flutter_system_ringtones/flutter_system_ringtones.dart'
     show Ringtone;

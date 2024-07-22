@@ -77,22 +77,25 @@ class _DraggableFabState extends State<DraggableFab> {
   }
 
   @override
-  Widget build(BuildContext context) => Stack(children: [
-        Positioned(
-          left: left,
-          top: top,
-          child: Draggable(
-            feedback: widget.button,
-            onDragStarted: widget.onDragStarted,
-            onDragUpdate: widget.onDragUpdate,
-            onDraggableCanceled: widget.onDraggableCanceled,
-            onDragEnd: handleDragEnded,
-            onDragCompleted: widget.onDragCompleted,
-            childWhenDragging: const SizedBox(),
-            child: widget.button,
-          ),
-        )
-      ]);
+  Widget build(BuildContext context) {
+    final widget = this.widget;
+    return Stack(children: [
+      Positioned(
+        left: left,
+        top: top,
+        child: Draggable(
+          feedback: widget.button,
+          onDragStarted: widget.onDragStarted,
+          onDragUpdate: widget.onDragUpdate,
+          onDraggableCanceled: widget.onDraggableCanceled,
+          onDragEnd: handleDragEnded,
+          onDragCompleted: widget.onDragCompleted,
+          childWhenDragging: const SizedBox(),
+          child: widget.button,
+        ),
+      )
+    ]);
+  }
 
   void handleDragEnded(DraggableDetails draggableDetails) {
     //

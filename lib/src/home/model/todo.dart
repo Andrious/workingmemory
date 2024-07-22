@@ -16,7 +16,7 @@
 ///          Created  23 Jun 2018
 ///
 
-import 'package:workingmemory/src/model.dart';
+import '/src/model.dart';
 
 ///
 class ToDo extends SQLiteDB {

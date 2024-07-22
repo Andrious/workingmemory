@@ -4,7 +4,7 @@
 ///
 
 /// Import the interface
-import 'package:workingmemory/src/view.dart';
+import '/src/view.dart';
 
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 

@@ -24,6 +24,6 @@ export 'package:fluttery_framework/view.dart' hide LoadingScreen;
 
 export 'package:form_field_widgets/form_field_widgets.dart';
 
-export 'package:workingmemory/src/app/app_view.dart';
+export '/src/app/app_view.dart';
 
-export 'package:workingmemory/src/home/home_view.dart';
+export '/src/home/home_view.dart';

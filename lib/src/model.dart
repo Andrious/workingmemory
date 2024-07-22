@@ -32,7 +32,7 @@ export 'package:firebase_database/firebase_database.dart'
     show DataSnapshot, DatabaseReference, DatabaseEvent, Query;
 
 /// App's model
-export 'package:workingmemory/src/app/app_model.dart';
+export '/src/app/app_model.dart';
 
 /// Homescreen's model
-export 'package:workingmemory/src/home/home_model.dart';
+export '/src/home/home_model.dart';

@@ -21,12 +21,11 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 
-import 'package:workingmemory/src/model.dart' show Settings;
+import '/src/model.dart' show Settings;
 
-import 'package:workingmemory/src/view.dart'
-    show L10nTranslate, NotificationSettings, SignIn;
+import '/src/view.dart' show L10nTranslate, NotificationSettings, SignIn;
 
-import 'package:workingmemory/src/controller.dart' show Controller;
+import '/src/controller.dart' show Controller;
 
 import 'settings_group.dart';
 

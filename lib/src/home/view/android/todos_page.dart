@@ -1,8 +1,8 @@
-import 'package:workingmemory/src/controller.dart' show App, Controller;
+import '/src/controller.dart' show App, Controller;
 
-import 'package:workingmemory/src/model.dart' hide Icon, Icons;
+import '/src/model.dart' hide Icon, Icons;
 
-import 'package:workingmemory/src/view.dart';
+import '/src/view.dart';
 
 /// MVC design pattern is the 'View' -- the build() in this State object.
 class TodosAndroid extends StateX<TodosPage> {
@@ -164,7 +164,10 @@ class TodosAndroid extends StateX<TodosPage> {
         );
       }
     } else {
-      actions = [settingsButton];
+      actions = [
+        if (Settings.showBottomBar) widget.sortArrow,
+        settingsButton,
+      ];
     }
 
     if (!Settings.leadingDrawer) {
@@ -179,47 +182,9 @@ class TodosAndroid extends StateX<TodosPage> {
       }
     }
 
-    // // This widget appears across the bottom of the app bar.
-    // PreferredSizeWidget? bottomBar;
-    // if (Settings.showBottomBar) {
-    //   IconData icon;
-    //   String orderBy = Settings.itemsOrder;
-    //   if (orderBy == 'descending') {
-    //     icon = Icons.south;
-    //   } else {
-    //     icon = Icons.north;
-    //   }
-    //   bottomBar = PreferredSize(
-    //     preferredSize: const Size(75, 75),
-    //     child: Row(
-    //         mainAxisAlignment:
-    //             leftSided ? MainAxisAlignment.start : MainAxisAlignment.end,
-    //         children: [
-    //           if (leftSided) const SizedBox(width: 10),
-    //           SizedBox(
-    //             width: 50,
-    //             height: 60,
-    //             child: InkWell(
-    //               onTap: () {
-    //                 orderBy =
-    //                     orderBy == 'ascending' ? 'descending' : 'ascending';
-    //                 Settings.itemsOrder = orderBy;
-    //                 _con.requery();
-    //                 setState(() {});
-    //               },
-    //               child: Icon(icon, color: Colors.white),
-    //             ),
-    //           ),
-    //           if (!leftSided) const SizedBox(width: 10),
-    //         ]),
-    //   );
-    // }
-
     return AppBar(
       title: title,
       actions: actions,
-//      bottom: bottomBar,
-      bottom: widget.sortArrow,
     );
   }
 
@@ -230,7 +195,7 @@ class TodosAndroid extends StateX<TodosPage> {
       builder: (BuildContext context) => TodoPage(todo: todo),
       fullscreenDialog: true,
     );
-    await Navigator.of(context).push(route);
+    await Navigator.of(context, rootNavigator: true).push(route);
     // Refresh the previous screen
     setState(() {});
   }

@@ -19,13 +19,13 @@
 
 import 'package:flutter/cupertino.dart';
 
-import 'package:workingmemory/src/model.dart' show Settings;
+import '/src/model.dart' show Settings;
 
-import 'package:workingmemory/src/home/view/ios/styles.dart';
+import '/src/home/view/ios/styles.dart';
 
-import 'package:workingmemory/src/home/view/ios/settings_group.dart';
+import '/src/home/view/ios/settings_group.dart';
 
-import 'package:workingmemory/src/home/view/ios/settings_item.dart';
+import '/src/home/view/ios/settings_item.dart';
 
 ///
 class NotificationSettings extends StatelessWidget {

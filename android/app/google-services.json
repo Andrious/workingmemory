@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "761477102089-bhst4c709gd7f0355rtqjpm5p2mevcp6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.andrioussolutions.authenticationapp",
+            "certificate_hash": "2d886d7f29d090e362cfdcd73e2ab9051a60c825"
+          }
+        },
+        {
           "client_id": "761477102089-nvjf1gpjr89mkvhld3kukp831r0ep1qi.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -56,10 +64,10 @@
               "client_type": 3
             },
             {
-              "client_id": "761477102089-aagj9gv953797r2gmpj9fvh5p8b2uc98.apps.googleusercontent.com",
+              "client_id": "761477102089-80ps6f4vbepm52qnb6b48vsvilbjr064.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.andrioussolutions.authenticationApp"
+                "bundle_id": "com.andrioussolutions.workingmemory.RunnerTests"
               }
             }
           ]
@@ -108,10 +116,10 @@
               "client_type": 3
             },
             {
-              "client_id": "761477102089-aagj9gv953797r2gmpj9fvh5p8b2uc98.apps.googleusercontent.com",
+              "client_id": "761477102089-80ps6f4vbepm52qnb6b48vsvilbjr064.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.andrioussolutions.authenticationApp"
+                "bundle_id": "com.andrioussolutions.workingmemory.RunnerTests"
               }
             }
           ]

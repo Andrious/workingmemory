@@ -30,16 +30,14 @@ import 'package:fluttery_framework/controller.dart'; // as c;
 
 import 'package:package_info_plus/package_info_plus.dart' show PackageInfo;
 
-import 'package:workingmemory/src/controller.dart'
-    show AppController, Controller, ThemeController;
+import '/src/controller.dart' show AppController, Controller, ThemeController;
 
-import 'package:workingmemory/src/model.dart'
+import '/src/model.dart'
     show CloudDB, DefaultFirebaseOptions, FireBaseDB, RemoteConfig;
 
-import 'package:workingmemory/src/view.dart'
-    show AppErrorHandler, Prefs, showBox;
+import '/src/view.dart' show AppErrorHandler, Prefs, showBox;
 
-import 'package:workingmemory/src/view.dart' as v;
+import '/src/view.dart' as v;
 
 /// The Controller for the Application as a whole.
 class WorkingController extends AppController {
@@ -118,7 +116,7 @@ class WorkingController extends AppController {
   @override
   void dispose() {
     if (!App.hotReload) {
-      _con.dispose();
+      _con.disposed();
       _auth.dispose();
       _remoteConfig.dispose();
 //    L10n.dispose();

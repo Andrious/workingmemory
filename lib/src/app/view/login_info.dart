@@ -16,10 +16,9 @@
 ///          Created  22 Aug 2018
 import 'dart:async' show Future;
 
-import 'package:workingmemory/src/view.dart';
+import '/src/view.dart';
 
-import 'package:workingmemory/src/controller.dart'
-    show AppDrawer, WorkingController;
+import '/src/controller.dart' show AppDrawer, WorkingController;
 
 ///
 class LoginInfo {

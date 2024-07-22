@@ -4,9 +4,9 @@
 
 import 'package:flutter/material.dart' show StateSetter;
 
-import 'package:workingmemory/src/model.dart';
+import '/src/model.dart';
 
-import 'package:workingmemory/src/view.dart' hide ColorPicker;
+import '/src/view.dart' hide ColorPicker;
 
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 

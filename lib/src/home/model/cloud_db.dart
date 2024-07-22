@@ -26,15 +26,15 @@ import 'package:firebase_database/firebase_database.dart'
     show DatabaseReference, DatabaseEvent;
 
 ///
-import 'package:workingmemory/src/controller.dart'
+import '/src/controller.dart'
     show App, Controller, DeviceInfo, WorkingController;
 
 ///
-import 'package:workingmemory/src/model.dart'
+import '/src/model.dart'
     show AppModel, FireBaseDB, Model, Semaphore, LocalSyncDB;
 
 ///
-import 'package:workingmemory/src/view.dart';
+import '/src/view.dart';
 
 /// What is done, with every change, it's recorded in every other device
 /// to be synced when those devices start up.

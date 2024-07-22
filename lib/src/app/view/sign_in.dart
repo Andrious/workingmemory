@@ -17,9 +17,9 @@
 ///
 ///
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:workingmemory/src/app/view/loading_screen.dart';
-import 'package:workingmemory/src/controller.dart';
-import 'package:workingmemory/src/view.dart';
+import '/src/app/view/loading_screen.dart';
+import '/src/controller.dart';
+import '/src/view.dart';
 
 ///
 class SignIn extends StatefulWidget {
@@ -119,9 +119,9 @@ class _SignInState extends StateX<SignIn> {
               onTap: () async {
                 spinner.start();
                 final bool signIn = await app.signInWithGoogle();
-                if (signIn) {
-                  Navigator.pop(context);
-                }
+//                if (signIn) {
+                Navigator.pop(context);
+                //               }
               },
               child: Container(
                 padding: const EdgeInsets.all(15),

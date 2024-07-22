@@ -1,6 +1,6 @@
-import 'package:workingmemory/src/model.dart';
+import '/src/model.dart';
 
-import 'package:workingmemory/src/view.dart';
+import '/src/view.dart';
 
 ///
 ///

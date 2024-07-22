@@ -16,7 +16,7 @@
 ///          Created  26 Oct 2020
 ///
 
-import 'package:workingmemory/src/model.dart';
+import '/src/model.dart';
 
 ///
 class IconFavourites {

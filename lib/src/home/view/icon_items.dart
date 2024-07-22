@@ -17,7 +17,7 @@
 ///
 //import 'dart:developer';
 
-import 'package:workingmemory/src/view.dart';
+import '/src/view.dart';
 
 ///
 class IconItems extends StatelessWidget {

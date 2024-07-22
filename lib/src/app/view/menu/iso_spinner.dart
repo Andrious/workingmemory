@@ -1,7 +1,7 @@
 // //import 'dart:math' show cos, pi;
 //
 // //import 'package:flutter/material.dart';
-// import 'package:workingmemory/src/view.dart';
+// import '/src/view.dart';
 //
 // import 'package:l10n_translator/l10n.dart';
 //

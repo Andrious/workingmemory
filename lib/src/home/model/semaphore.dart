@@ -1,7 +1,7 @@
 // Copyright 2018 Andrious Solutions Ltd. All rights reserved.
 // Use of this source code is governed by a Apache License, Version 2.0 that can be
 // found in the LICENSE file.
-import 'package:workingmemory/src/model.dart';
+import '/src/model.dart';
 
 // ignore: avoid_classes_with_only_static_members
 ///

@@ -2,10 +2,10 @@ name: workingmemory
 description: A ToDo List for a not so working memory
 publish_to: none
 
-version: 1.12.0
+version: 1.13.0
 
 environment:
-  sdk: ">=2.18.0 <4.0.0"
+  sdk: '>=3.0.0 <4.0.0'
 
 #  flutter: ">=1.17.0"
 
@@ -16,6 +16,7 @@ dependencies:
   auth: #^8.0.0
     git:
       url: https://github.com/AndriousSolutions/auth
+#    path: C:/Programs/Tools/Projects/Flutter/packages/auth
 
   # https://pub.dev/packages/auto_orientation/
   auto_orientation: 2.3.1
@@ -31,7 +32,7 @@ dependencies:
 
   # https://pub.dev/packages/firebase_crashlytics
   # Missing iOS Integration.
-  firebase_crashlytics: ^3.0.0
+  firebase_crashlytics: any #^4.0.0
 
   flutter:
     sdk: flutter
@@ -54,7 +55,7 @@ dependencies:
   flutter_system_ringtones: 0.0.6
 
   # https://pub.dev/packages/flutter_timezone
-  flutter_timezone: ^1.0.0
+  flutter_timezone: ^2.0.0
 
   # https://pub.dev/packages/fluttery_framework
   fluttery_framework: ^4.0.0
@@ -66,6 +67,7 @@ dependencies:
   form_field_widgets:
     git:
       url: https://github.com/AndriousSolutions/form_field_widgets/
+#    path: ../../../packages/form_field_widgets
 
   # https://pub.dev/packages/l10n_translator
   l10n_translator: ^4.0.0

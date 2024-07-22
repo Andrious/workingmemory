@@ -16,11 +16,11 @@
 ///          Created  10 Sep 2018
 ///
 
-import 'package:workingmemory/src/model.dart' show Settings;
+import '/src/model.dart' show Settings;
 
-import 'package:workingmemory/src/view.dart' hide ColorPicker;
+import '/src/view.dart' hide ColorPicker;
 
-import 'package:workingmemory/src/controller.dart';
+import '/src/controller.dart';
 
 /// The Settings widget
 class SettingsWidget extends StatefulWidget {

@@ -1,6 +1,7 @@
-import 'package:workingmemory/src/view.dart' hide ColorPicker;
+//
+import '/src/view.dart' hide ColorPicker;
 
-import 'package:workingmemory/src/model.dart' hide Icon, Icons;
+import '/src/model.dart' hide Icon, Icons;
 
 import 'package:flutter_system_ringtones/flutter_system_ringtones.dart';
 
@@ -34,8 +35,11 @@ class PhoneSounds {
   Future<void> show(BuildContext _context) async {
     // Current saved Ringtone
     _ringToneId = Prefs.getString('RingTone');
-    final currentTone =
-        _notifications?.firstWhere((tone) => tone.id == _ringToneId);
+    Ringtone? currentTone;
+    if (_ringToneId != null && _ringToneId!.isNotEmpty) {
+      currentTone =
+          _notifications?.firstWhere((tone) => tone.id == _ringToneId);
+    }
     if (currentTone != null) {
       _ringToneIndex = _notifications!.indexOf(currentTone);
       _controller = ScrollController(

@@ -15,11 +15,11 @@
 ///
 ///          Created  16 Jun 2018
 
-import 'package:workingmemory/src/controller.dart' show Controller;
+import '/src/controller.dart' show Controller;
 
-import 'package:workingmemory/src/model.dart' hide Icon, Icons;
+import '/src/model.dart' hide Icon, Icons;
 
-import 'package:workingmemory/src/view.dart';
+import '/src/view.dart';
 
 ///
 class TodosPage extends StatefulWidget {
@@ -30,13 +30,8 @@ class TodosPage extends StatefulWidget {
   State createState() => App.useMaterial ? TodosAndroid() : TodosiOS();
 
   ///
-  PreferredSizeWidget? get sortArrow {
+  Widget get sortArrow {
     //
-    if (!Settings.showBottomBar) {
-      PreferredSizeWidget? bottomBar;
-      return bottomBar;
-    }
-
     IconData icon;
     String orderBy = Settings.itemsOrder;
     if (orderBy == 'descending') {
@@ -47,33 +42,30 @@ class TodosPage extends StatefulWidget {
 
     final leftSided = Settings.leftSided;
 
-    return PreferredSize(
-      preferredSize: const Size(75, 75),
-      child: Row(
-          mainAxisAlignment:
-              leftSided ? MainAxisAlignment.start : MainAxisAlignment.end,
-          children: [
-            if (leftSided) const SizedBox(width: 10),
-            SizedBox(
-              width: 50,
-              height: 60,
-              child: InkWell(
-                onTap: () {
-                  orderBy = orderBy == 'ascending' ? 'descending' : 'ascending';
-                  Settings.itemsOrder = orderBy;
-                  final _con = Controller();
-                  _con.requery();
-                  _con.setState(() {});
-                },
-                child: Icon(
-                  icon,
-                  size: App.useCupertino ? 22 : null,
-                  color: App.useCupertino ? null : Colors.white,
-                ),
+    return Row(
+        mainAxisAlignment:
+            leftSided ? MainAxisAlignment.start : MainAxisAlignment.end,
+        children: [
+          if (leftSided) const SizedBox(width: 10),
+          SizedBox(
+            width: 50,
+            height: 60,
+            child: InkWell(
+              onTap: () {
+                orderBy = orderBy == 'ascending' ? 'descending' : 'ascending';
+                Settings.itemsOrder = orderBy;
+                final _con = Controller();
+                _con.requery();
+                _con.setState(() {});
+              },
+              child: Icon(
+                icon,
+                size: App.useCupertino ? 22 : null,
+                color: App.useCupertino ? null : Colors.white,
               ),
             ),
-            if (!leftSided) const SizedBox(width: 10),
-          ]),
-    );
+          ),
+          if (!leftSided) const SizedBox(width: 10),
+        ]);
   }
 }

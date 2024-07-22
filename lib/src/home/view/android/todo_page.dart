@@ -18,11 +18,11 @@
 
 import 'dart:async' show Future;
 
-import 'package:workingmemory/src/model.dart' hide Icon, Icons;
+import '/src/model.dart' hide Icon, Icons;
 
-import 'package:workingmemory/src/view.dart';
+import '/src/view.dart';
 
-import 'package:workingmemory/src/controller.dart';
+import '/src/controller.dart';
 
 ///
 class TodoAndroid extends StateX<TodoPage> {
@@ -54,7 +54,6 @@ class TodoAndroid extends StateX<TodoPage> {
     return Scaffold(
       appBar: _appBar(title: _con.data.title, leftHanded: _leftHanded),
       body: Form(
-        onWillPop: _onWillPop,
         child: _con.data.linkForm(
           ListView(
             padding: const EdgeInsets.all(16),
@@ -91,15 +90,17 @@ class TodoAndroid extends StateX<TodoPage> {
         ),
       );
 
-  Future<bool> _onWillPop() async {
+  Future<void> _onPopInvoked(bool didPop) async {
+    //
     if (!_con.data.hasChanged) {
-      return true;
+      return;
     }
 
     final TextStyle dialogTextStyle = theme!.textTheme.titleMedium!
         .copyWith(color: theme!.textTheme.bodySmall!.color);
 
-    return await showDialog<bool>(
+    final pop = await showDialog<bool>(
+          useRootNavigator: false,
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
@@ -109,6 +110,10 @@ class TodoAndroid extends StateX<TodoPage> {
           },
         ) ??
         false;
+
+    if (pop) {
+      await Navigator.maybePop(context);
+    }
   }
 
   List<Widget> _listWidgets() {
@@ -159,7 +164,7 @@ class TodoAndroid extends StateX<TodoPage> {
         InkWell(
           onLongPress: _editFavIcons,
           child: Container(
-            height: 100,
+            height: 10.h, //100,
             decoration: BoxDecoration(
               border: Border.all(width: 4),
               borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -185,7 +190,7 @@ class TodoAndroid extends StateX<TodoPage> {
           // So to access the Scaffold's state object.
           _scaffoldContext = context;
           return SizedBox(
-            height: 600,
+            height: 60.h, //600,
             child: IconItems(
               icons: _con.icons,
               icon: _con.data.icon!,

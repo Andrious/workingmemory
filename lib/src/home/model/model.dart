@@ -16,11 +16,11 @@
 ///          Created  23 Jun 2018
 ///
 
-import 'dart:async' show Future, unawaited;
+import 'dart:async' show Future;
 
-import 'package:workingmemory/src/model.dart';
+import '/src/model.dart';
 
-import 'package:workingmemory/src/view.dart';
+import '/src/view.dart';
 
 ///
 class Model {

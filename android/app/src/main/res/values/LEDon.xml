@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="LedOnMS_rates">
+        <item>0.1</item>
+        <item>0.3</item>
+        <item>0.5</item>
+    </string-array>
+</resources>

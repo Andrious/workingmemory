@@ -1,27 +1,18 @@
 ///
-/// Copyright (C) 2018 Andrious Solutions
-///
-/// Licensed under the Apache License, Version 2.0 (the "License");
-/// you may not use this file except in compliance with the License.
-/// You may obtain a copy of the License at
-///
-/// http://www.apache.org/licenses/LICENSE-2.0
-///
-/// Unless required by applicable law or agreed to in writing, software
-/// distributed under the License is distributed on an "AS IS" BASIS,
-/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-/// See the License for the specific language governing permissions and
-/// limitations under the License.
+/// Copyright (C) 2018 Andrious Solutions Ltd. All rights reserved.
+/// Use of this source code is governed by the Apache License, Version 2.0.
+/// The main directory contains that LICENSE file.
 ///
 ///          Created  04 Nov 2018
+///
 import 'dart:async' show Future;
 
 import 'package:auth/auth.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
-import 'package:workingmemory/src/controller.dart';
-import 'package:workingmemory/src/model.dart' as m;
-import 'package:workingmemory/src/view.dart';
+import '/src/controller.dart';
+import '/src/model.dart' as m;
+import '/src/view.dart';
 
 ///
 final ThemeData? theme = App.themeData;
@@ -178,8 +169,8 @@ class Controller extends StateXController with ConnectivityListener {
     return save;
   }
 
-  @override
-  void dispose() {
+  /// Called by the App's Controller
+  void disposed() {
     _model.dispose();
     _notifications.dispose();
     _this = null;
@@ -482,6 +473,7 @@ class ToDoEdit extends DataFields {
       notifyColor = todo?['LEDColor'] == 0 ? notifyColor : todo?['LEDColor'];
     } else {
       _item = ' ';
+      dateTime = null;
       icon = con.defaultIcon;
       notifyColor = Colors.blue.value;
     }
@@ -497,7 +489,10 @@ class ToDoEdit extends DataFields {
       controller?.text = _item;
     }
 
-    dateTime = dateTime ?? DateTime.now();
+    dateTime = dateTime ??
+        DateTime.now()
+            .copyWith(second: 0, millisecond: 0, microsecond: 0)
+            .add(const Duration(hours: 1));
   }
 
   /// Retrieve the to-do items from the database

@@ -17,11 +17,11 @@
 ///
 ///
 
-import 'package:workingmemory/src/model.dart' show Settings;
+import '/src/model.dart' show Settings;
 
-import 'package:workingmemory/src/view.dart';
+import '/src/view.dart';
 
-import 'package:workingmemory/src/controller.dart' show Controller;
+import '/src/controller.dart' show Controller;
 
 ///
 //class WorkMenu extends Menu {

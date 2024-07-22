@@ -30,8 +30,10 @@ class DTAndroid extends StatelessWidget {
 
   ///
   final DateTime date;
+
   ///
   final TimeOfDay time;
+
   ///
   final ValueChanged<DateTime> onChanged;
 
@@ -40,7 +42,7 @@ class DTAndroid extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     return DefaultTextStyle(
-        style: theme.textTheme.subtitle1!,
+        style: theme.textTheme.titleSmall!,
         child: Row(children: <Widget>[
           Expanded(
               child: Container(

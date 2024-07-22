@@ -15,7 +15,7 @@
 ///
 ///          Created  04 Nov 2021
 
-import 'package:workingmemory/src/view.dart';
+import '/src/view.dart';
 
 ///
 /// This is just a basic `Scaffold` with a centered `CircularProgressIndicator`

@@ -1,4 +1,8 @@
 
+## 1.13.0
+ July 21, 2024
+- Updated import statements to exclude package name
+
 ## 1.12.0
  December 01, 2023
 - Updated Flutter and dependencies

@@ -16,11 +16,11 @@
 ///          Created  01 Mar 2020
 
 /// place: "/todos"
-import 'package:workingmemory/src/controller.dart' show Controller;
+import '/src/controller.dart' show Controller;
 
-import 'package:workingmemory/src/model.dart' show Settings;
+import '/src/model.dart' show Settings;
 
-import 'package:workingmemory/src/view.dart';
+import '/src/view.dart';
 
 ///
 class TodosiOS extends StateX<TodosPage> {
@@ -35,12 +35,9 @@ class TodosiOS extends StateX<TodosPage> {
   late Widget _leading;
   late Widget _trailing;
 
-  // The iOS version
+  /// The iOS version
   @override
-  Widget buildiOS(BuildContext context) => buildAndroid(context);
-
-  @override
-  Widget buildAndroid(BuildContext context) {
+  Widget buildiOS(BuildContext context) {
     // Supply the leading and trailing buttons.
     _supplyButtons();
     return CupertinoPageScaffold(
@@ -59,6 +56,9 @@ class TodosiOS extends StateX<TodosPage> {
       ),
     );
   }
+
+  @override
+  Widget buildAndroid(BuildContext context) => buildiOS(context);
 
   ///
   Future<void> editToDo(BuildContext context,
